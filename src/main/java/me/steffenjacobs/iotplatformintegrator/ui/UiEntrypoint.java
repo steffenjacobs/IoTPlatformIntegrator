@@ -1,11 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.ui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -17,21 +14,16 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.DocumentEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
-import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
-import me.steffenjacobs.iotplatformintegrator.ui.util.DocumentAdapter;
 
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
 
 	private final static Logger LOG = LoggerFactory.getLogger(UiEntrypoint.class);
 
-	private final SettingService settingService = new SettingService("./settings.config");
+	private static final UiFactory UI_FACTORY = new UiFactory();
 
 	private void createAndShowGUI() {
 		// Creating the Frame
@@ -59,7 +51,7 @@ public class UiEntrypoint {
 		mImportRules.add(mImportRulesFromOpenhab);
 
 		JMenuItem mSettings = new JMenuItem("Settings");
-		mSettings.addActionListener(e -> createSettingsFrame().setVisible(true));
+		mSettings.addActionListener(e -> UI_FACTORY.createSettingsFrame().setVisible(true));
 
 		m1.add(mImportRules);
 		m1.add(mSettings);
@@ -84,64 +76,6 @@ public class UiEntrypoint {
 		frame.getContentPane().add(BorderLayout.NORTH, mb);
 		frame.getContentPane().add(BorderLayout.CENTER, ta);
 		frame.setVisible(true);
-	}
-
-	private JFrame createSettingsFrame() {
-		JFrame frame = new JFrame("OpenHAB Settings");
-		frame.setSize(400, 400);
-
-		JButton btnSave = new JButton("Save");
-		JPanel contentPanel = new JPanel();
-
-		contentPanel.add(createSettingField(SettingKey.OPENHAB_URI, btnSave));
-		contentPanel.add(btnSave);
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-
-		frame.add(contentPanel);
-
-		btnSave.setEnabled(false);
-		btnSave.addActionListener(e -> {
-			btnSave.setEnabled(false);
-		});
-
-		return frame;
-	}
-
-	private JPanel createSettingField(final SettingKey key, final JButton saveButton) {
-		JLabel settingsLabel = new JLabel(key.getTitle() + ":");
-		JTextField settingsField = new JTextField(settingService.getSetting(SettingKey.OPENHAB_URI));
-		JButton settingsButton = new JButton("Restore Default");
-
-		settingsField.getDocument().addDocumentListener(new DocumentAdapter() {
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				saveButton.setEnabled(true);
-				settingsButton.setEnabled(!settingsField.getText().equals(SettingKey.OPENHAB_URI.getDefaultValue()));
-			}
-		});
-
-		settingsButton.addActionListener(e -> {
-			settingsField.setText(SettingKey.OPENHAB_URI.getDefaultValue());
-			saveButton.doClick();
-		});
-		settingsButton.setEnabled(!settingsField.getText().equals(SettingKey.OPENHAB_URI.getDefaultValue()));
-
-		saveButton.addActionListener(e -> {
-			settingService.setSetting(SettingKey.OPENHAB_URI, settingsField.getText());
-		});
-
-		return wrapToPanel(settingsLabel, settingsField, settingsButton);
-
-	}
-
-	private JPanel wrapToPanel(JLabel label, JComponent... components) {
-		JPanel panel = new JPanel();
-		panel.add(label);
-		for (JComponent component : components) {
-			panel.add(component);
-		}
-		panel.setLayout(new FlowLayout());
-		return panel;
 	}
 
 	public void createAndShowGUIAsync() {
