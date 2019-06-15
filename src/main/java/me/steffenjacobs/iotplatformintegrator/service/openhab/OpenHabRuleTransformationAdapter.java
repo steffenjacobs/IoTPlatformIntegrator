@@ -1,17 +1,21 @@
 package me.steffenjacobs.iotplatformintegrator.service.openhab;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Action;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
+import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType;
 
@@ -19,7 +23,29 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType;
 public class OpenHabRuleTransformationAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(OpenHabRuleTransformationAdapter.class);
 
-	public SharedCondition transformCondition(Condition condition) {
+	public SharedRule transformRule(ExperimentalRule rule) {
+		String ruleName = rule.getName();
+		String ruleUid = rule.getUid();
+		String description = rule.getDescription();
+		String status = getReadeableStatus(rule);
+		String visible = rule.getVisibility();
+		Set<SharedCondition> conditions = new HashSet<>();
+		for (Condition condition : rule.getConditions()) {
+			conditions.add(transformCondition(condition));
+		}
+		Set<SharedTrigger> triggers = new HashSet<>();
+		for (Trigger trigger : rule.getTriggers()) {
+			triggers.add(transformTrigger(trigger));
+		}
+		Set<SharedAction> actions = new HashSet<>();
+		for (Action action : rule.getActions()) {
+			actions.add(transformAction(action));
+		}
+		LOG.info("Transformed rule {}.", rule.getUid());
+		return new SharedRule(ruleName, ruleUid, description, visible, status, triggers, conditions, actions);
+	}
+
+	private SharedCondition transformCondition(Condition condition) {
 		if (condition.getConfiguration() == null || condition.getConfiguration().getAdditionalProperties() == null) {
 			LOG.info("Could not parse condition {}", condition.getId());
 			return null;
@@ -31,7 +57,7 @@ public class OpenHabRuleTransformationAdapter {
 		return new SharedCondition(getConditiontype(type), properties, description, label);
 	}
 
-	public SharedTrigger transformTrigger(Trigger t) {
+	private SharedTrigger transformTrigger(Trigger t) {
 		if (t.getConfiguration() == null || t.getConfiguration().getAdditionalProperties() == null || t.getConfiguration().getAdditionalProperties().isEmpty()) {
 			LOG.info("Could not parse trigger {}", t.getId());
 			return null;
@@ -74,7 +100,7 @@ public class OpenHabRuleTransformationAdapter {
 		return TriggerType.Unknown;
 	}
 
-	public SharedAction transformAction(Action a) {
+	private SharedAction transformAction(Action a) {
 		if (a.getConfiguration() == null || a.getConfiguration().getAdditionalProperties() == null || a.getConfiguration().getAdditionalProperties().isEmpty()) {
 			LOG.info("Could not parse action {}", a.getId());
 			return null;
@@ -102,5 +128,12 @@ public class OpenHabRuleTransformationAdapter {
 			return ActionType.ItemCommand;
 		}
 		return ActionType.Unknown;
+	}
+
+	private String getReadeableStatus(ExperimentalRule rule) {
+		if (rule.getStatus() == null) {
+			return "-";
+		}
+		return rule.getStatus().getStatus();
 	}
 }

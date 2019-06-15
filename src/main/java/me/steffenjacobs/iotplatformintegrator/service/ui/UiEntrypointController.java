@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
+import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 
 /** @author Steffen Jacobs */
@@ -15,11 +17,12 @@ public class UiEntrypointController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
+	private static final OpenHabRuleTransformationAdapter transformer = new OpenHabRuleTransformationAdapter();
 
 	private final SettingService settingService;
 	private UiEntrypoint ui;
 
-	private final List<ExperimentalRule> loadedRules = new ArrayList<>();
+	private final List<SharedRule> loadedRules = new ArrayList<>();
 
 	public UiEntrypointController(SettingService settingService) {
 		this.settingService = settingService;
@@ -31,15 +34,15 @@ public class UiEntrypointController {
 
 	public void loadOpenHABRules() {
 		loadedRules.clear();
-		loadedRules.addAll(ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI)));
-		for (ExperimentalRule rule : loadedRules) {
+		for (ExperimentalRule rule : ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI))) {
 			LOG.info("Retrieved rule '{}'", rule.getName());
+			loadedRules.add(transformer.transformRule(rule));
 		}
 		LOG.info("Retrieved {} rules.", loadedRules.size());
 		ui.refreshTable(loadedRules);
 	}
 
-	public ExperimentalRule getRuleByIndex(int index) {
+	public SharedRule getRuleByIndex(int index) {
 		if (index < 0 || index >= loadedRules.size()) {
 			return null;
 		}

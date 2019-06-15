@@ -11,18 +11,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Action;
-import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
-import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
-import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType.TriggerTypeSpecificKey;
-import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
-import me.steffenjacobs.iotplatformintegrator.service.openhab.RuleStringifyService;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 
 /** @author Steffen Jacobs */
@@ -39,8 +34,6 @@ public class RuleDetailsPanel extends JPanel {
 	private final JPanel actionsPanel;
 
 	private final JPanel noRuleSelected, ruleSelected;
-	private static final RuleStringifyService ruleStringifyService = new RuleStringifyService();
-	private static final OpenHabRuleTransformationAdapter transformer = new OpenHabRuleTransformationAdapter();
 
 	public RuleDetailsPanel(UiFactory uiFactory) {
 		super();
@@ -90,42 +83,23 @@ public class RuleDetailsPanel extends JPanel {
 		super.add(noRuleSelected, BorderLayout.NORTH);
 	}
 
-	public void setDisplayedRule(ExperimentalRule rule) {
+	public void setDisplayedRule(SharedRule rule) {
 		if (rule == null) {
 			super.removeAll();
 			super.add(noRuleSelected, BorderLayout.NORTH);
 		} else {
 			txtRuleName.setText(rule.getName());
-			txtUUID.setText(rule.getUid());
+			txtUUID.setText(rule.getId());
 			txtDescription.setText(rule.getDescription());
-			txtStatus.setText(ruleStringifyService.getReadeableStatus(rule));
-
-			conditionsPanel.removeAll();
-			for (Condition c : rule.getConditions()) {
-				SharedCondition transformedCondition = transformer.transformCondition(c);
-				if (transformedCondition == null) {
-					continue;
-				}
-				conditionsPanel.add(createConditionPanel(transformedCondition));
-			}
+			txtStatus.setText(rule.getStatus());
 
 			triggersPanel.removeAll();
-			for (Trigger t : rule.getTriggers()) {
-				SharedTrigger transformedTrigger = transformer.transformTrigger(t);
-				if (transformedTrigger == null) {
-					continue;
-				}
-				triggersPanel.add(createTriggerPanel(transformedTrigger));
-			}
-
+			conditionsPanel.removeAll();
 			actionsPanel.removeAll();
-			for (Action a : rule.getActions()) {
-				SharedAction transformedAction = transformer.transformAction(a);
-				if (transformedAction == null) {
-					continue;
-				}
-				actionsPanel.add(createActionPanel(transformedAction));
-			}
+			rule.getTriggers().forEach(t -> triggersPanel.add(createTriggerPanel(t)));
+			rule.getConditions().forEach(c -> conditionsPanel.add(createConditionPanel(c)));
+			rule.getActions().forEach(a -> actionsPanel.add(createActionPanel(a)));
+
 			super.removeAll();
 			super.add(ruleSelected, BorderLayout.NORTH);
 		}

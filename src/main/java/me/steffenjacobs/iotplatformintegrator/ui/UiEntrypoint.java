@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
@@ -108,9 +109,9 @@ public class UiEntrypoint {
 		javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
 	}
 
-	public void refreshTable(List<ExperimentalRule> rules) {
+	public void refreshTable(List<SharedRule> loadedRules) {
 		rulesTable.getSelectionModel().clearSelection();
 		ruleDetailsPanel.setDisplayedRule(null);
-		uiFactory.updateRuleTable(rulesTable, rules);
+		uiFactory.updateRuleTable(rulesTable, loadedRules);
 	}
 }

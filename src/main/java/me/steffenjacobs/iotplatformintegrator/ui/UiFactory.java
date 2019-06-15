@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
-import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DocumentAdapter;
@@ -28,15 +28,15 @@ public class UiFactory {
 		this.settingService = settingService;
 	}
 
-	public void updateRuleTable(JTable rulesTable, List<ExperimentalRule> rules) {
+	public void updateRuleTable(JTable rulesTable, List<SharedRule> rules) {
 		DefaultTableModel tableModel = (DefaultTableModel) rulesTable.getModel();
 
 		tableModel.setNumRows(0);
-		for (ExperimentalRule rule : rules) {
+		for (SharedRule rule : rules) {
 			String[] arr = new String[3];
 			arr[0] = rule.getName();
-			arr[1] = rule.getUid();
-			arr[2] = rule.getVisibility();
+			arr[1] = rule.getId();
+			arr[2] = rule.getVisible();
 			tableModel.addRow(arr);
 		}
 		tableModel.fireTableDataChanged();
