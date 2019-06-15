@@ -57,7 +57,7 @@ public class UiEntrypoint {
 		SwingUtilities.updateComponentTreeUI(frame);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1280, 720);
+		frame.setSize(1600, 900);
 
 		// Creating the MenuBar and adding components
 		JMenuBar mb = new JMenuBar();
@@ -95,7 +95,7 @@ public class UiEntrypoint {
 		// Adding Components to the frame.
 		frame.getContentPane().add(BorderLayout.SOUTH, panel);
 		frame.getContentPane().add(BorderLayout.NORTH, mb);
-		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(rulesTable));
+		frame.getContentPane().add(BorderLayout.WEST, new JScrollPane(rulesTable));
 		frame.getContentPane().add(BorderLayout.EAST, new JScrollPane(ruleDetailsPanel));
 		frame.setVisible(true);
 	}

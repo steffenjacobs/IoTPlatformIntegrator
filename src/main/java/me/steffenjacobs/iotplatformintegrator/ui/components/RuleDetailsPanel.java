@@ -1,14 +1,13 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
-import java.awt.GridBagConstraints;
+import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
-
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.RuleStringifyService;
@@ -29,65 +28,44 @@ public class RuleDetailsPanel extends JPanel {
 	public RuleDetailsPanel(UiFactory uiFactory) {
 		super();
 
-		ruleSelected = new JPanel();
+		final JPanel form = new JPanel();
+		form.setLayout(new GridBagLayout());
+		FormUtility formUtility = new FormUtility();
 
-		// setup grid layout
-		ruleSelected.setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.weightx = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(4, 4, 4, 4);
-		gbc.anchor = GridBagConstraints.WEST;
-
+		// Add fields
+		formUtility.addLabel("Name: ", form);
 		txtRuleName = new JTextField();
-		ruleSelected.add(new GridPane("Name:", txtRuleName), gbc);
-		gbc.gridy++;
+		formUtility.addLastField(txtRuleName, form);
 
+		formUtility.addLabel("UUID: ", form);
 		txtUUID = new JTextField();
-		ruleSelected.add(new GridPane("UUID:", txtUUID), gbc);
-		gbc.gridy++;
+		formUtility.addLastField(txtUUID, form);
 
+		formUtility.addLabel("Description: ", form);
 		txtDescription = new JTextField();
-		ruleSelected.add(new GridPane("Description:", txtDescription));
-		gbc.gridy++;
+		formUtility.addLastField(txtDescription, form);
 
+		formUtility.addLabel("Status: ", form);
 		txtStatus = new JTextField();
-		ruleSelected.add(new GridPane("Status:", txtStatus));
+		formUtility.addLastField(txtStatus, form);
 
+		form.setBorder(new EmptyBorder(2, 2, 2, 2));
+
+		// Add form panel to rule panel
+		ruleSelected = new JPanel();
+		ruleSelected.add(form);
 		ruleSelected.setBorder(BorderFactory.createTitledBorder("Rule Details"));
 
 		noRuleSelected = new JPanel();
-		noRuleSelected.add(new JLabel("Please select a rule to display the details."));
+		noRuleSelected.add(new JLabel("Please select a rule to display the details.                                                                          "));
 
-		super.add(noRuleSelected);
-	}
-
-	private class GridPane extends JPanel {
-		private static final long serialVersionUID = 4839797903102457482L;
-
-		public GridPane(String label, JComponent comp) {
-			setLayout(new GridBagLayout());
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.weightx = 1;
-			gbc.anchor = GridBagConstraints.WEST;
-			add(new JLabel(label), gbc);
-
-			gbc.gridx = 1;
-			gbc.gridy = 0;
-			gbc.anchor = GridBagConstraints.EAST;
-			add(comp, gbc);
-		}
-
+		super.add(noRuleSelected, BorderLayout.NORTH);
 	}
 
 	public void setDisplayedRule(ExperimentalRule rule) {
 		if (rule == null) {
 			super.removeAll();
-			super.add(noRuleSelected);
+			super.add(noRuleSelected, BorderLayout.NORTH);
 		} else {
 			txtRuleName.setText(rule.getName());
 			txtUUID.setText(rule.getUid());
@@ -98,7 +76,7 @@ public class RuleDetailsPanel extends JPanel {
 				System.out.println(c);
 			}
 			super.removeAll();
-			super.add(ruleSelected);
+			super.add(ruleSelected, BorderLayout.NORTH);
 		}
 		this.repaint();
 		this.revalidate();
