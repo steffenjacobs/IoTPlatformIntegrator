@@ -1,9 +1,9 @@
 package me.steffenjacobs.iotplatformintegrator;
 
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
-    }
+import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
+
+public class App {
+	public static void main(String[] args) {
+		new UiEntrypoint().createAndShowGUIAsync();
+	}
 }
