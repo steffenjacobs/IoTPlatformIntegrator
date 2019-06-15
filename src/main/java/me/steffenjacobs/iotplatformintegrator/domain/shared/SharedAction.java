@@ -1,40 +1,31 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared;
 
+import java.util.Map;
+
 /** @author Steffen Jacobs */
 public class SharedAction {
 	private final String description;
-	private final String type;
 	private final String label;
-	private final String itemName;
-	private final String command;
 
-	public SharedAction(String description, String type, String label, String itemName, String command) {
+	private final ActionTypeContainer actionTypeContainer;
+
+	public SharedAction(ActionType actionType, Map<String, Object> properties, String description, String label) {
 		super();
 		this.description = description;
-		this.type = type;
 		this.label = label;
-		this.itemName = itemName;
-		this.command = command;
+
+		this.actionTypeContainer = new ActionTypeContainer(actionType, properties);
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public String getType() {
-		return type;
-	}
-
 	public String getLabel() {
 		return label;
 	}
 
-	public String getItemName() {
-		return itemName;
+	public ActionTypeContainer getActionTypeContainer() {
+		return actionTypeContainer;
 	}
-
-	public String getCommand() {
-		return command;
-	}
-
 }

@@ -18,6 +18,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.T
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
@@ -194,16 +195,15 @@ public class RuleDetailsPanel extends JPanel {
 
 		// Add fields
 		formUtility.addLabel("Type: ", form);
-		formUtility.addLastField(new JTextField(sa.getType()), form);
+		formUtility.addLastField(new JTextField("" + sa.getActionTypeContainer().getActionType()), form);
 
 		formUtility.addLabel("Label: ", form);
 		formUtility.addLastField(new JTextField(sa.getLabel()), form);
 
-		formUtility.addLabel("ItemName: ", form);
-		formUtility.addLastField(new JTextField(sa.getItemName()), form);
-
-		formUtility.addLabel("Command: ", form);
-		formUtility.addLastField(new JTextField(sa.getCommand()), form);
+		for (ActionTypeSpecificKey key : sa.getActionTypeContainer().getActionType().getTypeSpecificKeys()) {
+			formUtility.addLabel(key.getDisplayString(), form);
+			formUtility.addLastField(new JTextField("" + sa.getActionTypeContainer().getActionTypeSpecificValues().get(key)), form);
+		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(BorderFactory.createTitledBorder("Command"));

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Action;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
@@ -82,8 +83,24 @@ public class OpenHabRuleTransformationAdapter {
 		String description = a.getDescription();
 		String type = a.getType();
 		String label = a.getLabel();
-		String itemName = "" + properties.get("itemName");
-		String command = "" + properties.get("command");
-		return new SharedAction(description, type, label, itemName, command);
+		return new SharedAction(getActionType(type), properties, description, label);
+	}
+
+	private ActionType getActionType(String actionType) {
+		switch (actionType) {
+		case "core.RuleEnablementAction":
+			return ActionType.EnableDisableRule;
+		case "script.ScriptAction":
+			return ActionType.ExecuteScript;
+		case "media.PlayAction":
+			return ActionType.PlaySound;
+		case "core.RunRuleAction":
+			return ActionType.RunRules;
+		case "media.SayAction":
+			return ActionType.SaySomething;
+		case "core.ItemCommandAction":
+			return ActionType.ItemCommand;
+		}
+		return ActionType.Unknown;
 	}
 }
