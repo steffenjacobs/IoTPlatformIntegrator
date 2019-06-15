@@ -1,9 +1,9 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType.ConditionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 
 /** @author Steffen Jacobs */
 public class ConditionTypeContainer {

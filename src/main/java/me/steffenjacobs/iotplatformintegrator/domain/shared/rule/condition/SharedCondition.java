@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition;
 
 import java.util.Map;
 

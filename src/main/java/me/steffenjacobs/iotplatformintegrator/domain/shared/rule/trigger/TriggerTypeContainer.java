@@ -1,8 +1,9 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger;
 
 import java.util.HashMap;
 import java.util.Map;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType.TriggerTypeSpecificKey;
+
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 
 /** @author Steffen Jacobs */
 public class TriggerTypeContainer {

@@ -1,9 +1,9 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType.ActionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
 
 /** @author Steffen Jacobs */
 public class ActionTypeContainer {

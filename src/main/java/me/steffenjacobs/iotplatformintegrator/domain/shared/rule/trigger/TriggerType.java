@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger;
 
 /** @author Steffen Jacobs */
 public enum TriggerType {

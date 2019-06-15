@@ -11,13 +11,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType.ActionTypeSpecificKey;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType.ConditionTypeSpecificKey;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 
 /** @author Steffen Jacobs */

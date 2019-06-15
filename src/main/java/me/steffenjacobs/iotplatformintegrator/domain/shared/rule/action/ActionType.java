@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action;
 
 /** @author Steffen Jacobs */
 public enum ActionType {

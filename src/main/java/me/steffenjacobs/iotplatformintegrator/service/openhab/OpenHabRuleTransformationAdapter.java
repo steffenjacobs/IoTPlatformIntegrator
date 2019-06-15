@@ -11,13 +11,13 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.A
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.ActionType;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedRule;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 
 /** @author Steffen Jacobs */
 public class OpenHabRuleTransformationAdapter {

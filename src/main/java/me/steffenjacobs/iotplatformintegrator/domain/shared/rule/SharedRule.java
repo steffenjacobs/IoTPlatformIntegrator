@@ -1,6 +1,10 @@
-package me.steffenjacobs.iotplatformintegrator.domain.shared;
+package me.steffenjacobs.iotplatformintegrator.domain.shared.rule;
 
 import java.util.Set;
+
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 
 /** @author Steffen Jacobs */
 public class SharedRule {
