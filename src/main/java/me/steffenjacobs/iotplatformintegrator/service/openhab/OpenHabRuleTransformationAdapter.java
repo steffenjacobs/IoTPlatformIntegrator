@@ -8,6 +8,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.T
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType;
 
 /** @author Steffen Jacobs */
 public class OpenHabRuleTransformationAdapter {
@@ -35,8 +36,23 @@ public class OpenHabRuleTransformationAdapter {
 		String description = t.getDescription();
 		String type = t.getType();
 		String label = t.getLabel();
-		String itemName = "" + properties.get("itemName");
-		return new SharedTrigger(description, type, label, itemName);
+		return new SharedTrigger(getTriggerType(type), properties, description, label);
+	}
+
+	private TriggerType getTriggerType(String triggerType) {
+		switch (triggerType) {
+		case "core.ItemStateChangeTrigger":
+			return TriggerType.ItemStateChanged;
+		case "core.ItemCommandTrigger":
+			return TriggerType.CommandReceived;
+		case "core.ItemStateUpdateTrigger":
+			return TriggerType.ItemStateUpdated;
+		case "timer.TimeOfDayTrigger":
+			return TriggerType.Timed;
+		case "core.ChannelEventTrigger":
+			return TriggerType.TriggerChannelFired;
+		}
+		return TriggerType.Unknown;
 	}
 
 	public SharedAction transformAction(Action a) {

@@ -1,35 +1,32 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared;
 
+import java.util.Map;
+
 /** @author Steffen Jacobs */
 public class SharedTrigger {
 
 	private final String description;
-	private final String type;
 	private final String label;
-	private final String itemName;
+	private final TriggerTypeContainer triggerTypeContainer;
 
-	public SharedTrigger(String description, String type, String label, String itemName) {
+	public SharedTrigger(TriggerType triggerType, Map<String, Object> properties, String description, String label) {
 		super();
 		this.description = description;
-		this.type = type;
 		this.label = label;
-		this.itemName = itemName;
-	}
 
-	public String getType() {
-		return type;
+		this.triggerTypeContainer = new TriggerTypeContainer(triggerType, properties);
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public String getItemName() {
-		return itemName;
-	}
-
 	public String getLabel() {
 		return label;
+	}
+
+	public TriggerTypeContainer getTriggerTypeContainer() {
+		return triggerTypeContainer;
 	}
 
 }

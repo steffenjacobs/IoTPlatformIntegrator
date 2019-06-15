@@ -17,6 +17,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.T
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.RuleStringifyService;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
@@ -69,10 +70,13 @@ public class RuleDetailsPanel extends JPanel {
 
 		conditionsPanel = new JPanel();
 		ruleSelected.add(conditionsPanel);
+		conditionsPanel.setLayout(new BoxLayout(conditionsPanel, BoxLayout.Y_AXIS));
 		triggersPanel = new JPanel();
 		ruleSelected.add(triggersPanel);
+		triggersPanel.setLayout(new BoxLayout(triggersPanel, BoxLayout.Y_AXIS));
 		actionsPanel = new JPanel();
 		ruleSelected.add(actionsPanel);
+		actionsPanel.setLayout(new BoxLayout(actionsPanel, BoxLayout.Y_AXIS));
 
 		ruleSelected.setBorder(BorderFactory.createTitledBorder("Rule Details"));
 		ruleSelected.setLayout(new BoxLayout(ruleSelected, BoxLayout.Y_AXIS));
@@ -153,13 +157,15 @@ public class RuleDetailsPanel extends JPanel {
 
 		// Add fields
 		formUtility.addLabel("Type: ", form);
-		formUtility.addLastField(new JTextField(st.getType()), form);
+		formUtility.addLastField(new JTextField("" + st.getTriggerTypeContainer().getTriggerType()), form);
 
 		formUtility.addLabel("Label: ", form);
 		formUtility.addLastField(new JTextField(st.getLabel()), form);
 
-		formUtility.addLabel("ItemName: ", form);
-		formUtility.addLastField(new JTextField(st.getItemName()), form);
+		for (TriggerTypeSpecificKey key : st.getTriggerTypeContainer().getTriggerType().getTypeSpecificKeys()) {
+			formUtility.addLabel(key.getDisplayString(), form);
+			formUtility.addLastField(new JTextField("" + st.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key)), form);
+		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(BorderFactory.createTitledBorder("Trigger"));
