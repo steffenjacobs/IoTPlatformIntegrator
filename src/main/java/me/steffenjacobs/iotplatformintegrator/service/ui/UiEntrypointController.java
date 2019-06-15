@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
+import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 
 /** @author Steffen Jacobs */
 public class UiEntrypointController {
@@ -15,10 +16,14 @@ public class UiEntrypointController {
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 
 	private final SettingService settingService;
+	private UiEntrypoint ui;
 
 	public UiEntrypointController(SettingService settingService) {
 		this.settingService = settingService;
-
+	}
+	
+	public void setUi(UiEntrypoint ui) {
+		this.ui = ui;
 	}
 
 	public void loadOpenHABRules() {
@@ -27,6 +32,7 @@ public class UiEntrypointController {
 			LOG.info("Retrieved rule '{}'", rule.getName());
 		}
 		LOG.info("Retrieved {} rules.", rules.size());
+		ui.refreshTable(rules);
 	}
 
 }

@@ -1,6 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.ui;
 
 import java.awt.BorderLayout;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -9,7 +10,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -18,6 +20,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
 
@@ -28,14 +31,18 @@ public class UiEntrypoint {
 
 	private final UiFactory uiFactory;
 	private final UiEntrypointController entrypointController;
+	private final JTable rulesTable;
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
 		entrypointController = new UiEntrypointController(settingService);
 		uiFactory = new UiFactory(settingService);
+
+		rulesTable = uiFactory.createRulesTable();
 	}
 
 	private void createAndShowGUI() {
+		entrypointController.setUi(this);
 		// Creating the Frame
 		JFrame frame = new JFrame("IoT Platform Integrator");
 
@@ -47,7 +54,7 @@ public class UiEntrypoint {
 		SwingUtilities.updateComponentTreeUI(frame);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400, 400);
+		frame.setSize(1280, 720);
 
 		// Creating the MenuBar and adding components
 		JMenuBar mb = new JMenuBar();
@@ -79,17 +86,18 @@ public class UiEntrypoint {
 		panel.add(send);
 		panel.add(reset);
 
-		// Text Area at the Center
-		JTextArea ta = new JTextArea();
-
 		// Adding Components to the frame.
 		frame.getContentPane().add(BorderLayout.SOUTH, panel);
 		frame.getContentPane().add(BorderLayout.NORTH, mb);
-		frame.getContentPane().add(BorderLayout.CENTER, ta);
+		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(rulesTable));
 		frame.setVisible(true);
 	}
 
 	public void createAndShowGUIAsync() {
 		javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
+	}
+
+	public void refreshTable(List<ExperimentalRule> rules) {
+		uiFactory.updateRuleTable(rulesTable, rules);
 	}
 }
