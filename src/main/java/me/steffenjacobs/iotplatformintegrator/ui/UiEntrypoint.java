@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -90,7 +91,10 @@ public class UiEntrypoint {
 		panel.add(reset);
 
 		// Rule Details Panel
-		rulesTable.getSelectionModel().addListSelectionListener(e -> ruleDetailsPanel.setDisplayedRule(entrypointController.getRuleByIndex(e.getFirstIndex())));
+		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		rulesTable.getSelectionModel().addListSelectionListener(e -> {
+			ruleDetailsPanel.setDisplayedRule(entrypointController.getRuleByIndex(rulesTable.getSelectedRow()));
+		});
 
 		// Adding Components to the frame.
 		frame.getContentPane().add(BorderLayout.SOUTH, panel);
@@ -105,6 +109,7 @@ public class UiEntrypoint {
 	}
 
 	public void refreshTable(List<ExperimentalRule> rules) {
+		rulesTable.getSelectionModel().clearSelection();
 		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, rules);
 	}

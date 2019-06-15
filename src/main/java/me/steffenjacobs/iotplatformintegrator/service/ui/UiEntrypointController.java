@@ -40,6 +40,9 @@ public class UiEntrypointController {
 	}
 
 	public ExperimentalRule getRuleByIndex(int index) {
+		if (index < 0 || index >= loadedRules.size()) {
+			return null;
+		}
 		return loadedRules.get(index);
 	}
 
