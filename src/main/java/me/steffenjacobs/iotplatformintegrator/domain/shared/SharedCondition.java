@@ -1,46 +1,30 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared;
 
+import java.util.Map;
+
 /** @author Steffen Jacobs */
 public class SharedCondition {
 	private final String description;
-	private final String itemName;
-	private final String operator;
-	private final String state;
-	private final String type;
 	private final String label;
+	private final ConditionTypeContainer conditionTypeContainer;
 
-	public SharedCondition(String description, String type, String label, String itemName, String operator, String state) {
+	public SharedCondition(ConditionType conditionType, Map<String, Object> propertiesMap, String description, String label) {
 		super();
 		this.description = description;
-		this.type = type;
 		this.label = label;
-		this.itemName = itemName;
-		this.operator = operator;
-		this.state = state;
+
+		this.conditionTypeContainer = new ConditionTypeContainer(conditionType, propertiesMap);
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public String getItemName() {
-		return itemName;
-	}
-
-	public String getOperator() {
-		return operator;
-	}
-
-	public String getState() {
-		return state;
-	}
-
 	public String getLabel() {
 		return label;
 	}
 
-	public String getType() {
-		return type;
+	public ConditionTypeContainer getConditionTypeContainer() {
+		return conditionTypeContainer;
 	}
-
 }

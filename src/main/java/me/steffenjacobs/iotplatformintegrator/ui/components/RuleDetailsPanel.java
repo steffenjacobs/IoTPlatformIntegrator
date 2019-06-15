@@ -2,6 +2,7 @@ package me.steffenjacobs.iotplatformintegrator.ui.components;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,6 +18,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.T
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.RuleStringifyService;
@@ -99,17 +101,29 @@ public class RuleDetailsPanel extends JPanel {
 
 			conditionsPanel.removeAll();
 			for (Condition c : rule.getConditions()) {
-				conditionsPanel.add(createConditionPanel(transformer.transformCondition(c)));
+				SharedCondition transformedCondition = transformer.transformCondition(c);
+				if (transformedCondition == null) {
+					continue;
+				}
+				conditionsPanel.add(createConditionPanel(transformedCondition));
 			}
 
 			triggersPanel.removeAll();
 			for (Trigger t : rule.getTriggers()) {
-				triggersPanel.add(createTriggerPanel(transformer.transformTrigger(t)));
+				SharedTrigger transformedTrigger = transformer.transformTrigger(t);
+				if (transformedTrigger == null) {
+					continue;
+				}
+				triggersPanel.add(createTriggerPanel(transformedTrigger));
 			}
 
 			actionsPanel.removeAll();
 			for (Action a : rule.getActions()) {
-				actionsPanel.add(createActionPanel(transformer.transformAction(a)));
+				SharedAction transformedAction = transformer.transformAction(a);
+				if (transformedAction == null) {
+					continue;
+				}
+				actionsPanel.add(createActionPanel(transformedAction));
 			}
 			super.removeAll();
 			super.add(ruleSelected, BorderLayout.NORTH);
@@ -126,19 +140,15 @@ public class RuleDetailsPanel extends JPanel {
 
 		// Add fields
 		formUtility.addLabel("Type: ", form);
-		formUtility.addLastField(new JTextField(sc.getType()), form);
+		formUtility.addLastField(new JTextField("" + sc.getConditionTypeContainer().getConditionType()), form);
 
 		formUtility.addLabel("Label: ", form);
 		formUtility.addLastField(new JTextField(sc.getLabel()), form);
 
-		formUtility.addLabel("ItemName: ", form);
-		formUtility.addLastField(new JTextField(sc.getItemName()), form);
-
-		formUtility.addLabel("Operator: ", form);
-		formUtility.addLastField(new JTextField(sc.getOperator()), form);
-
-		formUtility.addLabel("State: ", form);
-		formUtility.addLastField(new JTextField(sc.getState()), form);
+		for (ConditionTypeSpecificKey key : sc.getConditionTypeContainer().getConditionType().getTypeSpecificKeys()) {
+			formUtility.addLabel(key.getDisplayString(), form);
+			formUtility.addLastField(new JTextField("" + sc.getConditionTypeContainer().getConditionTypeSpecificValues().get(key)), form);
+		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(BorderFactory.createTitledBorder("Condition"));
