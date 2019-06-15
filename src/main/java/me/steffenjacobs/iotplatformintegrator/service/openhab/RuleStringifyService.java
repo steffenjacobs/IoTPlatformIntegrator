@@ -11,5 +11,4 @@ public class RuleStringifyService {
 		}
 		return rule.getStatus().getStatus();
 	}
-
 }
