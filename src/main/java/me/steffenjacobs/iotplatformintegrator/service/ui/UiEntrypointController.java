@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,21 +19,28 @@ public class UiEntrypointController {
 	private final SettingService settingService;
 	private UiEntrypoint ui;
 
+	private final List<ExperimentalRule> loadedRules = new ArrayList<>();
+
 	public UiEntrypointController(SettingService settingService) {
 		this.settingService = settingService;
 	}
-	
+
 	public void setUi(UiEntrypoint ui) {
 		this.ui = ui;
 	}
 
 	public void loadOpenHABRules() {
-		List<ExperimentalRule> rules = ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI));
-		for (ExperimentalRule rule : rules) {
+		loadedRules.clear();
+		loadedRules.addAll(ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI)));
+		for (ExperimentalRule rule : loadedRules) {
 			LOG.info("Retrieved rule '{}'", rule.getName());
 		}
-		LOG.info("Retrieved {} rules.", rules.size());
-		ui.refreshTable(rules);
+		LOG.info("Retrieved {} rules.", loadedRules.size());
+		ui.refreshTable(loadedRules);
+	}
+
+	public ExperimentalRule getRuleByIndex(int index) {
+		return loadedRules.get(index);
 	}
 
 }

@@ -81,7 +81,6 @@ public class UiFactory {
 	}
 
 	private JPanel createSettingField(final SettingKey key, final JButton saveButton) {
-		JLabel settingsLabel = new JLabel(key.getTitle() + ":");
 		JTextField settingsField = new JTextField(settingService.getSetting(SettingKey.OPENHAB_URI));
 		JButton settingsButton = new JButton("Restore Default");
 
@@ -103,13 +102,13 @@ public class UiFactory {
 			settingService.setSetting(SettingKey.OPENHAB_URI, settingsField.getText());
 		});
 
-		return wrapToPanel(settingsLabel, settingsField, settingsButton);
+		return wrapToPanel(key.getTitle() + ":", settingsField, settingsButton);
 
 	}
 
-	private JPanel wrapToPanel(JLabel label, JComponent... components) {
+	public JPanel wrapToPanel(String label, JComponent... components) {
 		JPanel panel = new JPanel();
-		panel.add(label);
+		panel.add(new JLabel(label));
 		for (JComponent component : components) {
 			panel.add(component);
 		}

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
+import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
@@ -32,6 +33,7 @@ public class UiEntrypoint {
 	private final UiFactory uiFactory;
 	private final UiEntrypointController entrypointController;
 	private final JTable rulesTable;
+	final RuleDetailsPanel ruleDetailsPanel;
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
@@ -39,6 +41,7 @@ public class UiEntrypoint {
 		uiFactory = new UiFactory(settingService);
 
 		rulesTable = uiFactory.createRulesTable();
+		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 	}
 
 	private void createAndShowGUI() {
@@ -86,10 +89,14 @@ public class UiEntrypoint {
 		panel.add(send);
 		panel.add(reset);
 
+		// Rule Details Panel
+		rulesTable.getSelectionModel().addListSelectionListener(e -> ruleDetailsPanel.setDisplayedRule(entrypointController.getRuleByIndex(e.getFirstIndex())));
+
 		// Adding Components to the frame.
 		frame.getContentPane().add(BorderLayout.SOUTH, panel);
 		frame.getContentPane().add(BorderLayout.NORTH, mb);
 		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(rulesTable));
+		frame.getContentPane().add(BorderLayout.EAST, new JScrollPane(ruleDetailsPanel));
 		frame.setVisible(true);
 	}
 
@@ -98,6 +105,7 @@ public class UiEntrypoint {
 	}
 
 	public void refreshTable(List<ExperimentalRule> rules) {
+		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, rules);
 	}
 }
