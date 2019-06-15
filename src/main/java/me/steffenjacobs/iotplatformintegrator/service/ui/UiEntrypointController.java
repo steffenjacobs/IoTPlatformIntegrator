@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class UiEntrypointController {
 		this.ui = ui;
 	}
 
-	public void loadOpenHABRules() {
+	public void loadOpenHABRules() throws IOException {
 		loadedRules.clear();
 		for (ExperimentalRule rule : ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI))) {
 			LOG.info("Retrieved rule '{}'", rule.getName());
@@ -47,6 +48,10 @@ public class UiEntrypointController {
 			return null;
 		}
 		return loadedRules.get(index);
+	}
+
+	public String getUrlWithPort() {
+		return settingService.getSetting(SettingKey.OPENHAB_URI);
 	}
 
 }

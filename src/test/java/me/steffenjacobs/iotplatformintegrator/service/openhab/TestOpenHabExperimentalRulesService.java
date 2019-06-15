@@ -1,14 +1,12 @@
 package me.steffenjacobs.iotplatformintegrator.service.openhab;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Action;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
@@ -24,7 +22,7 @@ public class TestOpenHabExperimentalRulesService {
 	private static final String OH_URL_WITH_PORT = "http://localhost:8080";
 
 	@Test
-	public void testExperimentalRulesService() throws UnsupportedEncodingException, JsonProcessingException {
+	public void testExperimentalRulesService() throws IOException {
 
 		// get all rules -> should be zero
 		List<ExperimentalRule> list = new OpenHabExperimentalRulesService().requestAllRules(OH_URL_WITH_PORT);

@@ -24,15 +24,10 @@ public class OpenHabExperimentalRulesService {
 	 * 
 	 * @return A list of all found {@link ExperimentalRule}s.
 	 */
-	public List<ExperimentalRule> requestAllRules(String openHabUrlWithPort) {
+	public List<ExperimentalRule> requestAllRules(String openHabUrlWithPort) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			return objectMapper.readValue(new URL(openHabUrlWithPort + "/rest/rules"), new TypeReference<List<ExperimentalRule>>() {
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return new ArrayList<>();
+		return objectMapper.readValue(new URL(openHabUrlWithPort + "/rest/rules"), new TypeReference<List<ExperimentalRule>>() {
+		});
 	}
 
 	/**

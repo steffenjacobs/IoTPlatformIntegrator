@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -62,7 +63,7 @@ public class UiEntrypoint {
 
 		// Creating the MenuBar and adding components
 		JMenuBar mb = new JMenuBar();
-		JMenu m1 = new JMenu("FILE");
+		JMenu m1 = new JMenu("File");
 		JMenu m2 = new JMenu("Help");
 		mb.add(m1);
 		mb.add(m2);
@@ -70,7 +71,14 @@ public class UiEntrypoint {
 
 		JMenuItem mImportRulesFromOpenhab = new JMenuItem("OpenHAB");
 		mImportRules.add(mImportRulesFromOpenhab);
-		mImportRulesFromOpenhab.addActionListener(e -> entrypointController.loadOpenHABRules());
+		mImportRulesFromOpenhab.addActionListener(e -> {
+			try {
+				entrypointController.loadOpenHABRules();
+			} catch (Exception e2) {
+				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
+						entrypointController.getUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
+			}
+		});
 
 		JMenuItem mSettings = new JMenuItem("Settings");
 		mSettings.addActionListener(e -> uiFactory.createSettingsFrame().setVisible(true));
