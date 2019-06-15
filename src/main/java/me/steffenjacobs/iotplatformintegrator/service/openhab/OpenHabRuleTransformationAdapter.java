@@ -3,7 +3,9 @@ package me.steffenjacobs.iotplatformintegrator.service.openhab;
 import java.util.Map;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
+import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
 
 /** @author Steffen Jacobs */
 public class OpenHabRuleTransformationAdapter {
@@ -21,5 +23,18 @@ public class OpenHabRuleTransformationAdapter {
 		String operator = "" + properties.get("operator");
 		String state = "" + properties.get("state");
 		return new SharedCondition(description, type, label, itemName, operator, state);
+	}
+
+	public SharedTrigger transformTrigger(Trigger t) {
+		if (t.getConfiguration() == null || t.getConfiguration().getAdditionalProperties() == null
+				|| t.getConfiguration().getAdditionalProperties().isEmpty()) {
+			return null;
+		}
+		final Map<String, Object> properties = t.getConfiguration().getAdditionalProperties();
+		String description = t.getDescription();
+		String type = t.getType();
+		String label = t.getLabel();
+		String itemName = "" + properties.get("itemName");
+		return new SharedTrigger(description, type, label, itemName);
 	}
 }
