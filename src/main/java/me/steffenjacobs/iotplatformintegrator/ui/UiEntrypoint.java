@@ -18,12 +18,22 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
+import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
+
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
 
 	private final static Logger LOG = LoggerFactory.getLogger(UiEntrypoint.class);
 
-	private static final UiFactory UI_FACTORY = new UiFactory();
+	private final UiFactory uiFactory;
+	private final UiEntrypointController entrypointController;
+
+	public UiEntrypoint() {
+		final SettingService settingService = new SettingService("./settings.config");
+		entrypointController = new UiEntrypointController(settingService);
+		uiFactory = new UiFactory(settingService);
+	}
 
 	private void createAndShowGUI() {
 		// Creating the Frame
@@ -49,9 +59,10 @@ public class UiEntrypoint {
 
 		JMenuItem mImportRulesFromOpenhab = new JMenuItem("OpenHAB");
 		mImportRules.add(mImportRulesFromOpenhab);
+		mImportRulesFromOpenhab.addActionListener(e -> entrypointController.loadOpenHABRules());
 
 		JMenuItem mSettings = new JMenuItem("Settings");
-		mSettings.addActionListener(e -> UI_FACTORY.createSettingsFrame().setVisible(true));
+		mSettings.addActionListener(e -> uiFactory.createSettingsFrame().setVisible(true));
 
 		m1.add(mImportRules);
 		m1.add(mSettings);

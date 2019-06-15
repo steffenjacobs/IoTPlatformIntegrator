@@ -20,8 +20,8 @@ public class UiFactory {
 
 	private final SettingService settingService;
 
-	public UiFactory() {
-		settingService = new SettingService("./settings.config");
+	public UiFactory(SettingService settingService) {
+		this.settingService = settingService;
 	}
 
 	public JFrame createSettingsFrame() {
