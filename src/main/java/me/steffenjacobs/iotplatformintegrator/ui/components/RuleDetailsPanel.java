@@ -10,9 +10,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Action;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Condition;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
@@ -30,6 +32,7 @@ public class RuleDetailsPanel extends JPanel {
 
 	private final JPanel conditionsPanel;
 	private final JPanel triggersPanel;
+	private final JPanel actionsPanel;
 
 	private final JPanel noRuleSelected, ruleSelected;
 	private static final RuleStringifyService ruleStringifyService = new RuleStringifyService();
@@ -68,6 +71,8 @@ public class RuleDetailsPanel extends JPanel {
 		ruleSelected.add(conditionsPanel);
 		triggersPanel = new JPanel();
 		ruleSelected.add(triggersPanel);
+		actionsPanel = new JPanel();
+		ruleSelected.add(actionsPanel);
 
 		ruleSelected.setBorder(BorderFactory.createTitledBorder("Rule Details"));
 		ruleSelected.setLayout(new BoxLayout(ruleSelected, BoxLayout.Y_AXIS));
@@ -96,6 +101,11 @@ public class RuleDetailsPanel extends JPanel {
 			triggersPanel.removeAll();
 			for (Trigger t : rule.getTriggers()) {
 				triggersPanel.add(createTriggerPanel(transformer.transformTrigger(t)));
+			}
+
+			actionsPanel.removeAll();
+			for (Action a : rule.getActions()) {
+				actionsPanel.add(createActionPanel(transformer.transformAction(a)));
 			}
 			super.removeAll();
 			super.add(ruleSelected, BorderLayout.NORTH);
@@ -154,6 +164,34 @@ public class RuleDetailsPanel extends JPanel {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(BorderFactory.createTitledBorder("Trigger"));
 		panel.add(new JLabel(st.getDescription()));
+		panel.add(Box.createVerticalStrut(10));
+		panel.add(form);
+
+		return panel;
+	}
+
+	private JPanel createActionPanel(SharedAction sa) {
+		JPanel panel = new JPanel();
+		final JPanel form = new JPanel();
+		form.setLayout(new GridBagLayout());
+		FormUtility formUtility = new FormUtility();
+
+		// Add fields
+		formUtility.addLabel("Type: ", form);
+		formUtility.addLastField(new JTextField(sa.getType()), form);
+
+		formUtility.addLabel("Label: ", form);
+		formUtility.addLastField(new JTextField(sa.getLabel()), form);
+
+		formUtility.addLabel("ItemName: ", form);
+		formUtility.addLastField(new JTextField(sa.getItemName()), form);
+
+		formUtility.addLabel("Command: ", form);
+		formUtility.addLastField(new JTextField(sa.getCommand()), form);
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setBorder(BorderFactory.createTitledBorder("Command"));
+		panel.add(new JLabel(sa.getDescription()));
 		panel.add(Box.createVerticalStrut(10));
 		panel.add(form);
 
