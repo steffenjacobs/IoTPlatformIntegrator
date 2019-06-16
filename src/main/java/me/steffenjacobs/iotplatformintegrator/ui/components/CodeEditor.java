@@ -3,8 +3,6 @@ package me.steffenjacobs.iotplatformintegrator.ui.components;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
