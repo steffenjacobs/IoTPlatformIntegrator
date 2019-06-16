@@ -1,6 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -8,18 +7,15 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -28,6 +24,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CGrid;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
@@ -54,9 +54,61 @@ public class UiEntrypoint {
 		codeText = new JTextArea("Select a rule to see the generated pseudocode.");
 	}
 
+	private void setupDockingEnvironment(JFrame frame) {
+		CControl control = new CControl(frame);
+		frame.add(control.getContentArea());
+
+		// create rule table window
+		SingleCDockable ruleTableWindow = createDockable("RuleTable-Window", "Rules", rulesTable);
+		control.addDockable(ruleTableWindow);
+
+		// create pseudo code window
+		SingleCDockable pseudocodeWindow = createDockable("Pseudocode-Window", "Pseudocode", codeText);
+		control.addDockable(pseudocodeWindow);
+
+		// create rule details window
+		SingleCDockable ruleDetailsWindow = createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
+		control.addDockable(ruleDetailsWindow);
+
+		CGrid grid = new CGrid(control);
+		/*
+		 * Best imaging the CGrid as a sheet of paper. You put your panels onto the
+		 * paper and measure the position and size of the panels afterwards. You then
+		 * forward these numbers to the CGrid.
+		 */
+		grid.add(0, 0, 1, 1, pseudocodeWindow);
+		grid.add(0, 1, 1, 1, ruleTableWindow);
+		grid.add(1, 0, 1, 2, ruleDetailsWindow);
+
+		control.getContentArea().deploy(grid);
+	}
+
+	private SingleCDockable createDockable(String id, String title, JComponent component) {
+		DefaultSingleCDockable dockable = new DefaultSingleCDockable(id, title);
+		dockable.setTitleText(title);
+		dockable.setCloseable(false);
+		dockable.add(new JScrollPane(component));
+		return dockable;
+	}
+
 	private void createAndShowGUI() {
 		entrypointController.setUi(this);
 		// Creating the Frame
+		JFrame frame = setupFrame();
+
+		// Creating the MenuBar and adding components
+		frame.setJMenuBar(setupMenu(frame));
+
+		// Rule Details Panel
+		createRuleDetailsPanel();
+
+		// setup docking environment
+		setupDockingEnvironment(frame);
+
+		frame.setVisible(true);
+	}
+
+	private JFrame setupFrame() {
 		JFrame frame = new JFrame("IoT Platform Integrator");
 		try {
 			BufferedImage bufferedImage = ImageIO.read(getClass().getResource("/icon.png"));
@@ -76,23 +128,7 @@ public class UiEntrypoint {
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1600, 900);
-
-		// Creating the MenuBar and adding components
-		JMenuBar mb = setupMenu(frame);
-
-		// Creating the panel at bottom and adding components
-		JPanel panel = createBottomPanel();
-
-		// Rule Details Panel
-		createRuleDetailsPanel();
-
-		// Adding Components to the frame.
-		frame.getContentPane().add(BorderLayout.SOUTH, panel);
-		frame.getContentPane().add(BorderLayout.NORTH, mb);
-		frame.getContentPane().add(BorderLayout.WEST, new JScrollPane(rulesTable));
-		frame.getContentPane().add(BorderLayout.EAST, new JScrollPane(ruleDetailsPanel));
-		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(codeText));
-		frame.setVisible(true);
+		return frame;
 	}
 
 	private void createRuleDetailsPanel() {
@@ -102,20 +138,6 @@ public class UiEntrypoint {
 			ruleDetailsPanel.setDisplayedRule(rule);
 			codeText.setText(entrypointController.getPseudocode(rule));
 		});
-	}
-
-	private JPanel createBottomPanel() {
-		JPanel panel = new JPanel(); // the panel is not visible in output
-		JLabel label = new JLabel("Enter Text");
-		JTextField tf = new JTextField(10); // accepts upto 10 characters
-		JButton send = new JButton("Send");
-		JButton reset = new JButton("Reset");
-		panel.add(label); // Components Added using Flow Layout
-		panel.add(label); // Components Added using Flow Layout
-		panel.add(tf);
-		panel.add(send);
-		panel.add(reset);
-		return panel;
 	}
 
 	private JMenuBar setupMenu(JFrame frame) {
