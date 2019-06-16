@@ -1,7 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.ui;
 
 import java.awt.FlowLayout;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -29,7 +28,7 @@ public class UiFactory {
 		this.settingService = settingService;
 	}
 
-	public void updateRuleTable(JTable rulesTable, List<SharedRule> rules) {
+	public void updateRuleTable(JTable rulesTable, Iterable<SharedRule> rules) {
 		DefaultTableModel tableModel = (DefaultTableModel) rulesTable.getModel();
 
 		tableModel.setNumRows(0);
@@ -134,7 +133,7 @@ public class UiFactory {
 		return panel;
 	}
 
-	public void updateItemsTable(JTable itemsTable, List<SharedItem> items) {
+	public void updateItemsTable(JTable itemsTable, Iterable<SharedItem> items) {
 		DefaultTableModel tableModel = (DefaultTableModel) itemsTable.getModel();
 
 		tableModel.setNumRows(0);

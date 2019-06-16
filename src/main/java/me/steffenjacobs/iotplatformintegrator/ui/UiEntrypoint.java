@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -177,12 +176,12 @@ public class UiEntrypoint {
 		javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
 	}
 
-	public void refreshItems(List<SharedItem> loadedItems) {
+	public void refreshItems(Iterable<SharedItem> loadedItems) {
 		itemsTable.getSelectionModel().clearSelection();
 		uiFactory.updateItemsTable(itemsTable, loadedItems);
 	}
 
-	public void refreshRulesTable(List<SharedRule> loadedRules) {
+	public void refreshRulesTable(Iterable<SharedRule> loadedRules) {
 		rulesTable.getSelectionModel().clearSelection();
 		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, loadedRules);

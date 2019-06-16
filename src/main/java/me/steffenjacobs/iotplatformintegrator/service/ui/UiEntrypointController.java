@@ -2,7 +2,9 @@ package me.steffenjacobs.iotplatformintegrator.service.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ public class UiEntrypointController {
 	private UiEntrypoint ui;
 
 	private final List<SharedRule> loadedRules = new ArrayList<>();
-	private final List<SharedItem> loadedItems = new ArrayList<>();
+	private final Map<String, SharedItem> loadedItems = new HashMap<>();
 
 	public UiEntrypointController(SettingService settingService) {
 		this.settingService = settingService;
@@ -43,8 +45,9 @@ public class UiEntrypointController {
 
 	public void loadOpenHABRules() throws IOException {
 		loadedRules.clear();
-		LOG.info("Retrieved {} rules.", loadedRules.size());
-		for (ExperimentalRule rule : ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI))) {
+		final List<ExperimentalRule> retrievedRules = ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI));
+		LOG.info("Retrieved {} rules.", retrievedRules.size());
+		for (ExperimentalRule rule : retrievedRules) {
 			loadedRules.add(transformer.transformRule(rule));
 		}
 		ui.refreshRulesTable(loadedRules);
@@ -52,11 +55,13 @@ public class UiEntrypointController {
 
 	public void loadOpenHABItems() throws IOException {
 		loadedItems.clear();
-		LOG.info("Retrieved {} items.", loadedItems.size());
-		for (ItemDTO item : itemService.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI))) {
-			loadedItems.add(transformer.transformItem(item));
+		final List<ItemDTO> retrievedItems = itemService.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI));
+		LOG.info("Retrieved {} items.", retrievedItems.size());
+		for (ItemDTO item : retrievedItems) {
+			SharedItem transformedItem = transformer.transformItem(item);
+			loadedItems.put(transformedItem.getName(), transformedItem);
 		}
-		ui.refreshItems(loadedItems);
+		ui.refreshItems(loadedItems.values());
 	}
 
 	public SharedRule getRuleByIndex(int index) {
