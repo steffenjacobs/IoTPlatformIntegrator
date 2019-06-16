@@ -85,9 +85,9 @@ public class UiEntrypoint {
 		mb.add(m2);
 		JMenu mConnect = new JMenu("Connect");
 
-		JMenuItem mImportRulesFromOpenhab = new JMenuItem("OpenHAB");
-		mConnect.add(mImportRulesFromOpenhab);
-		mImportRulesFromOpenhab.addActionListener(e -> {
+		JMenuItem mImportFromOpenhab = new JMenuItem("OpenHAB");
+		mConnect.add(mImportFromOpenhab);
+		mImportFromOpenhab.addActionListener(e -> {
 			try {
 				entrypointController.loadOpenHABRules();
 			} catch (Exception e2) {
