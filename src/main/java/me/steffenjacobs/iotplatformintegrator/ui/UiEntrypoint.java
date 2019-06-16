@@ -83,10 +83,10 @@ public class UiEntrypoint {
 		JMenu m2 = new JMenu("Help");
 		mb.add(m1);
 		mb.add(m2);
-		JMenu mImportRules = new JMenu("Import Rules");
+		JMenu mConnect = new JMenu("Connect");
 
 		JMenuItem mImportRulesFromOpenhab = new JMenuItem("OpenHAB");
-		mImportRules.add(mImportRulesFromOpenhab);
+		mConnect.add(mImportRulesFromOpenhab);
 		mImportRulesFromOpenhab.addActionListener(e -> {
 			try {
 				entrypointController.loadOpenHABRules();
@@ -99,7 +99,7 @@ public class UiEntrypoint {
 		JMenuItem mSettings = new JMenuItem("Settings");
 		mSettings.addActionListener(e -> uiFactory.createSettingsFrame().setVisible(true));
 
-		m1.add(mImportRules);
+		m1.add(mConnect);
 		m1.add(mSettings);
 
 		// Creating the panel at bottom and adding components

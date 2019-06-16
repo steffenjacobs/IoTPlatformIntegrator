@@ -37,11 +37,10 @@ public class UiEntrypointController {
 
 	public void loadOpenHABRules() throws IOException {
 		loadedRules.clear();
+		LOG.info("Retrieved {} rules.", loadedRules.size());
 		for (ExperimentalRule rule : ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI))) {
-			LOG.info("Retrieved rule '{}'", rule.getName());
 			loadedRules.add(transformer.transformRule(rule));
 		}
-		LOG.info("Retrieved {} rules.", loadedRules.size());
 		ui.refreshTable(loadedRules);
 	}
 
