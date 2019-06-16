@@ -1,13 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.service.shared;
 
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
-
 /** @author Steffen Jacobs */
-public interface PlatformTransformationAdapter<Rule, Item> {
+public interface PlatformTransformationAdapter<Item, Rule> {
+	PlatformItemTransformationAdapter<Item> getItemTransformer();
 
-	SharedRule transformRule(Rule rule);
-
-	SharedItem transformItem(Item item);
-
+	PlatformRuleTransformationAdapter<Rule> getRuleTransformer();
 }

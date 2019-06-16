@@ -15,7 +15,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
-import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
+import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
@@ -26,7 +26,7 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
-	private static final PlatformTransformationAdapter<ExperimentalRule, ItemDTO> transformer = new OpenHabRuleTransformationAdapter();
+	private static final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
 	private static final PseudocodeGenerator pseudocodeGenerator = new PseudocodeGenerator();
 
 	private final SettingService settingService;
@@ -48,7 +48,7 @@ public class UiEntrypointController {
 		final List<ExperimentalRule> retrievedRules = ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} rules.", retrievedRules.size());
 		for (ExperimentalRule rule : retrievedRules) {
-			loadedRules.add(transformer.transformRule(rule));
+			loadedRules.add(transformer.getRuleTransformer().transformRule(rule));
 		}
 		ui.refreshRulesTable(loadedRules);
 	}
@@ -58,7 +58,7 @@ public class UiEntrypointController {
 		final List<ItemDTO> retrievedItems = itemService.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} items.", retrievedItems.size());
 		for (ItemDTO item : retrievedItems) {
-			SharedItem transformedItem = transformer.transformItem(item);
+			SharedItem transformedItem = transformer.getItemTransformer().transformItem(item);
 			loadedItems.put(transformedItem.getName(), transformedItem);
 		}
 		ui.refreshItems(loadedItems.values());
