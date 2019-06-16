@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
@@ -50,6 +51,23 @@ public class UiFactory {
 
 		// setup columns
 		String[] columnNames = { "Name", "UUID", "visible" };
+		tableModel.setColumnIdentifiers(columnNames);
+
+		// create JTable
+		JTable table = new JTable(tableModel);
+		table.setBounds(30, 40, 200, 300);
+
+		return table;
+	}
+
+	public JTable createItemsTable() {
+
+		// create table model
+		DefaultTableModel tableModel = new DefaultTableModel();
+		tableModel.setColumnCount(3);
+
+		// setup columns
+		String[] columnNames = { "Name", "Label", "Type" };
 		tableModel.setColumnIdentifiers(columnNames);
 
 		// create JTable
@@ -114,5 +132,19 @@ public class UiFactory {
 		}
 		panel.setLayout(new FlowLayout());
 		return panel;
+	}
+
+	public void updateItemsTable(JTable itemsTable, List<SharedItem> items) {
+		DefaultTableModel tableModel = (DefaultTableModel) itemsTable.getModel();
+
+		tableModel.setNumRows(0);
+		for (SharedItem item : items) {
+			String[] arr = new String[3];
+			arr[0] = item.getName();
+			arr[1] = item.getLabel();
+			arr[2] = item.getType();
+			tableModel.addRow(arr);
+		}
+		tableModel.fireTableDataChanged();
 	}
 }

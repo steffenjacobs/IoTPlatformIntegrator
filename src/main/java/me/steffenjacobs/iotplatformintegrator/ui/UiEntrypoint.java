@@ -28,6 +28,7 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
@@ -41,6 +42,7 @@ public class UiEntrypoint {
 	private final UiFactory uiFactory;
 	private final UiEntrypointController entrypointController;
 	private final JTable rulesTable;
+	private final JTable itemsTable;
 	final RuleDetailsPanel ruleDetailsPanel;
 	private final JTextArea codeText;
 
@@ -50,6 +52,7 @@ public class UiEntrypoint {
 		uiFactory = new UiFactory(settingService);
 
 		rulesTable = uiFactory.createRulesTable();
+		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 		codeText = new JTextArea("Select a rule to see the generated pseudocode.");
 	}
@@ -57,6 +60,10 @@ public class UiEntrypoint {
 	private void setupDockingEnvironment(JFrame frame) {
 		CControl control = new CControl(frame);
 		frame.add(control.getContentArea());
+
+		// create items table window
+		SingleCDockable itemsTableWindow = createDockable("ItemTable-Window", "Items", itemsTable);
+		control.addDockable(itemsTableWindow);
 
 		// create rule table window
 		SingleCDockable ruleTableWindow = createDockable("RuleTable-Window", "Rules", rulesTable);
@@ -70,14 +77,12 @@ public class UiEntrypoint {
 		SingleCDockable ruleDetailsWindow = createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
 		control.addDockable(ruleDetailsWindow);
 
+		// configure grid
 		CGrid grid = new CGrid(control);
-		/*
-		 * Best imaging the CGrid as a sheet of paper. You put your panels onto the
-		 * paper and measure the position and size of the panels afterwards. You then
-		 * forward these numbers to the CGrid.
-		 */
+
 		grid.add(0, 0, 1, 1, pseudocodeWindow);
-		grid.add(0, 1, 1, 1, ruleTableWindow);
+		grid.add(0, 1, .5, 1, ruleTableWindow);
+		grid.add(.5, 1, .5, 1, itemsTableWindow);
 		grid.add(1, 0, 1, 2, ruleDetailsWindow);
 
 		control.getContentArea().deploy(grid);
@@ -153,6 +158,7 @@ public class UiEntrypoint {
 		mImportFromOpenhab.addActionListener(e -> {
 			try {
 				entrypointController.loadOpenHABRules();
+				entrypointController.loadOpenHABItems();
 			} catch (Exception e2) {
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
 						entrypointController.getUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
@@ -171,7 +177,12 @@ public class UiEntrypoint {
 		javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
 	}
 
-	public void refreshTable(List<SharedRule> loadedRules) {
+	public void refreshItems(List<SharedItem> loadedItems) {
+		itemsTable.getSelectionModel().clearSelection();
+		uiFactory.updateItemsTable(itemsTable, loadedItems);
+	}
+
+	public void refreshRulesTable(List<SharedRule> loadedRules) {
 		rulesTable.getSelectionModel().clearSelection();
 		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, loadedRules);
