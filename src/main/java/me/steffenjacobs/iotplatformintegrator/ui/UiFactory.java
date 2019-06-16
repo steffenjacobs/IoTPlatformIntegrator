@@ -142,7 +142,7 @@ public class UiFactory {
 			String[] arr = new String[3];
 			arr[0] = item.getName();
 			arr[1] = item.getLabel();
-			arr[2] = item.getType();
+			arr[2] = "" + item.getType();
 			tableModel.addRow(arr);
 		}
 		tableModel.fireTableDataChanged();

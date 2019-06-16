@@ -12,6 +12,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.C
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.Trigger;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.item.ItemDTO;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType;
@@ -142,8 +143,40 @@ public class OpenHabRuleTransformationAdapter {
 	public SharedItem transformItem(ItemDTO item) {
 		String name = item.getName();
 		String label = item.getLabel();
-		String type = item.getType();
+		ItemType type = getItemType(item.getType());
 		LOG.info("Transformed item {}.", name);
 		return new SharedItem(name, label, type);
+	}
+
+	private ItemType getItemType(String itemType) {
+		switch (itemType) {
+		case "Switch":
+			return ItemType.Switch;
+		case "Number":
+			return ItemType.Number;
+		case "String":
+			return ItemType.String;
+		case "Player":
+			return ItemType.Player;
+		case "Color":
+			return ItemType.Color;
+		case "Contact":
+			return ItemType.Contact;
+		case "Dimmer":
+			return ItemType.Dimmer;
+		case "Rollershutter":
+			return ItemType.Rollershutter;
+		case "Image":
+			return ItemType.Image;
+		case "Location":
+			return ItemType.Location;
+		case "DateTime":
+			return ItemType.DateTime;
+		case "Group":
+			// TODO: handle group
+			return ItemType.Group;
+		default:
+			return ItemType.Unknown;
+		}
 	}
 }

@@ -5,9 +5,9 @@ public class SharedItem {
 
 	private final String name;
 	private final String label;
-	private final String type;
+	private final ItemType type;
 
-	public SharedItem(String name, String label, String type) {
+	public SharedItem(String name, String label, ItemType type) {
 		super();
 		this.name = name;
 		this.label = label;
@@ -22,7 +22,7 @@ public class SharedItem {
 		return label;
 	}
 
-	public String getType() {
+	public ItemType getType() {
 		return type;
 	}
 
