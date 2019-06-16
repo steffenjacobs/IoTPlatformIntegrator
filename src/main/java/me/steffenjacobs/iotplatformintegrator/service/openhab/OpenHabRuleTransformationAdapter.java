@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.openhab;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,11 +19,18 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformRuleTransformationAdapter;
 
 /** @author Steffen Jacobs */
 public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformationAdapter<ExperimentalRule> {
 	private static final Logger LOG = LoggerFactory.getLogger(OpenHabRuleTransformationAdapter.class);
+
+	private final OpenHabTriggerTransformationAdapter triggerTransformer;
+
+	public OpenHabRuleTransformationAdapter(ItemDirectory itemDirectory) {
+		triggerTransformer = new OpenHabTriggerTransformationAdapter(itemDirectory);
+	}
 
 	@Override
 	public SharedRule transformRule(ExperimentalRule rule) {
@@ -64,11 +72,15 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 			LOG.info("Could not parse trigger {}", t.getId());
 			return null;
 		}
-		final Map<String, Object> properties = t.getConfiguration().getAdditionalProperties();
+		final Map<String, Object> properties = new HashMap<>();
+		properties.putAll(t.getConfiguration().getAdditionalProperties());
 		String description = t.getDescription();
 		String type = t.getType();
 		String label = t.getLabel();
-		return new SharedTrigger(getTriggerType(type), properties, description, label);
+		
+		SharedTrigger st =  new SharedTrigger(getTriggerType(type), properties, description, label);
+		triggerTransformer.convertTriggerTypeContainer(st.getTriggerTypeContainer());
+		return st;
 	}
 
 	private ConditionType getConditiontype(String conditionType) {

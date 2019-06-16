@@ -52,11 +52,11 @@ public enum ItemType {
 		}
 	}
 
-	/** Commands to execute on the items. */
+	public /** Commands to execute on the items. */
 	enum Command {
 		On, Off, Open, Closed, String, Decimal, Increase, Decrease, Percent, HSB, Point, //
 		Play, Pause, Next, Previous, Rewind, Fastforward, //
-		Up, Down, StopMove;
+		Up, Down, StopMove, Unknown;
 
 		static Command[] getColorCommands() {
 			return ArrayUtils.addAll(getDimmerCommands(), new Command[] { HSB });
