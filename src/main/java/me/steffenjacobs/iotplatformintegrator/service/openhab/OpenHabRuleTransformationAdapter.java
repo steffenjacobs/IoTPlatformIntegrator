@@ -28,10 +28,13 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 
 	private final OpenHabTriggerTransformationAdapter triggerTransformer;
 	private final OpenHabConditionTransformationAdapter conditionTransformer;
+	private final OpenHabActionTransformationAdapter actionTransformer;
 
 	public OpenHabRuleTransformationAdapter(ItemDirectory itemDirectory) {
-		triggerTransformer = new OpenHabTriggerTransformationAdapter(itemDirectory);
+		final OpenHabCommandParser commandParser = new OpenHabCommandParser();
+		triggerTransformer = new OpenHabTriggerTransformationAdapter(itemDirectory, commandParser);
 		conditionTransformer = new OpenHabConditionTransformationAdapter(itemDirectory);
+		actionTransformer = new OpenHabActionTransformationAdapter(itemDirectory, commandParser);
 	}
 
 	@Override
@@ -127,7 +130,9 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		String description = a.getDescription();
 		String type = a.getType();
 		String label = a.getLabel();
-		return new SharedAction(getActionType(type), properties, description, label);
+		SharedAction sa = new SharedAction(getActionType(type), properties, description, label);
+		actionTransformer.convertActionTypeContainer(sa.getActionTypeContainer());
+		return sa;
 	}
 
 	private ActionType getActionType(String actionType) {
