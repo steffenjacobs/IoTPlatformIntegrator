@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 
@@ -30,6 +32,17 @@ public class PseudocodeGenerator {
 		sb.append(String.join("\n    \u2228 ", triggers));
 		sb.append("\n\n");
 
+		sb.append("IF");
+		List<String> conditions = new ArrayList<>();
+		for (SharedCondition condition : sharedRule.getConditions()) {
+			conditions.add(generateCodeForCondition(condition));
+		}
+		sb.append("\n    ");
+		sb.append(String.join("\n    \u2228 ", triggers));
+		sb.append("\n\n");
+		
+		sb.append("THEN");
+
 		return sb.toString();
 	}
 
@@ -41,9 +54,9 @@ public class PseudocodeGenerator {
 			String previousState = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.PreviousState);
 			String state = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
 			if (previousState != null && !previousState.equals("") && !previousState.equals("null")) {
-				return String.format("Item '%s' changed from '%' to '%s'", itemName, previousState, state);
+				return String.format("Item '%s' changed from %s to %s", itemName, previousState, state);
 			}
-			return String.format("Item '%s' changed to '%s'", itemName, state);
+			return String.format("Item '%s' changed to %s", itemName, state);
 		case CommandReceived:
 			String command = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Command);
 			String itemName2 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
@@ -51,18 +64,42 @@ public class PseudocodeGenerator {
 		case ItemStateUpdated:
 			String itemName3 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
 			String state2 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
-			return String.format("Item '%s' was updated to '%s'", itemName3, state2);
+			return String.format("Item '%s' was updated to %s", itemName3, state2);
 		case Timed:
 			String time = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Time);
-			return String.format("Time is equal to '%s'", time);
+			return String.format("Time is equal to %s", time);
 		case TriggerChannelFired:
 			String triggerChannel = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
 			String event = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Event);
 			return String.format("Channel '%s' received event '%s'", triggerChannel, event);
 		default:
 			LOG.error("Invalid trigger type: {}", trigger.getTriggerTypeContainer().getTriggerType());
-			return "<An error occured during parsing.>";
+			return "<An error occured during parsing of the trigger.>";
 		}
+	}
+
+	public String generateCodeForCondition(SharedCondition condition) {
+		switch (condition.getConditionTypeContainer().getConditionType()) {
+		case ScriptEvaluatesTrue:
+			String script = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Script);
+			String type = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Type);
+			return String.format("Script type=%s {%s} evaluated true", type, script);
+		case ItemState:
+			String itemName = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName);
+			String state = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.State);
+			String operator = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Operator);
+			return String.format("value of item '%s' %s %s", itemName, operator, state);
+		case DayOfWeek:
+			return "<Day of Week is not implemented with openHAB 2.4.0>";
+		case TimeOfDay:
+			String startTime = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.StartTime);
+			String endTime = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.EndTime);
+			return String.format("time between %s and %s", startTime, endTime);
+		default:
+			LOG.error("Invalid condition type: {}", condition.getConditionTypeContainer().getConditionType());
+			return "<An error occured during parsing of the condition.>";
+		}
+
 	}
 
 }

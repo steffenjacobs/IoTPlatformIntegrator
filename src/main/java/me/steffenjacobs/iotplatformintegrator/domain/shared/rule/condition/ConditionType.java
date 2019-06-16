@@ -3,13 +3,9 @@ package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition;
 /** @author Steffen Jacobs */
 public enum ConditionType {
 	ScriptEvaluatesTrue(new ConditionTypeSpecificKey[] { ConditionTypeSpecificKey.Script, ConditionTypeSpecificKey.Type }), //
-
 	ItemState(new ConditionTypeSpecificKey[] { ConditionTypeSpecificKey.ItemName, ConditionTypeSpecificKey.State, ConditionTypeSpecificKey.Operator }), //
-
 	DayOfWeek(new ConditionTypeSpecificKey[] {}), //
-
 	TimeOfDay(new ConditionTypeSpecificKey[] { ConditionTypeSpecificKey.StartTime, ConditionTypeSpecificKey.EndTime }), //
-
 	Unknown(new ConditionTypeSpecificKey[0]);
 
 	private final ConditionTypeSpecificKey[] typeSpecificKeys;
