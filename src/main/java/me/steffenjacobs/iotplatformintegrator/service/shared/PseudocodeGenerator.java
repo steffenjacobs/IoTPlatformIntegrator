@@ -1,8 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.service.shared;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,55 +15,99 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.ReferenceToken;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
 
 /** @author Steffen Jacobs */
 public class PseudocodeGenerator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PseudocodeGenerator.class);
 
-	public String generateCodeForRule(SharedRule sharedRule) {
+	public List<Token> generateCodeForRule(SharedRule sharedRule) {
 		if (sharedRule == null) {
-			return "Please select a rule to generate pseudocode for.";
+			return Arrays.asList(new Token("Please select a rule to generate pseudocode for.", Token.TokenType.UNCLASSIFIED, ""));
 		}
-		StringBuilder sb = new StringBuilder();
+
+		List<Token> tokens = new ArrayList<>();
 
 		// triggers
-		sb.append("WHEN");
+		addToken(tokens, keywordToken("WHEN"));
 		List<String> triggers = new ArrayList<>();
 		for (SharedTrigger trigger : sharedRule.getTriggers()) {
 			triggers.add(generateCodeForTrigger(trigger));
 		}
-		sb.append("\n    ");
-		sb.append(String.join("\n    \u2228 ", triggers));
-		sb.append("\n\n");
+		addToken(tokens, unclassifiedToken("\n    "));
+		for (int i = 0; i < triggers.size(); i++) {
+			addToken(tokens, new Token(triggers.get(i), TokenType.UNKNOWN, triggers.get(i)));
+			if (i < triggers.size() - 1) {
+				addToken(tokens, unclassifiedToken("\n    "));
+				addToken(tokens, operatorToken("\u2228 "));
+			}
+		}
+		addToken(tokens, unclassifiedToken("\n\n "));
 
 		// conditions
 		if (!sharedRule.getConditions().isEmpty()) {
 
-			sb.append("IF");
+			addToken(tokens, keywordToken("IF"));
 			List<String> conditions = new ArrayList<>();
 			for (SharedCondition condition : sharedRule.getConditions()) {
 				conditions.add(generateCodeForCondition(condition));
 			}
-			sb.append("\n    ");
-			sb.append(String.join("\n    \u2228 ", conditions));
-			sb.append("\n\n");
+			addToken(tokens, unclassifiedToken("\n    "));
+			for (int i = 0; i < conditions.size(); i++) {
+				addToken(tokens, new Token(conditions.get(i), TokenType.UNKNOWN, conditions.get(i)));
+				if (i < triggers.size() - 1) {
+					addToken(tokens, unclassifiedToken("\n    "));
+					addToken(tokens, operatorToken("\u2228 "));
+				}
+			}
+			addToken(tokens, unclassifiedToken("\n\n "));
 		}
 
 		// actions
 		if (!sharedRule.getActions().isEmpty()) {
 
-			sb.append("DO");
+			addToken(tokens, keywordToken("DO"));
 			List<String> actions = new ArrayList<>();
 			for (SharedAction action : sharedRule.getActions()) {
 				actions.add(generateCodeForAction(action));
 			}
-			sb.append("\n    ");
-			sb.append(String.join("\n    ", actions));
-			sb.append("\n\n");
+			addToken(tokens, unclassifiedToken("\n    "));
+			for (int i = 0; i < actions.size(); i++) {
+				addToken(tokens, new Token(actions.get(i), TokenType.UNKNOWN, actions.get(i)));
+				if (i < triggers.size() - 1) {
+					addToken(tokens, unclassifiedToken("\n    "));
+				}
+			}
+			addToken(tokens, unclassifiedToken("\n\n "));
 		}
+System.out.println("Generated " + tokens.size() + " tokens.");
+		return tokens;
+	}
 
-		return sb.toString();
+	public void addToken(List<Token> tokens, Token t) {
+		tokens.add(t);
+		int cnt = StringUtils.countMatches(t.getText(), " ");
+		if (cnt > 0) {
+			ReferenceToken rt = new ReferenceToken(t);
+			for (int i = 0; i < cnt; i++) {
+				tokens.add(rt);
+			}
+		}
+	}
+
+	private Token keywordToken(String keyword) {
+		return new Token(keyword, TokenType.KEYWORD, "Keyword " + keyword);
+	}
+
+	private Token unclassifiedToken(String text) {
+		return new Token(text, TokenType.UNCLASSIFIED, "");
+	}
+
+	private Token operatorToken(String operator) {
+		return new Token(operator, TokenType.OPERATOR, "Operator " + operator);
 	}
 
 	public String generateCodeForTrigger(SharedTrigger trigger) {

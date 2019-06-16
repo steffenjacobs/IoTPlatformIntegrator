@@ -34,12 +34,19 @@ public class UiEntrypointController {
 	private final ItemDirectory itemDirectory;
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer;
 	private final CodeEditorController codeEditorController;
-	
+
+	private SharedRule lastRule = null;
+
 	public UiEntrypointController(SettingService settingService, CodeEditor codeEditor) {
 		this.settingService = settingService;
 		itemDirectory = new ItemDirectory();
 		transformer = new OpenHabTransformationAdapter(itemDirectory);
 		codeEditorController = new CodeEditorController(codeEditor);
+		codeEditor.setController(codeEditorController);
+	}
+
+	public CodeEditorController getCodeEditorController() {
+		return codeEditorController;
 	}
 
 	public void setUi(UiEntrypoint ui) {
@@ -54,6 +61,7 @@ public class UiEntrypointController {
 			loadedRules.add(transformer.getRuleTransformer().transformRule(rule));
 		}
 		ui.refreshRulesTable(loadedRules);
+		lastRule = null;
 	}
 
 	public void loadOpenHABItems() throws IOException {
@@ -65,6 +73,9 @@ public class UiEntrypointController {
 			itemDirectory.addItem(transformedItem);
 		}
 		ui.refreshItems(itemDirectory.getAllItems());
+
+		// avoid generating rule code with stale items
+		lastRule = null;
 	}
 
 	public SharedRule getRuleByIndex(int index) {
@@ -79,8 +90,11 @@ public class UiEntrypointController {
 	}
 
 	public void renderPseudocode(SharedRule rule) {
-		codeEditorController.renderPseudocode(rule);
-		
+		if (lastRule != rule) {
+			codeEditorController.renderPseudocode(rule);
+			lastRule = rule;
+		}
+
 	}
 
 }
