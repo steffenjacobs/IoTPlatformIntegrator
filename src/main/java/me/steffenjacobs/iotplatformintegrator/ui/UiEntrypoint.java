@@ -63,7 +63,7 @@ public class UiEntrypoint {
 		control.addDockable(ruleTableWindow);
 
 		// create pseudo code window
-		SingleCDockable pseudocodeWindow = createDockable("Pseudocode-Window", "Pseudocode", codeText);
+		SingleCDockable pseudocodeWindow = createDockable("Pseudocode-Window", "Generated Pseudocode", codeText);
 		control.addDockable(pseudocodeWindow);
 
 		// create rule details window
