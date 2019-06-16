@@ -39,7 +39,7 @@ public class CodeEditor extends JPanel {
 				int pos = tp.viewToModel(event.getPoint());
 				int cnt = StringUtils.countMatches(tp.getText().substring(0, pos).replaceAll(" +", " "), " ");
 				System.out.println(cnt);
-				String tt=   controller.getTooltipForTokenByIndex(cnt);
+				String tt = controller.getTooltipForTokenByIndex(cnt);
 				System.out.println(tt);
 				return tt;
 				// int wordStart = tp.getText().lastIndexOf(" ", pos);

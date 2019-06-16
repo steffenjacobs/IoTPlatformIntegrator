@@ -42,15 +42,15 @@ public class PseudocodeGenerator {
 			addToken(tokens, new Token(triggers.get(i), TokenType.UNKNOWN, triggers.get(i)));
 			if (i < triggers.size() - 1) {
 				addToken(tokens, unclassifiedToken("\n    "));
-				addToken(tokens, operatorToken("\u2228 "));
+				addToken(tokens, operatorToken("\u2228"));
 			}
 		}
-		addToken(tokens, unclassifiedToken("\n\n"));
+		addToken(tokens, unclassifiedToken("\n"));
 
 		// conditions
 		if (!sharedRule.getConditions().isEmpty()) {
 
-			addToken(tokens, keywordToken("IF"));
+			addToken(tokens, keywordToken("\nIF"));
 			List<String> conditions = new ArrayList<>();
 			for (SharedCondition condition : sharedRule.getConditions()) {
 				conditions.add(generateCodeForCondition(condition));
@@ -60,16 +60,16 @@ public class PseudocodeGenerator {
 				addToken(tokens, new Token(conditions.get(i), TokenType.UNKNOWN, conditions.get(i)));
 				if (i < triggers.size() - 1) {
 					addToken(tokens, unclassifiedToken("\n    "));
-					addToken(tokens, operatorToken("\u2228 "));
+					addToken(tokens, operatorToken("\u2228"));
 				}
 			}
-			addToken(tokens, unclassifiedToken("\n\n"));
+			addToken(tokens, unclassifiedToken("\n"));
 		}
 
 		// actions
 		if (!sharedRule.getActions().isEmpty()) {
 
-			addToken(tokens, keywordToken("DO"));
+			addToken(tokens, keywordToken("\nDO"));
 			List<String> actions = new ArrayList<>();
 			for (SharedAction action : sharedRule.getActions()) {
 				actions.add(generateCodeForAction(action));
@@ -92,7 +92,7 @@ public class PseudocodeGenerator {
 		int cnt = StringUtils.countMatches(t.getText().replaceAll(" +", " "), " ");
 		if (cnt > 1) {
 			ReferenceToken rt = new ReferenceToken(t);
-			for (int i = 1; i < cnt; i++) {
+			for (int i = 0; i < cnt; i++) {
 				tokens.add(rt);
 			}
 		}
