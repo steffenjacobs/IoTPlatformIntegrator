@@ -257,9 +257,8 @@ public class PseudocodeGenerator {
 	public List<Token> generateCodeForAction(SharedAction action) {
 		switch (action.getActionTypeContainer().getActionType()) {
 		case EnableDisableRule:
-			String enable = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Enable);
+			boolean enable = (boolean) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Enable);
 			String rules = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
-			boolean e = Boolean.parseBoolean(enable);
 			List<Token> tokens = new ArrayList<>();
 			tokens.add(actionToken("Set", "Set rule.enabled for rules %s to %s"));
 			tokens.add(actionToken("rule.enabled", "Set rule.enabled for rules %s to %s"));
@@ -267,7 +266,7 @@ public class PseudocodeGenerator {
 			tokens.add(actionToken("rules", "Set rule.enabled for rules %s to %s"));
 			tokens.addAll(valueToken(rules));
 			tokens.add(actionToken("to", "Set rule.enabled for rules %s to %s"));
-			tokens.addAll(valueToken(Boolean.toString(e)));
+			tokens.addAll(valueToken(Boolean.toString(enable)));
 			return tokens;
 		case ExecuteScript:
 			String type = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Type);

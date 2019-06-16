@@ -50,6 +50,7 @@ public class OpenHabActionTransformationAdapter {
 		case Command:
 			return commandParser.parseCommand(value);
 		case Enable:
+			return Boolean.parseBoolean(value);
 		case RuleUUIDs:
 		case Type:
 		case Script:
