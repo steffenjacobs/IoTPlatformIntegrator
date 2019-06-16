@@ -291,15 +291,14 @@ public class PseudocodeGenerator {
 			return tokens3;
 		case RunRules:
 			String rules2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
-			String considerConditions = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ConsiderConditions);
-			boolean cc = Boolean.valueOf(considerConditions);
+			boolean considerConditions = (boolean) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ConsiderConditions);
 			List<Token> tokens4 = new ArrayList<>();
 			tokens4.add(actionToken("Run", "Run rules %s Check condition: %s"));
 			tokens4.add(actionToken("rules", "Run rules %s Check condition: %s"));
 			tokens4.addAll(valueToken(rules2));
 			tokens4.add(actionToken("Check", "Run rules %s Check condition: %s"));
 			tokens4.add(actionToken("condition:", "Run rules %s Check condition: %s"));
-			tokens4.addAll(valueToken(Boolean.toString(cc)));
+			tokens4.addAll(valueToken(Boolean.toString(considerConditions)));
 			return tokens4;
 		case SaySomething:
 			String sink2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);

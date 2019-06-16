@@ -180,7 +180,7 @@ public class RuleDetailsPanel extends JPanel {
 		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Command"));
+		panel.setBorder(BorderFactory.createTitledBorder("Action"));
 		panel.add(new JLabel(sa.getDescription()));
 		panel.add(Box.createVerticalStrut(10));
 		panel.add(form);
