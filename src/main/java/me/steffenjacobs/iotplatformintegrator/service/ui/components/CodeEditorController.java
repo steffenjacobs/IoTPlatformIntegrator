@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
@@ -42,7 +43,7 @@ public class CodeEditorController {
 					prefix = firstKeyword ? "" : "\n\n";
 					firstKeyword = false;
 					suffix = "\n    ";
-				} else if (t.getTokenType() == TokenType.OPERATOR) {
+				} else if (t.getTokenType() == TokenType.OPERATOR && Operation.isOrOrAnd(t.getText())) {
 					prefix = "\n        ";
 					suffix = "";
 				} else {
@@ -126,7 +127,7 @@ public class CodeEditorController {
 		}
 
 		public static enum TokenType {
-			KEYWORD, ITEM, COMMAND, VALUE, OPERATOR, UNCLASSIFIED, UNKNOWN;
+			KEYWORD, ITEM, COMMAND, VALUE, OPERATOR, UNCLASSIFIED, UNKNOWN, TRIGGER_CONDITION;
 		}
 	}
 

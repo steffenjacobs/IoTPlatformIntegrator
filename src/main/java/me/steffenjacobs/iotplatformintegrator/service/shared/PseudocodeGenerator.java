@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
@@ -33,15 +36,15 @@ public class PseudocodeGenerator {
 
 		// triggers
 		addToken(tokens, keywordToken("WHEN"));
-		List<String> triggers = new ArrayList<>();
+		int count = 0;
 		for (SharedTrigger trigger : sharedRule.getTriggers()) {
-			triggers.add(generateCodeForTrigger(trigger));
-		}
-		for (int i = 0; i < triggers.size(); i++) {
-			addToken(tokens, new Token(triggers.get(i), TokenType.UNKNOWN, triggers.get(i)));
-			if (i < triggers.size() - 1) {
-				addToken(tokens, operatorToken("\u2228"));
+			for (Token t : generateCodeForTrigger(trigger)) {
+				addToken(tokens, t);
 			}
+			if (count < sharedRule.getTriggers().size() - 1) {
+				addToken(tokens, operatorToken(Operation.OR));
+			}
+			count++;
 		}
 
 		// conditions
@@ -55,7 +58,7 @@ public class PseudocodeGenerator {
 			for (int i = 0; i < conditions.size(); i++) {
 				addToken(tokens, new Token(conditions.get(i), TokenType.UNKNOWN, conditions.get(i)));
 				if (i < conditions.size() - 1) {
-					addToken(tokens, operatorToken("\u2228"));
+					addToken(tokens, operatorToken(Operation.OR));
 				}
 			}
 		}
@@ -71,7 +74,7 @@ public class PseudocodeGenerator {
 			for (int i = 0; i < actions.size(); i++) {
 				addToken(tokens, new Token(actions.get(i), TokenType.UNKNOWN, actions.get(i)));
 				if (i < actions.size() - 1) {
-					addToken(tokens, operatorToken("\u2227"));
+					addToken(tokens, operatorToken(Operation.AND));
 				}
 			}
 		}
@@ -94,39 +97,95 @@ public class PseudocodeGenerator {
 		return new Token(keyword, TokenType.KEYWORD, "Keyword " + keyword);
 	}
 
-	private Token operatorToken(String operator) {
-		return new Token(operator, TokenType.OPERATOR, "Operator " + operator);
+	private Token operatorToken(Operation operation) {
+		return new Token(operation.getText(), TokenType.OPERATOR, String.format("Type: %s, Operator: %s (%s)", TokenType.OPERATOR, operation.getText(), operation.name()));
 	}
 
-	public String generateCodeForTrigger(SharedTrigger trigger) {
+	private Token triggerToken(String text, String description) {
+		return new Token(text, TokenType.TRIGGER_CONDITION, description);
+	}
+
+	private Token itemToken(SharedItem item) {
+		return new Token(item.getName(), TokenType.ITEM, String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
+	}
+
+	private Token valueToken(String value) {
+		return new Token(value, TokenType.VALUE, String.format("Type: %s, Value: %s", TokenType.VALUE, value));
+	}
+
+	private Token commandToken(Command command) {
+		return new Token(command.name(), TokenType.COMMAND, String.format("Type: %s, Command: %s", TokenType.COMMAND, command.name()));
+	}
+
+	private Token unknownToken(String message) {
+		return new Token(message, TokenType.UNKNOWN, message);
+	}
+
+	public List<Token> generateCodeForTrigger(SharedTrigger trigger) {
 
 		switch (trigger.getTriggerTypeContainer().getTriggerType()) {
 		case ItemStateChanged:
-			String itemName = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+			SharedItem item = (SharedItem) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
 			String previousState = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.PreviousState);
 			String state = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
 			if (previousState != null && !previousState.equals("") && !previousState.equals("null")) {
-				return String.format("Item '%s' changed from %s to %s", itemName, previousState, state);
+				List<Token> tokens = new ArrayList<>();
+				tokens.add(triggerToken("Item", "Item '%s' changed from %s to %s"));
+				tokens.add(itemToken(item));
+				tokens.add(triggerToken("changed", "Item '%s' changed from %s to %s"));
+				tokens.add(triggerToken("from", "Item '%s' changed from %s to %s"));
+				tokens.add(valueToken(previousState));
+				tokens.add(triggerToken("to", "Item '%s' changed from %s to %s"));
+				tokens.add(valueToken(state));
+				return tokens;
 			}
-			return String.format("Item '%s' changed to %s", itemName, state);
+			List<Token> tokens = new ArrayList<>();
+			tokens.add(triggerToken("Item", "Item '%s' changed to %s"));
+			tokens.add(itemToken(item));
+			tokens.add(triggerToken("changed", "Item '%s' changed to %s"));
+			tokens.add(valueToken(state));
+			return tokens;
 		case CommandReceived:
-			String command = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Command);
-			String itemName2 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
-			return String.format("Item '%s' received command '%s'", itemName2, command);
+			Command command = (Command) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Command);
+			SharedItem item2 = (SharedItem) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+			List<Token> tokens2 = new ArrayList<>();
+			tokens2.add(triggerToken("Item", "Item '%s' received command '%s'"));
+			tokens2.add(itemToken(item2));
+			tokens2.add(triggerToken("received", "Item '%s' received command '%s'"));
+			tokens2.add(triggerToken("command", "Item '%s' received command '%s'"));
+			tokens2.add(commandToken(command));
+			return tokens2;
 		case ItemStateUpdated:
-			String itemName3 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+			SharedItem item3 = (SharedItem) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
 			String state2 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
-			return String.format("Item '%s' was updated to %s", itemName3, state2);
+			List<Token> tokens3 = new ArrayList<>();
+			tokens3.add(triggerToken("Item", "Item '%s' was updated to %s"));
+			tokens3.add(itemToken(item3));
+			tokens3.add(triggerToken("was", "Item '%s' was updated to %s"));
+			tokens3.add(triggerToken("updated", "Item '%s' was updated to %s"));
+			tokens3.add(triggerToken("to", "Item '%s' was updated to %s"));
+			tokens3.add(valueToken(state2));
+			return tokens3;
 		case Timed:
 			String time = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Time);
-			return String.format("Time is equal to %s", time);
+			List<Token> tokens4 = new ArrayList<>();
+			tokens4.add(triggerToken("Time", "Time == %s"));
+			tokens4.add(operatorToken(Operation.EQUAL));
+			tokens4.add(valueToken(time));
+			return tokens4;
 		case TriggerChannelFired:
 			String triggerChannel = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
 			String event = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Event);
-			return String.format("Channel '%s' received event '%s'", triggerChannel, event);
+			List<Token> tokens5 = new ArrayList<>();
+			tokens5.add(triggerToken("Channel", "Channel '%s' received event '%s'"));
+			tokens5.add(valueToken(triggerChannel));
+			tokens5.add(triggerToken("received", "Channel '%s' received event '%s'"));
+			tokens5.add(triggerToken("event", "Channel '%s' received event '%s'"));
+			tokens5.add(valueToken(event));
+			return tokens5;
 		default:
 			LOG.error("Invalid trigger type: {}", trigger.getTriggerTypeContainer().getTriggerType());
-			return "<An error occured during parsing of the trigger.>";
+			return Arrays.asList(unknownToken("<An error occured during parsing of the trigger.>"));
 		}
 	}
 

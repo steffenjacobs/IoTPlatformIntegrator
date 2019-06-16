@@ -52,8 +52,8 @@ public enum ItemType {
 		}
 	}
 
-	public /** Commands to execute on the items. */
-	enum Command {
+	/** Commands to execute on the items. */
+	public enum Command {
 		On, Off, Open, Closed, String, Decimal, Increase, Decrease, Percent, HSB, Point, //
 		Play, Pause, Next, Previous, Rewind, Fastforward, //
 		Up, Down, StopMove, Unknown;
@@ -84,7 +84,27 @@ public enum ItemType {
 	}
 
 	/** Operations to execute with the items. */
-	enum Operation {
-		EQUAL, SMALLER_EQUAL, SMALLER, BIGGER_EQUAL, BIGGER, NOT_EQUAL;
+	public enum Operation {
+		EQUAL("=="), SMALLER_EQUAL("<="), SMALLER("<"), BIGGER_EQUAL(">="), BIGGER(">"), NOT_EQUAL("\\u2260"), OR("\u2228"), AND("\u2227");
+
+		final String text;
+
+		private Operation(String text) {
+			this.text = text;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public static boolean isOrOrAnd(String text) {
+			switch (text) {
+			case "\u2228":
+			case "\u2227":
+				return true;
+			default:
+				return false;
+			}
+		}
 	}
 }
