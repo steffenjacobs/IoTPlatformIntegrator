@@ -45,7 +45,7 @@ public class PseudocodeGenerator {
 				addToken(tokens, operatorToken("\u2228 "));
 			}
 		}
-		addToken(tokens, unclassifiedToken("\n\n "));
+		addToken(tokens, unclassifiedToken("\n\n"));
 
 		// conditions
 		if (!sharedRule.getConditions().isEmpty()) {
@@ -63,7 +63,7 @@ public class PseudocodeGenerator {
 					addToken(tokens, operatorToken("\u2228 "));
 				}
 			}
-			addToken(tokens, unclassifiedToken("\n\n "));
+			addToken(tokens, unclassifiedToken("\n\n"));
 		}
 
 		// actions
@@ -81,18 +81,18 @@ public class PseudocodeGenerator {
 					addToken(tokens, unclassifiedToken("\n    "));
 				}
 			}
-			addToken(tokens, unclassifiedToken("\n\n "));
+			addToken(tokens, unclassifiedToken("\n"));
 		}
-System.out.println("Generated " + tokens.size() + " tokens.");
+		LOG.info("Generated {} tokens.", tokens.size());
 		return tokens;
 	}
 
 	public void addToken(List<Token> tokens, Token t) {
 		tokens.add(t);
-		int cnt = StringUtils.countMatches(t.getText(), " ");
-		if (cnt > 0) {
+		int cnt = StringUtils.countMatches(t.getText().replaceAll(" +", " "), " ");
+		if (cnt > 1) {
 			ReferenceToken rt = new ReferenceToken(t);
-			for (int i = 0; i < cnt; i++) {
+			for (int i = 1; i < cnt; i++) {
 				tokens.add(rt);
 			}
 		}

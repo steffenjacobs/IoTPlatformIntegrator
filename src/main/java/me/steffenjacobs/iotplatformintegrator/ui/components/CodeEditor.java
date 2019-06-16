@@ -37,9 +37,11 @@ public class CodeEditor extends JPanel {
 			@Override
 			public String getToolTipText(MouseEvent event) {
 				int pos = tp.viewToModel(event.getPoint());
-				int cnt = StringUtils.countMatches(tp.getText().subSequence(0, pos), " ");
+				int cnt = StringUtils.countMatches(tp.getText().substring(0, pos).replaceAll(" +", " "), " ");
 				System.out.println(cnt);
-				return controller.getTooltipForTokenByIndex(cnt);
+				String tt=   controller.getTooltipForTokenByIndex(cnt);
+				System.out.println(tt);
+				return tt;
 				// int wordStart = tp.getText().lastIndexOf(" ", pos);
 				// int wordEnd = tp.getText().indexOf(" ", pos);
 				// String tt = tp.getText().substring(wordStart < 0 ? 0 : wordStart, wordEnd < 0

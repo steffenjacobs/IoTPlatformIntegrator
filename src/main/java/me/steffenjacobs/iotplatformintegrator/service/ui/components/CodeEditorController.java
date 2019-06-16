@@ -35,13 +35,20 @@ public class CodeEditorController {
 	}
 
 	private void appendToken(Token t) {
-		tokens.add(t);
+
+		// clean whitespace tokens
+		if (!t.getText().equals("") && !t.getText().equals(" ")) {
+			tokens.add(t);
+		}
 		if (t instanceof ReferenceToken) {
 			return;
 		}
 
 		final Color color = determineColorForTokenType(t.getTokenType());
 		codeEditor.appendToPane(t.getText(), color);
+		
+		//append space
+		codeEditor.appendToPane(" ", color);
 	}
 
 	public String getTooltipForTokenByIndex(int tokenIndex) {
