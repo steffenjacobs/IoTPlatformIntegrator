@@ -14,7 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
-import me.steffenjacobs.iotplatformintegrator.service.openhab.PlatformTransformationAdapter;
+import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 

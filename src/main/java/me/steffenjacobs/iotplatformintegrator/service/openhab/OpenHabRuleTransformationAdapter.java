@@ -21,6 +21,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 
 /** @author Steffen Jacobs */
 public class OpenHabRuleTransformationAdapter implements PlatformTransformationAdapter<ExperimentalRule, ItemDTO> {
