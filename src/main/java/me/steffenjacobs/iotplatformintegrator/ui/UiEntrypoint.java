@@ -78,6 +78,47 @@ public class UiEntrypoint {
 		frame.setSize(1600, 900);
 
 		// Creating the MenuBar and adding components
+		JMenuBar mb = setupMenu(frame);
+
+		// Creating the panel at bottom and adding components
+		JPanel panel = createBottomPanel();
+
+		// Rule Details Panel
+		createRuleDetailsPanel();
+
+		// Adding Components to the frame.
+		frame.getContentPane().add(BorderLayout.SOUTH, panel);
+		frame.getContentPane().add(BorderLayout.NORTH, mb);
+		frame.getContentPane().add(BorderLayout.WEST, new JScrollPane(rulesTable));
+		frame.getContentPane().add(BorderLayout.EAST, new JScrollPane(ruleDetailsPanel));
+		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(codeText));
+		frame.setVisible(true);
+	}
+
+	private void createRuleDetailsPanel() {
+		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		rulesTable.getSelectionModel().addListSelectionListener(e -> {
+			SharedRule rule = entrypointController.getRuleByIndex(rulesTable.getSelectedRow());
+			ruleDetailsPanel.setDisplayedRule(rule);
+			codeText.setText(entrypointController.getPseudocode(rule));
+		});
+	}
+
+	private JPanel createBottomPanel() {
+		JPanel panel = new JPanel(); // the panel is not visible in output
+		JLabel label = new JLabel("Enter Text");
+		JTextField tf = new JTextField(10); // accepts upto 10 characters
+		JButton send = new JButton("Send");
+		JButton reset = new JButton("Reset");
+		panel.add(label); // Components Added using Flow Layout
+		panel.add(label); // Components Added using Flow Layout
+		panel.add(tf);
+		panel.add(send);
+		panel.add(reset);
+		return panel;
+	}
+
+	private JMenuBar setupMenu(JFrame frame) {
 		JMenuBar mb = new JMenuBar();
 		JMenu m1 = new JMenu("File");
 		JMenu m2 = new JMenu("Help");
@@ -101,34 +142,7 @@ public class UiEntrypoint {
 
 		m1.add(mConnect);
 		m1.add(mSettings);
-
-		// Creating the panel at bottom and adding components
-		JPanel panel = new JPanel(); // the panel is not visible in output
-		JLabel label = new JLabel("Enter Text");
-		JTextField tf = new JTextField(10); // accepts upto 10 characters
-		JButton send = new JButton("Send");
-		JButton reset = new JButton("Reset");
-		panel.add(label); // Components Added using Flow Layout
-		panel.add(label); // Components Added using Flow Layout
-		panel.add(tf);
-		panel.add(send);
-		panel.add(reset);
-
-		// Rule Details Panel
-		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		rulesTable.getSelectionModel().addListSelectionListener(e -> {
-			SharedRule rule = entrypointController.getRuleByIndex(rulesTable.getSelectedRow());
-			ruleDetailsPanel.setDisplayedRule(rule);
-			codeText.setText(entrypointController.getPseudocode(rule));
-		});
-
-		// Adding Components to the frame.
-		frame.getContentPane().add(BorderLayout.SOUTH, panel);
-		frame.getContentPane().add(BorderLayout.NORTH, mb);
-		frame.getContentPane().add(BorderLayout.WEST, new JScrollPane(rulesTable));
-		frame.getContentPane().add(BorderLayout.EAST, new JScrollPane(ruleDetailsPanel));
-		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(codeText));
-		frame.setVisible(true);
+		return mb;
 	}
 
 	public void createAndShowGUIAsync() {
