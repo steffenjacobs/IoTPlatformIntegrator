@@ -95,6 +95,7 @@ public class CodeEditorController {
 			cl = Color.RED;
 			break;
 		case VALUE:
+		case MULTI_VALUE:
 		case OPERATOR:
 			cl = Color.GRAY;
 			break;

@@ -117,8 +117,20 @@ public class PseudocodeGenerator {
 		return new Token(item.getName(), TokenType.ITEM, String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
 	}
 
-	private Token valueToken(String value) {
-		return new Token(value, TokenType.VALUE, String.format("Type: %s, Value: %s", TokenType.VALUE, value));
+	private List<Token> valueToken(String value) {
+		if (value.contains(" ")) {
+			return multivalueToken(value);
+		}
+		return Arrays.asList(new Token(value, TokenType.VALUE, String.format("Type: %s, Value: %s", TokenType.VALUE, value)));
+	}
+
+	private List<Token> multivalueToken(String value) {
+		String[] values = value.trim().split(" ");
+		List<Token> tokens = new ArrayList<>();
+		for (String val : values) {
+			tokens.add(new Token(val, TokenType.MULTI_VALUE, String.format("Type: %s, Value: %s", TokenType.MULTI_VALUE, value.trim())));
+		}
+		return tokens;
 	}
 
 	private Token commandToken(Command command) {
@@ -142,16 +154,16 @@ public class PseudocodeGenerator {
 				tokens.add(itemToken(item));
 				tokens.add(triggerToken("changed", "Item '%s' changed from %s to %s"));
 				tokens.add(triggerToken("from", "Item '%s' changed from %s to %s"));
-				tokens.add(valueToken(previousState));
+				tokens.addAll(valueToken(previousState));
 				tokens.add(triggerToken("to", "Item '%s' changed from %s to %s"));
-				tokens.add(valueToken(state));
+				tokens.addAll(valueToken(state));
 				return tokens;
 			}
 			List<Token> tokens = new ArrayList<>();
 			tokens.add(triggerToken("Item", "Item '%s' changed to %s"));
 			tokens.add(itemToken(item));
 			tokens.add(triggerToken("changed", "Item '%s' changed to %s"));
-			tokens.add(valueToken(state));
+			tokens.addAll(valueToken(state));
 			return tokens;
 		case CommandReceived:
 			Command command = (Command) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Command);
@@ -172,24 +184,24 @@ public class PseudocodeGenerator {
 			tokens3.add(triggerToken("was", "Item '%s' was updated to %s"));
 			tokens3.add(triggerToken("updated", "Item '%s' was updated to %s"));
 			tokens3.add(triggerToken("to", "Item '%s' was updated to %s"));
-			tokens3.add(valueToken(state2));
+			tokens3.addAll(valueToken(state2));
 			return tokens3;
 		case Timed:
 			String time = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Time);
 			List<Token> tokens4 = new ArrayList<>();
 			tokens4.add(triggerToken("Time", "Time == %s"));
 			tokens4.add(operatorToken(Operation.EQUAL));
-			tokens4.add(valueToken(time));
+			tokens4.addAll(valueToken(time));
 			return tokens4;
 		case TriggerChannelFired:
 			String triggerChannel = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
 			String event = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Event);
 			List<Token> tokens5 = new ArrayList<>();
 			tokens5.add(triggerToken("Channel", "Channel '%s' received event '%s'"));
-			tokens5.add(valueToken(triggerChannel));
+			tokens5.addAll(valueToken(triggerChannel));
 			tokens5.add(triggerToken("received", "Channel '%s' received event '%s'"));
 			tokens5.add(triggerToken("event", "Channel '%s' received event '%s'"));
-			tokens5.add(valueToken(event));
+			tokens5.addAll(valueToken(event));
 			return tokens5;
 		default:
 			LOG.error("Invalid trigger type: {}", trigger.getTriggerTypeContainer().getTriggerType());
@@ -202,12 +214,11 @@ public class PseudocodeGenerator {
 		case ScriptEvaluatesTrue:
 			List<Token> tokens = new ArrayList<>();
 			String script = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Script);
-			script="...";
 			String type = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Type);
 			tokens.add(conditionToken("Script", "Script %s {%s} evaluates to true"));
-			tokens.add(valueToken(type));
+			tokens.addAll(valueToken(type));
 			tokens.add(unknownToken("{"));
-			tokens.add(valueToken(script));
+			tokens.addAll(valueToken(script));
 			tokens.add(unknownToken("}"));
 			tokens.add(conditionToken("evaluates", "Script %s {%s} evaluates to true"));
 			tokens.add(conditionToken("to", "Script %s {%s} evaluates to true"));
@@ -223,7 +234,7 @@ public class PseudocodeGenerator {
 			tokens2.add(conditionToken("item", "value of item '%s' %s %s"));
 			tokens2.add(itemToken(item));
 			tokens2.add(operatorToken(operator));
-			tokens2.add(valueToken(state));
+			tokens2.addAll(valueToken(state));
 			return tokens2;
 		case DayOfWeek:
 			return Arrays.asList(unknownToken("<Day of Week is not implemented with openHAB 2.4.0>"));
@@ -233,9 +244,9 @@ public class PseudocodeGenerator {
 			List<Token> tokens3 = new ArrayList<>();
 			tokens3.add(conditionToken("time", "time between %s and %s"));
 			tokens3.add(conditionToken("between", "time between %s and %s"));
-			tokens3.add(valueToken(startTime));
+			tokens3.addAll(valueToken(startTime));
 			tokens3.add(conditionToken("and", "time between %s and %s"));
-			tokens3.add(valueToken(endTime));
+			tokens3.addAll(valueToken(endTime));
 			return tokens3;
 		default:
 			LOG.error("Invalid condition type: {}", condition.getConditionTypeContainer().getConditionType());
@@ -254,20 +265,19 @@ public class PseudocodeGenerator {
 			tokens.add(actionToken("rule.enabled", "Set rule.enabled for rules %s to %s"));
 			tokens.add(actionToken("for", "Set rule.enabled for rules %s to %s"));
 			tokens.add(actionToken("rules", "Set rule.enabled for rules %s to %s"));
-			tokens.add(valueToken(rules));
+			tokens.addAll(valueToken(rules));
 			tokens.add(actionToken("to", "Set rule.enabled for rules %s to %s"));
-			tokens.add(valueToken(Boolean.toString(e)));
+			tokens.addAll(valueToken(Boolean.toString(e)));
 			return tokens;
 		case ExecuteScript:
 			String type = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Type);
 			String script = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Script);
-			script="...";
 			List<Token> tokens2 = new ArrayList<>();
 			tokens2.add(actionToken("Execute", "Execute script %s {%s}"));
 			tokens2.add(actionToken("script", "Execute script %s {%s}"));
-			tokens2.add(valueToken(type));
+			tokens2.addAll(valueToken(type));
 			tokens2.add(unknownToken("{"));
-			tokens2.add(valueToken(script));
+			tokens2.addAll(valueToken(script));
 			tokens2.add(unknownToken("}"));
 			return tokens2;
 		case PlaySound:
@@ -276,9 +286,9 @@ public class PseudocodeGenerator {
 			List<Token> tokens3 = new ArrayList<>();
 			tokens3.add(actionToken("Play", "Play sound %s to %s"));
 			tokens3.add(actionToken("sound", "Play sound %s to %s"));
-			tokens3.add(valueToken(sound));
+			tokens3.addAll(valueToken(sound));
 			tokens3.add(actionToken("to", "Play sound %s to %s"));
-			tokens3.add(valueToken(sink));
+			tokens3.addAll(valueToken(sink));
 			return tokens3;
 		case RunRules:
 			String rules2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
@@ -287,20 +297,19 @@ public class PseudocodeGenerator {
 			List<Token> tokens4 = new ArrayList<>();
 			tokens4.add(actionToken("Run", "Run rules %s Check condition: %s"));
 			tokens4.add(actionToken("rules", "Run rules %s Check condition: %s"));
-			tokens4.add(valueToken(rules2));
+			tokens4.addAll(valueToken(rules2));
 			tokens4.add(actionToken("Check", "Run rules %s Check condition: %s"));
 			tokens4.add(actionToken("condition:", "Run rules %s Check condition: %s"));
-			tokens4.add(valueToken(Boolean.toString(cc)));
+			tokens4.addAll(valueToken(Boolean.toString(cc)));
 			return tokens4;
 		case SaySomething:
 			String sink2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);
 			String text = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Text);
-			text="...";
 			List<Token> tokens5 = new ArrayList<>();
 			tokens5.add(actionToken("Say", "Say %s to %s"));
-			tokens5.add(valueToken(text));
+			tokens5.addAll(valueToken(text));
 			tokens5.add(actionToken("to", "Say %s to %s"));
-			tokens5.add(valueToken(sink2));
+			tokens5.addAll(valueToken(sink2));
 			return tokens5;
 		case ItemCommand:
 			SharedItem item = (SharedItem) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName);
