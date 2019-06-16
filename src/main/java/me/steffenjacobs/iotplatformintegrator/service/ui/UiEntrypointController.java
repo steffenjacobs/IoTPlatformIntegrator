@@ -11,6 +11,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.E
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
+import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 
 /** @author Steffen Jacobs */
@@ -19,6 +20,7 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabRuleTransformationAdapter transformer = new OpenHabRuleTransformationAdapter();
+	private static final PseudocodeGenerator pseudocodeGenerator = new PseudocodeGenerator();
 
 	private final SettingService settingService;
 	private UiEntrypoint ui;
@@ -52,6 +54,10 @@ public class UiEntrypointController {
 
 	public String getUrlWithPort() {
 		return settingService.getSetting(SettingKey.OPENHAB_URI);
+	}
+
+	public String getPseudocode(SharedRule rule) {
+		return pseudocodeGenerator.generateCodeForRule(rule);
 	}
 
 }

@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -36,6 +37,7 @@ public class UiEntrypoint {
 	private final UiEntrypointController entrypointController;
 	private final JTable rulesTable;
 	final RuleDetailsPanel ruleDetailsPanel;
+	private final JTextArea codeText;
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
@@ -44,6 +46,7 @@ public class UiEntrypoint {
 
 		rulesTable = uiFactory.createRulesTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
+		codeText = new JTextArea("Select a rule to see the generated pseudocode.");
 	}
 
 	private void createAndShowGUI() {
@@ -101,7 +104,9 @@ public class UiEntrypoint {
 		// Rule Details Panel
 		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		rulesTable.getSelectionModel().addListSelectionListener(e -> {
-			ruleDetailsPanel.setDisplayedRule(entrypointController.getRuleByIndex(rulesTable.getSelectedRow()));
+			SharedRule rule = entrypointController.getRuleByIndex(rulesTable.getSelectedRow());
+			ruleDetailsPanel.setDisplayedRule(rule);
+			codeText.setText(entrypointController.getPseudocode(rule));
 		});
 
 		// Adding Components to the frame.
@@ -109,6 +114,7 @@ public class UiEntrypoint {
 		frame.getContentPane().add(BorderLayout.NORTH, mb);
 		frame.getContentPane().add(BorderLayout.WEST, new JScrollPane(rulesTable));
 		frame.getContentPane().add(BorderLayout.EAST, new JScrollPane(ruleDetailsPanel));
+		frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(codeText));
 		frame.setVisible(true);
 	}
 
