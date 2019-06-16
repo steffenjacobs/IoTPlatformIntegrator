@@ -67,15 +67,15 @@ public class PseudocodeGenerator {
 		if (!sharedRule.getActions().isEmpty()) {
 
 			addToken(tokens, keywordToken("DO"));
-			List<String> actions = new ArrayList<>();
+			count = 0;
 			for (SharedAction action : sharedRule.getActions()) {
-				actions.add(generateCodeForAction(action));
-			}
-			for (int i = 0; i < actions.size(); i++) {
-				addToken(tokens, new Token(actions.get(i), TokenType.UNKNOWN, actions.get(i)));
-				if (i < actions.size() - 1) {
+				for (Token t : generateCodeForAction(action)) {
+					addToken(tokens, t);
+				}
+				if (count < sharedRule.getActions().size() - 1) {
 					addToken(tokens, operatorToken(Operation.AND));
 				}
+				count++;
 			}
 		}
 		LOG.info("Generated {} tokens.", tokens.size());
@@ -107,6 +107,10 @@ public class PseudocodeGenerator {
 
 	private Token conditionToken(String text, String description) {
 		return new Token(text, TokenType.CONDITION, description);
+	}
+
+	private Token actionToken(String text, String description) {
+		return new Token(text, TokenType.ACTION, description);
 	}
 
 	private Token itemToken(SharedItem item) {
@@ -198,6 +202,7 @@ public class PseudocodeGenerator {
 		case ScriptEvaluatesTrue:
 			List<Token> tokens = new ArrayList<>();
 			String script = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Script);
+			script="...";
 			String type = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Type);
 			tokens.add(conditionToken("Script", "Script %s {%s} evaluates to true"));
 			tokens.add(valueToken(type));
@@ -238,37 +243,78 @@ public class PseudocodeGenerator {
 		}
 	}
 
-	public String generateCodeForAction(SharedAction action) {
+	public List<Token> generateCodeForAction(SharedAction action) {
 		switch (action.getActionTypeContainer().getActionType()) {
 		case EnableDisableRule:
 			String enable = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Enable);
 			String rules = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
 			boolean e = Boolean.parseBoolean(enable);
-			return String.format((e ? "Enable" : "Disable") + " rules %s", rules);
+			List<Token> tokens = new ArrayList<>();
+			tokens.add(actionToken("Set", "Set rule.enabled for rules %s to %s"));
+			tokens.add(actionToken("rule.enabled", "Set rule.enabled for rules %s to %s"));
+			tokens.add(actionToken("for", "Set rule.enabled for rules %s to %s"));
+			tokens.add(actionToken("rules", "Set rule.enabled for rules %s to %s"));
+			tokens.add(valueToken(rules));
+			tokens.add(actionToken("to", "Set rule.enabled for rules %s to %s"));
+			tokens.add(valueToken(Boolean.toString(e)));
+			return tokens;
 		case ExecuteScript:
 			String type = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Type);
 			String script = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Script);
-			return String.format("Execute script '%s' (%s)", script, type);
+			script="...";
+			List<Token> tokens2 = new ArrayList<>();
+			tokens2.add(actionToken("Execute", "Execute script %s {%s}"));
+			tokens2.add(actionToken("script", "Execute script %s {%s}"));
+			tokens2.add(valueToken(type));
+			tokens2.add(unknownToken("{"));
+			tokens2.add(valueToken(script));
+			tokens2.add(unknownToken("}"));
+			return tokens2;
 		case PlaySound:
 			String sink = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);
 			String sound = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sound);
-			return String.format("Play sound '%s' to '%s'", sound, sink);
+			List<Token> tokens3 = new ArrayList<>();
+			tokens3.add(actionToken("Play", "Play sound %s to %s"));
+			tokens3.add(actionToken("sound", "Play sound %s to %s"));
+			tokens3.add(valueToken(sound));
+			tokens3.add(actionToken("to", "Play sound %s to %s"));
+			tokens3.add(valueToken(sink));
+			return tokens3;
 		case RunRules:
 			String rules2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
 			String considerConditions = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ConsiderConditions);
 			boolean cc = Boolean.valueOf(considerConditions);
-			return String.format("Run %s with" + (cc ? "" : "out") + " checking associated conditions", rules2);
+			List<Token> tokens4 = new ArrayList<>();
+			tokens4.add(actionToken("Run", "Run rules %s Check condition: %s"));
+			tokens4.add(actionToken("rules", "Run rules %s Check condition: %s"));
+			tokens4.add(valueToken(rules2));
+			tokens4.add(actionToken("Check", "Run rules %s Check condition: %s"));
+			tokens4.add(actionToken("condition:", "Run rules %s Check condition: %s"));
+			tokens4.add(valueToken(Boolean.toString(cc)));
+			return tokens4;
 		case SaySomething:
 			String sink2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);
 			String text = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Text);
-			return String.format("Say '%s' to '%s'", text, sink2);
+			text="...";
+			List<Token> tokens5 = new ArrayList<>();
+			tokens5.add(actionToken("Say", "Say %s to %s"));
+			tokens5.add(valueToken(text));
+			tokens5.add(actionToken("to", "Say %s to %s"));
+			tokens5.add(valueToken(sink2));
+			return tokens5;
 		case ItemCommand:
-			String itemName = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName);
-			String command = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Command);
-			return String.format("Send command %s to item '%s'", command, itemName);
+			SharedItem item = (SharedItem) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName);
+			Command command = (Command) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Command);
+			List<Token> tokens6 = new ArrayList<>();
+			tokens6.add(actionToken("Send", "Send command %s to %s"));
+			tokens6.add(actionToken("command", "Send command %s to %s"));
+			tokens6.add(commandToken(command));
+			tokens6.add(actionToken("to", "Send command %s to %s"));
+			tokens6.add(itemToken(item));
+			return tokens6;
 		default:
 			LOG.error("Invalid action type: {}", action.getActionTypeContainer().getActionType());
-			return "<An error occured during parsing of the action.>";
+			return Arrays.asList(unknownToken("<An error occured during parsing of the action.>"));
 		}
 
 	}
