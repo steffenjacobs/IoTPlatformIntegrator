@@ -25,6 +25,7 @@ public class OpenHabTriggerTransformationAdapter {
 		final SharedItem item;
 		if (ArrayUtils.contains(container.getTriggerType().getTypeSpecificKeys(), TriggerTypeSpecificKey.ItemName)) {
 			item = itemDirectory.getItemByName("" + container.getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
+			container.getTriggerTypeSpecificValues().put(TriggerTypeSpecificKey.ItemName, item);
 		} else {
 			item = null;
 		}
