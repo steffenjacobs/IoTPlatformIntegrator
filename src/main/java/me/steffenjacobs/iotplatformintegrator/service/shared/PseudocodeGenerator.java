@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
@@ -23,6 +25,7 @@ public class PseudocodeGenerator {
 		}
 		StringBuilder sb = new StringBuilder();
 
+		// triggers
 		sb.append("WHEN");
 		List<String> triggers = new ArrayList<>();
 		for (SharedTrigger trigger : sharedRule.getTriggers()) {
@@ -32,16 +35,31 @@ public class PseudocodeGenerator {
 		sb.append(String.join("\n    \u2228 ", triggers));
 		sb.append("\n\n");
 
-		sb.append("IF");
-		List<String> conditions = new ArrayList<>();
-		for (SharedCondition condition : sharedRule.getConditions()) {
-			conditions.add(generateCodeForCondition(condition));
+		// conditions
+		if (!sharedRule.getConditions().isEmpty()) {
+
+			sb.append("IF");
+			List<String> conditions = new ArrayList<>();
+			for (SharedCondition condition : sharedRule.getConditions()) {
+				conditions.add(generateCodeForCondition(condition));
+			}
+			sb.append("\n    ");
+			sb.append(String.join("\n    \u2228 ", conditions));
+			sb.append("\n\n");
 		}
-		sb.append("\n    ");
-		sb.append(String.join("\n    \u2228 ", triggers));
-		sb.append("\n\n");
-		
-		sb.append("THEN");
+
+		// actions
+		if (!sharedRule.getActions().isEmpty()) {
+
+			sb.append("DO");
+			List<String> actions = new ArrayList<>();
+			for (SharedAction action : sharedRule.getActions()) {
+				actions.add(generateCodeForAction(action));
+			}
+			sb.append("\n    ");
+			sb.append(String.join("\n    ", actions));
+			sb.append("\n\n");
+		}
 
 		return sb.toString();
 	}
@@ -98,6 +116,40 @@ public class PseudocodeGenerator {
 		default:
 			LOG.error("Invalid condition type: {}", condition.getConditionTypeContainer().getConditionType());
 			return "<An error occured during parsing of the condition.>";
+		}
+	}
+
+	public String generateCodeForAction(SharedAction action) {
+		switch (action.getActionTypeContainer().getActionType()) {
+		case EnableDisableRule:
+			String enable = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Enable);
+			String rules = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
+			boolean e = Boolean.parseBoolean(enable);
+			return String.format((e ? "Enable" : "Disable") + " rules %s", rules);
+		case ExecuteScript:
+			String type = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Type);
+			String script = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Script);
+			return String.format("Execute script '%s' (%s)", script, type);
+		case PlaySound:
+			String sink = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);
+			String sound = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sound);
+			return String.format("Play sound '%s' to '%s'", sound, sink);
+		case RunRules:
+			String rules2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
+			String considerConditions = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ConsiderConditions);
+			boolean cc = Boolean.valueOf(considerConditions);
+			return String.format("Run %s with" + (cc ? "" : "out") + " checking associated conditions", rules2);
+		case SaySomething:
+			String sink2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);
+			String text = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Text);
+			return String.format("Say '%s' to '%s'", text, sink2);
+		case ItemCommand:
+			String itemName = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName);
+			String command = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Command);
+			return String.format("Send command %s to item '%s'", command, itemName);
+		default:
+			LOG.error("Invalid action type: {}", action.getActionTypeContainer().getActionType());
+			return "<An error occured during parsing of the action.>";
 		}
 
 	}
