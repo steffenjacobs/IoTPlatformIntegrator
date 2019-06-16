@@ -41,7 +41,7 @@ public class UiEntrypointController {
 		this.settingService = settingService;
 		itemDirectory = new ItemDirectory();
 		transformer = new OpenHabTransformationAdapter(itemDirectory);
-		codeEditorController = new CodeEditorController(codeEditor);
+		codeEditorController = new CodeEditorController(codeEditor, settingService);
 		codeEditor.setController(codeEditorController);
 	}
 

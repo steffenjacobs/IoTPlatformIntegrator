@@ -2,7 +2,8 @@ package me.steffenjacobs.iotplatformintegrator.service.ui;
 
 /** @author Steffen Jacobs */
 public enum SettingKey {
-	OPENHAB_URI("http://localhost:8080", "openhab-uri", "OpenHAB URI"), SHOW_WHITESPACES("1", "show-whitespaces", "Show Whitespaces");
+	OPENHAB_URI("http://localhost:8080", "openhab-uri", "OpenHAB URI"), SHOW_WHITESPACES("1", "show-whitespaces", "Show Whitespaces"), //
+	FORMAT_CODE("1", "format-code", "Format Pseudocode");
 	private final String defaultValue;
 	private final String configKey;
 	private final String title;

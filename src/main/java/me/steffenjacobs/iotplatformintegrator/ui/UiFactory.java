@@ -85,6 +85,7 @@ public class UiFactory {
 
 		contentPanel.add(createSettingField(SettingKey.OPENHAB_URI, btnSave));
 		contentPanel.add(createSettingField(SettingKey.SHOW_WHITESPACES, btnSave));
+		contentPanel.add(createSettingField(SettingKey.FORMAT_CODE, btnSave));
 		contentPanel.add(btnSave);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 

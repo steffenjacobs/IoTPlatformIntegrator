@@ -6,6 +6,8 @@ import java.util.List;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 
@@ -14,32 +16,39 @@ public class CodeEditorController {
 
 	private static final PseudocodeGenerator pseudocodeGenerator = new PseudocodeGenerator();
 	private final CodeEditor codeEditor;
+	private final SettingService settingService;
 
 	private final ArrayList<Token> tokens = new ArrayList<>();
 
-	public CodeEditorController(CodeEditor codeEditor) {
+	public CodeEditorController(CodeEditor codeEditor, SettingService settingService) {
 		this.codeEditor = codeEditor;
+		this.settingService = settingService;
 	}
 
 	public void renderPseudocode(SharedRule rule) {
 		clear();
 		List<Token> generatedTokens = pseudocodeGenerator.generateCodeForRule(rule);
+		renderFormatted(generatedTokens);
+	}
+
+	private void renderFormatted(List<Token> generatedTokens) {
 		String prefix = "";
 		String suffix = "";
 		boolean firstKeyword = true;
 		for (int i = 0; i < generatedTokens.size(); i++) {
 			Token t = generatedTokens.get(i);
-			if(t.getTokenType() == TokenType.KEYWORD) {
-				prefix = firstKeyword?"":"\n\n";
-				firstKeyword = false;
-				suffix = "\n    ";
-			}else if (t.getTokenType() == TokenType.OPERATOR) {
-				prefix = "\n        ";
-				suffix = "";
-			}
-			else {
-				suffix = "";
-				prefix = "";
+			if ("1".equals(settingService.getSetting(SettingKey.FORMAT_CODE))) {
+				if (t.getTokenType() == TokenType.KEYWORD) {
+					prefix = firstKeyword ? "" : "\n\n";
+					firstKeyword = false;
+					suffix = "\n    ";
+				} else if (t.getTokenType() == TokenType.OPERATOR) {
+					prefix = "\n        ";
+					suffix = "";
+				} else {
+					suffix = "";
+					prefix = "";
+				}
 			}
 			appendToken(t, prefix, suffix);
 		}
