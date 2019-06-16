@@ -51,15 +51,15 @@ public class PseudocodeGenerator {
 		if (!sharedRule.getConditions().isEmpty()) {
 
 			addToken(tokens, keywordToken("IF"));
-			List<String> conditions = new ArrayList<>();
+			count = 0;
 			for (SharedCondition condition : sharedRule.getConditions()) {
-				conditions.add(generateCodeForCondition(condition));
-			}
-			for (int i = 0; i < conditions.size(); i++) {
-				addToken(tokens, new Token(conditions.get(i), TokenType.UNKNOWN, conditions.get(i)));
-				if (i < conditions.size() - 1) {
+				for (Token t : generateCodeForCondition(condition)) {
+					addToken(tokens, t);
+				}
+				if (count < sharedRule.getConditions().size() - 1) {
 					addToken(tokens, operatorToken(Operation.OR));
 				}
+				count++;
 			}
 		}
 
@@ -103,6 +103,10 @@ public class PseudocodeGenerator {
 
 	private Token triggerToken(String text, String description) {
 		return new Token(text, TokenType.TRIGGER_CONDITION, description);
+	}
+
+	private Token conditionToken(String text, String description) {
+		return new Token(text, TokenType.CONDITION, description);
 	}
 
 	private Token itemToken(SharedItem item) {
@@ -189,26 +193,48 @@ public class PseudocodeGenerator {
 		}
 	}
 
-	public String generateCodeForCondition(SharedCondition condition) {
+	public List<Token> generateCodeForCondition(SharedCondition condition) {
 		switch (condition.getConditionTypeContainer().getConditionType()) {
 		case ScriptEvaluatesTrue:
+			List<Token> tokens = new ArrayList<>();
 			String script = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Script);
 			String type = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Type);
-			return String.format("Script type=%s {%s} evaluated true", type, script);
+			tokens.add(conditionToken("Script", "Script %s {%s} evaluates to true"));
+			tokens.add(valueToken(type));
+			tokens.add(unknownToken("{"));
+			tokens.add(valueToken(script));
+			tokens.add(unknownToken("}"));
+			tokens.add(conditionToken("evaluates", "Script %s {%s} evaluates to true"));
+			tokens.add(conditionToken("to", "Script %s {%s} evaluates to true"));
+			tokens.add(conditionToken("true", "Script %s {%s} evaluates to true"));
+			return tokens;
 		case ItemState:
-			String itemName = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName);
+			SharedItem item = (SharedItem) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName);
 			String state = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.State);
-			String operator = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Operator);
-			return String.format("value of item '%s' %s %s", itemName, operator, state);
+			Operation operator = (Operation) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Operator);
+			List<Token> tokens2 = new ArrayList<>();
+			tokens2.add(conditionToken("value", "value of item '%s' %s %s"));
+			tokens2.add(conditionToken("of", "value of item '%s' %s %s"));
+			tokens2.add(conditionToken("item", "value of item '%s' %s %s"));
+			tokens2.add(itemToken(item));
+			tokens2.add(operatorToken(operator));
+			tokens2.add(valueToken(state));
+			return tokens2;
 		case DayOfWeek:
-			return "<Day of Week is not implemented with openHAB 2.4.0>";
+			return Arrays.asList(unknownToken("<Day of Week is not implemented with openHAB 2.4.0>"));
 		case TimeOfDay:
 			String startTime = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.StartTime);
 			String endTime = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.EndTime);
-			return String.format("time between %s and %s", startTime, endTime);
+			List<Token> tokens3 = new ArrayList<>();
+			tokens3.add(conditionToken("time", "time between %s and %s"));
+			tokens3.add(conditionToken("between", "time between %s and %s"));
+			tokens3.add(valueToken(startTime));
+			tokens3.add(conditionToken("and", "time between %s and %s"));
+			tokens3.add(valueToken(endTime));
+			return tokens3;
 		default:
 			LOG.error("Invalid condition type: {}", condition.getConditionTypeContainer().getConditionType());
-			return "<An error occured during parsing of the condition.>";
+			return Arrays.asList(unknownToken("<An error occured during parsing of the condition.>"));
 		}
 	}
 

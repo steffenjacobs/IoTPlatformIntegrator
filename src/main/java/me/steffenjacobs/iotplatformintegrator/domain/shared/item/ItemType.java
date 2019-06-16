@@ -85,7 +85,7 @@ public enum ItemType {
 
 	/** Operations to execute with the items. */
 	public enum Operation {
-		EQUAL("=="), SMALLER_EQUAL("<="), SMALLER("<"), BIGGER_EQUAL(">="), BIGGER(">"), NOT_EQUAL("\\u2260"), OR("\u2228"), AND("\u2227");
+		EQUAL("=="), SMALLER_EQUAL("\u2264"), SMALLER("<"), BIGGER_EQUAL("\u2265"), BIGGER(">"), NOT_EQUAL("\u2260"), OR("\u2228"), AND("\u2227"), UNKNOWN("<?>");
 
 		final String text;
 
@@ -104,6 +104,52 @@ public enum ItemType {
 				return true;
 			default:
 				return false;
+			}
+		}
+
+		public static Object fromText(String text) {
+			switch (text) {
+			case "==":
+				return EQUAL;
+			case "\u2264":
+				return SMALLER_EQUAL;
+			case "<":
+				return SMALLER;
+			case ">":
+				return BIGGER;
+			case "\u2265":
+				return BIGGER_EQUAL;
+			case "\u2260":
+				return NOT_EQUAL;
+			case "\u2228":
+				return OR;
+			case "\u2227":
+				return AND;
+			default:
+				return UNKNOWN;
+			}
+		}
+
+		public static Object fromString(String value) {
+			switch (value) {
+			case "=":
+				return EQUAL;
+			case "<=":
+				return SMALLER_EQUAL;
+			case "<":
+				return SMALLER;
+			case ">":
+				return BIGGER;
+			case ">=":
+				return BIGGER_EQUAL;
+			case "\u2260":
+				return NOT_EQUAL;
+			case "\u2228":
+				return OR;
+			case "\u2227":
+				return AND;
+			default:
+				return UNKNOWN;
 			}
 		}
 	}

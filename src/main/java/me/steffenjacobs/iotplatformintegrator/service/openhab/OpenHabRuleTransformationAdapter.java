@@ -27,9 +27,11 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 	private static final Logger LOG = LoggerFactory.getLogger(OpenHabRuleTransformationAdapter.class);
 
 	private final OpenHabTriggerTransformationAdapter triggerTransformer;
+	private final OpenHabConditionTransformationAdapter conditionTransformer;
 
 	public OpenHabRuleTransformationAdapter(ItemDirectory itemDirectory) {
 		triggerTransformer = new OpenHabTriggerTransformationAdapter(itemDirectory);
+		conditionTransformer = new OpenHabConditionTransformationAdapter(itemDirectory);
 	}
 
 	@Override
@@ -64,7 +66,9 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		String description = condition.getDescription();
 		String type = condition.getType();
 		String label = condition.getLabel();
-		return new SharedCondition(getConditiontype(type), properties, description, label);
+		SharedCondition sc = new SharedCondition(getConditionType(type), properties, description, label);
+		conditionTransformer.convertConditionTypeContainer(sc.getConditionTypeContainer());
+		return sc;
 	}
 
 	private SharedTrigger transformTrigger(Trigger t) {
@@ -77,13 +81,13 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		String description = t.getDescription();
 		String type = t.getType();
 		String label = t.getLabel();
-		
-		SharedTrigger st =  new SharedTrigger(getTriggerType(type), properties, description, label);
+
+		SharedTrigger st = new SharedTrigger(getTriggerType(type), properties, description, label);
 		triggerTransformer.convertTriggerTypeContainer(st.getTriggerTypeContainer());
 		return st;
 	}
 
-	private ConditionType getConditiontype(String conditionType) {
+	private ConditionType getConditionType(String conditionType) {
 		switch (conditionType) {
 		case "timer.DayOfWeekCondition":
 			LOG.error("DayOfWeek is currently (openHab version 2.4.0) broken!");

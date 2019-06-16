@@ -89,13 +89,15 @@ public class CodeEditorController {
 			break;
 		case ITEM:
 		case COMMAND:
-			cl = Color.RED;
+			cl = Color.LIGHT_GRAY;
 			break;
 		case UNKNOWN:
-			cl = Color.CYAN;
+			cl = Color.RED;
 			break;
 		case VALUE:
 		case OPERATOR:
+			cl = Color.GRAY;
+			break;
 		default:
 			cl = Color.BLACK;
 		}
@@ -127,7 +129,7 @@ public class CodeEditorController {
 		}
 
 		public static enum TokenType {
-			KEYWORD, ITEM, COMMAND, VALUE, OPERATOR, UNCLASSIFIED, UNKNOWN, TRIGGER_CONDITION;
+			KEYWORD, ITEM, COMMAND, VALUE, OPERATOR, UNCLASSIFIED, UNKNOWN, TRIGGER_CONDITION, CONDITION, ACTION;
 		}
 	}
 
