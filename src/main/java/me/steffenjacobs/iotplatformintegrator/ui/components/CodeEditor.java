@@ -3,6 +3,8 @@ package me.steffenjacobs.iotplatformintegrator.ui.components;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -37,16 +39,16 @@ public class CodeEditor extends JPanel {
 			@Override
 			public String getToolTipText(MouseEvent event) {
 				int pos = tp.viewToModel(event.getPoint());
-				int cnt = StringUtils.countMatches(tp.getText().substring(0, pos).replaceAll("\\s+", " "), " ");
-				System.out.println(cnt);
+				String textToCursor = tp.getText().substring(0, pos);
+
+				// viewToModel does not take "\n" into account -> quick fix
+				int lines = StringUtils.countMatches(textToCursor, '\n');
+				textToCursor = tp.getText().substring(0, pos + lines );
+
+				// remove whitespaces
+				int cnt = StringUtils.countMatches(textToCursor.replaceAll("\\s+", " "), " ");
 				String tt = controller.getTooltipForTokenByIndex(cnt);
-				System.out.println(tt);
 				return tt;
-				// int wordStart = tp.getText().lastIndexOf(" ", pos);
-				// int wordEnd = tp.getText().indexOf(" ", pos);
-				// String tt = tp.getText().substring(wordStart < 0 ? 0 : wordStart, wordEnd < 0
-				// ? tp.getText().length() : wordEnd);
-				// return tt;
 			}
 		};
 		tp.setToolTipText("test");
