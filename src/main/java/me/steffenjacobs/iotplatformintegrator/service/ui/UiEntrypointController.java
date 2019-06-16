@@ -16,8 +16,9 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
-import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
+import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 
 /** @author Steffen Jacobs */
 public class UiEntrypointController {
@@ -25,7 +26,6 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
-	private static final PseudocodeGenerator pseudocodeGenerator = new PseudocodeGenerator();
 
 	private final SettingService settingService;
 	private UiEntrypoint ui;
@@ -33,11 +33,13 @@ public class UiEntrypointController {
 	private final List<SharedRule> loadedRules = new ArrayList<>();
 	private final ItemDirectory itemDirectory;
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer;
-
-	public UiEntrypointController(SettingService settingService) {
+	private final CodeEditorController codeEditorController;
+	
+	public UiEntrypointController(SettingService settingService, CodeEditor codeEditor) {
 		this.settingService = settingService;
 		itemDirectory = new ItemDirectory();
 		transformer = new OpenHabTransformationAdapter(itemDirectory);
+		codeEditorController = new CodeEditorController(codeEditor);
 	}
 
 	public void setUi(UiEntrypoint ui) {
@@ -76,8 +78,9 @@ public class UiEntrypointController {
 		return settingService.getSetting(SettingKey.OPENHAB_URI);
 	}
 
-	public String getPseudocode(SharedRule rule) {
-		return pseudocodeGenerator.generateCodeForRule(rule);
+	public void renderPseudocode(SharedRule rule) {
+		codeEditorController.renderPseudocode(rule);
+		
 	}
 
 }

@@ -14,7 +14,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -31,6 +30,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
+import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 
 /** @author Steffen Jacobs */
@@ -43,17 +43,17 @@ public class UiEntrypoint {
 	private final JTable rulesTable;
 	private final JTable itemsTable;
 	final RuleDetailsPanel ruleDetailsPanel;
-	private final JTextArea codeText;
+	private final CodeEditor codeText;
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
-		entrypointController = new UiEntrypointController(settingService);
+		codeText = new CodeEditor();
+		entrypointController = new UiEntrypointController(settingService, codeText);
 		uiFactory = new UiFactory(settingService);
 
 		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
-		codeText = new JTextArea("Select a rule to see the generated pseudocode.");
 	}
 
 	private void setupDockingEnvironment(JFrame frame) {
@@ -140,7 +140,7 @@ public class UiEntrypoint {
 		rulesTable.getSelectionModel().addListSelectionListener(e -> {
 			SharedRule rule = entrypointController.getRuleByIndex(rulesTable.getSelectedRow());
 			ruleDetailsPanel.setDisplayedRule(rule);
-			codeText.setText(entrypointController.getPseudocode(rule));
+			entrypointController.renderPseudocode(rule);
 		});
 	}
 
