@@ -37,51 +37,43 @@ public class PseudocodeGenerator {
 		for (SharedTrigger trigger : sharedRule.getTriggers()) {
 			triggers.add(generateCodeForTrigger(trigger));
 		}
-		addToken(tokens, unclassifiedToken("\n    "));
 		for (int i = 0; i < triggers.size(); i++) {
 			addToken(tokens, new Token(triggers.get(i), TokenType.UNKNOWN, triggers.get(i)));
 			if (i < triggers.size() - 1) {
-				addToken(tokens, unclassifiedToken("\n    "));
 				addToken(tokens, operatorToken("\u2228"));
 			}
 		}
-		addToken(tokens, unclassifiedToken("\n"));
 
 		// conditions
 		if (!sharedRule.getConditions().isEmpty()) {
 
-			addToken(tokens, keywordToken("\nIF"));
+			addToken(tokens, keywordToken("IF"));
 			List<String> conditions = new ArrayList<>();
 			for (SharedCondition condition : sharedRule.getConditions()) {
 				conditions.add(generateCodeForCondition(condition));
 			}
-			addToken(tokens, unclassifiedToken("\n    "));
 			for (int i = 0; i < conditions.size(); i++) {
 				addToken(tokens, new Token(conditions.get(i), TokenType.UNKNOWN, conditions.get(i)));
-				if (i < triggers.size() - 1) {
-					addToken(tokens, unclassifiedToken("\n    "));
+				if (i < conditions.size() - 1) {
 					addToken(tokens, operatorToken("\u2228"));
 				}
 			}
-			addToken(tokens, unclassifiedToken("\n"));
 		}
 
 		// actions
 		if (!sharedRule.getActions().isEmpty()) {
 
-			addToken(tokens, keywordToken("\nDO"));
+			addToken(tokens, keywordToken("DO"));
 			List<String> actions = new ArrayList<>();
 			for (SharedAction action : sharedRule.getActions()) {
 				actions.add(generateCodeForAction(action));
 			}
-			addToken(tokens, unclassifiedToken("\n    "));
 			for (int i = 0; i < actions.size(); i++) {
 				addToken(tokens, new Token(actions.get(i), TokenType.UNKNOWN, actions.get(i)));
-				if (i < triggers.size() - 1) {
-					addToken(tokens, unclassifiedToken("\n    "));
+				if (i < actions.size() - 1) {
+					addToken(tokens, operatorToken("\u2227"));
 				}
 			}
-			addToken(tokens, unclassifiedToken("\n"));
 		}
 		LOG.info("Generated {} tokens.", tokens.size());
 		return tokens;
@@ -100,10 +92,6 @@ public class PseudocodeGenerator {
 
 	private Token keywordToken(String keyword) {
 		return new Token(keyword, TokenType.KEYWORD, "Keyword " + keyword);
-	}
-
-	private Token unclassifiedToken(String text) {
-		return new Token(text, TokenType.UNCLASSIFIED, "");
 	}
 
 	private Token operatorToken(String operator) {

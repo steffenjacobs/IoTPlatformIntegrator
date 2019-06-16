@@ -24,8 +24,24 @@ public class CodeEditorController {
 	public void renderPseudocode(SharedRule rule) {
 		clear();
 		List<Token> generatedTokens = pseudocodeGenerator.generateCodeForRule(rule);
-		for (Token t : generatedTokens) {
-			appendToken(t);
+		String prefix = "";
+		String suffix = "";
+		boolean firstKeyword = true;
+		for (int i = 0; i < generatedTokens.size(); i++) {
+			Token t = generatedTokens.get(i);
+			if(t.getTokenType() == TokenType.KEYWORD) {
+				prefix = firstKeyword?"":"\n\n";
+				firstKeyword = false;
+				suffix = "\n    ";
+			}else if (t.getTokenType() == TokenType.OPERATOR) {
+				prefix = "\n        ";
+				suffix = "";
+			}
+			else {
+				suffix = "";
+				prefix = "";
+			}
+			appendToken(t, prefix, suffix);
 		}
 	}
 
@@ -34,7 +50,7 @@ public class CodeEditorController {
 		tokens.clear();
 	}
 
-	private void appendToken(Token t) {
+	private void appendToken(Token t, String prefix, String suffix) {
 
 		// clean whitespace tokens
 		if (!t.getText().equals("") && !t.getText().equals(" ")) {
@@ -45,14 +61,14 @@ public class CodeEditorController {
 		}
 
 		final Color color = determineColorForTokenType(t.getTokenType());
-		codeEditor.appendToPane(t.getText(), color);
-		
-		//append space
+		codeEditor.appendToPane(prefix + t.getText() + suffix, color);
+
+		// append space
 		codeEditor.appendToPane(" ", color);
 	}
 
 	public String getTooltipForTokenByIndex(int tokenIndex) {
-		return tokens.get(tokenIndex).getTooltip();
+		return tokenIndex < tokens.size() ? tokens.get(tokenIndex).getTooltip() : "";
 	}
 
 	private Color determineColorForTokenType(TokenType t) {

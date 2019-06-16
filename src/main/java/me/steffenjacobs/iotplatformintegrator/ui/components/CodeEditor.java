@@ -70,7 +70,8 @@ public class CodeEditor extends JPanel {
 
 	private void appendWhitespace() {
 		StyleContext sc = StyleContext.getDefaultStyleContext();
-		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, Color.LIGHT_GRAY);
+		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background,
+				"0".equals(settingService.getSetting(SettingKey.SHOW_WHITESPACES)) ? Color.WHITE : Color.LIGHT_GRAY);
 
 		aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
