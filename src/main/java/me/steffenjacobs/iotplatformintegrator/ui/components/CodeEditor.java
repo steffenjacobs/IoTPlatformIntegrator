@@ -54,15 +54,15 @@ public class CodeEditor extends JPanel {
 		showHelpText();
 	}
 
-	public void appendToPane(String msg, Color col) {
+	public void appendToPane(String msg, Color col, boolean bold) {
 		if ("0".equals(settingService.getSetting(SettingKey.SHOW_WHITESPACES))) {
-			appendStringToPane(msg, col);
+			appendStringToPane(msg, col, bold);
 		} else {
 			msg.chars().forEach(c -> {
 				if (c == ' ') {
 					appendWhitespace();
 				} else {
-					appendStringToPane("" + (char) c, col);
+					appendStringToPane("" + (char) c, col, bold);
 				}
 			});
 		}
@@ -82,7 +82,7 @@ public class CodeEditor extends JPanel {
 		tp.replaceSelection(" ");
 	}
 
-	private void appendStringToPane(String msg, Color c) {
+	private void appendStringToPane(String msg, Color c, boolean bold) {
 		if (msg.equals(" ")) {
 			appendWhitespace();
 		} else {
@@ -92,6 +92,7 @@ public class CodeEditor extends JPanel {
 			aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
 			aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 			aset = sc.addAttribute(aset, StyleConstants.Foreground, c);
+			aset = sc.addAttribute(aset, StyleConstants.Bold, bold);
 
 			int len = tp.getDocument().getLength();
 			tp.setCaretPosition(len);
@@ -106,7 +107,7 @@ public class CodeEditor extends JPanel {
 
 	public void showHelpText() {
 		clear();
-		appendToPane("Select a rule to see the generated pseudocode.", Color.BLACK);
+		appendToPane("Select a rule to see the generated pseudocode.", Color.BLACK, false);
 	}
 
 	public void setController(CodeEditorController controller) {

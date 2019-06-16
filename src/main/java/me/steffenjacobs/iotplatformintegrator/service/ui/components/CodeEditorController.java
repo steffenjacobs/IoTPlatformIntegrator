@@ -71,25 +71,37 @@ public class CodeEditorController {
 		}
 
 		final Color color = determineColorForTokenType(t.getTokenType());
-		codeEditor.appendToPane(prefix + t.getText() + suffix, color);
+		final boolean bold = determineBoldnessForTokenType(t.getTokenType());
+		codeEditor.appendToPane(prefix + t.getText() + suffix, color, bold);
 
 		// append space
-		codeEditor.appendToPane(" ", color);
+		codeEditor.appendToPane(" ", color, bold);
 	}
 
 	public String getTooltipForTokenByIndex(int tokenIndex) {
 		return tokenIndex < tokens.size() ? tokens.get(tokenIndex).getTooltip() : "";
 	}
 
+	private boolean determineBoldnessForTokenType(TokenType t) {
+		switch (t) {
+		case KEYWORD:
+		case ITEM:
+		case COMMAND:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	private Color determineColorForTokenType(TokenType t) {
 		final Color cl;
 		switch (t) {
 		case KEYWORD:
-			cl = Color.BLUE;
+			cl = Color.decode("#7f0055");
 			break;
 		case ITEM:
 		case COMMAND:
-			cl = Color.LIGHT_GRAY;
+			cl = Color.decode("#0069b5");
 			break;
 		case UNKNOWN:
 			cl = Color.RED;
@@ -97,7 +109,7 @@ public class CodeEditorController {
 		case VALUE:
 		case MULTI_VALUE:
 		case OPERATOR:
-			cl = Color.GRAY;
+			cl = Color.decode("#7f9fd6");
 			break;
 		default:
 			cl = Color.BLACK;
