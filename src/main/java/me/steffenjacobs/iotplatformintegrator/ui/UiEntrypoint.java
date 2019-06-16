@@ -1,8 +1,13 @@
 package me.steffenjacobs.iotplatformintegrator.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -53,6 +58,14 @@ public class UiEntrypoint {
 		entrypointController.setUi(this);
 		// Creating the Frame
 		JFrame frame = new JFrame("IoT Platform Integrator");
+		try {
+			BufferedImage bufferedImage = ImageIO.read(getClass().getResource("/icon.png"));
+			Graphics2D g = bufferedImage.createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			frame.setIconImage(bufferedImage);
+		} catch (IOException e1) {
+			LOG.error("Could not load icon: " + e1.getMessage());
+		}
 
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
