@@ -14,6 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabRuleTransformationAdapter;
+import me.steffenjacobs.iotplatformintegrator.service.openhab.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 
@@ -23,7 +24,7 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
-	private static final OpenHabRuleTransformationAdapter transformer = new OpenHabRuleTransformationAdapter();
+	private static final PlatformTransformationAdapter<ExperimentalRule, ItemDTO> transformer = new OpenHabRuleTransformationAdapter();
 	private static final PseudocodeGenerator pseudocodeGenerator = new PseudocodeGenerator();
 
 	private final SettingService settingService;

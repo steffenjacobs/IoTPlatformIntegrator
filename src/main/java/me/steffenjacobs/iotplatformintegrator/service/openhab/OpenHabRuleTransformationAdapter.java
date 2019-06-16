@@ -23,9 +23,10 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 
 /** @author Steffen Jacobs */
-public class OpenHabRuleTransformationAdapter {
+public class OpenHabRuleTransformationAdapter implements PlatformTransformationAdapter<ExperimentalRule, ItemDTO> {
 	private static final Logger LOG = LoggerFactory.getLogger(OpenHabRuleTransformationAdapter.class);
 
+	@Override
 	public SharedRule transformRule(ExperimentalRule rule) {
 		String ruleName = rule.getName();
 		String ruleUid = rule.getUid();
@@ -140,6 +141,7 @@ public class OpenHabRuleTransformationAdapter {
 		return rule.getStatus().getStatus();
 	}
 
+	@Override
 	public SharedItem transformItem(ItemDTO item) {
 		String name = item.getName();
 		String label = item.getLabel();
