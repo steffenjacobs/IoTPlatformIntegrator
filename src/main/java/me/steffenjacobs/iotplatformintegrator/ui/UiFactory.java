@@ -84,6 +84,7 @@ public class UiFactory {
 		JPanel contentPanel = new JPanel();
 
 		contentPanel.add(createSettingField(SettingKey.OPENHAB_URI, btnSave));
+		contentPanel.add(createSettingField(SettingKey.SHOW_WHITESPACES, btnSave));
 		contentPanel.add(btnSave);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
@@ -98,25 +99,25 @@ public class UiFactory {
 	}
 
 	private JPanel createSettingField(final SettingKey key, final JButton saveButton) {
-		JTextField settingsField = new JTextField(settingService.getSetting(SettingKey.OPENHAB_URI));
+		JTextField settingsField = new JTextField(settingService.getSetting(key));
 		JButton settingsButton = new JButton("Restore Default");
 
 		settingsField.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				saveButton.setEnabled(true);
-				settingsButton.setEnabled(!settingsField.getText().equals(SettingKey.OPENHAB_URI.getDefaultValue()));
+				settingsButton.setEnabled(!settingsField.getText().equals(key.getDefaultValue()));
 			}
 		});
 
 		settingsButton.addActionListener(e -> {
-			settingsField.setText(SettingKey.OPENHAB_URI.getDefaultValue());
+			settingsField.setText(key.getDefaultValue());
 			saveButton.doClick();
 		});
-		settingsButton.setEnabled(!settingsField.getText().equals(SettingKey.OPENHAB_URI.getDefaultValue()));
+		settingsButton.setEnabled(!settingsField.getText().equals(key.getDefaultValue()));
 
 		saveButton.addActionListener(e -> {
-			settingService.setSetting(SettingKey.OPENHAB_URI, settingsField.getText());
+			settingService.setSetting(key, settingsField.getText());
 		});
 
 		return wrapToPanel(key.getTitle() + ":", settingsField, settingsButton);

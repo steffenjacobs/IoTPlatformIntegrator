@@ -47,7 +47,7 @@ public class UiEntrypoint {
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
-		codeText = new CodeEditor();
+		codeText = new CodeEditor(settingService);
 		entrypointController = new UiEntrypointController(settingService, codeText);
 		uiFactory = new UiFactory(settingService);
 
