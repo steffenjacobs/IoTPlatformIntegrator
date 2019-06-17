@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.print.attribute.HashAttributeSet;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.states.State;
