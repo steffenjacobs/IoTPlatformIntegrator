@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.E
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.item.ItemDTO;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantApiService;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantItemTransformationService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
@@ -26,6 +29,9 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
+
+	private final HomeAssistantApiService homeAssistantApiService = new HomeAssistantApiService();
+	private final HomeAssistantItemTransformationService haItemTransformationService = new HomeAssistantItemTransformationService();
 
 	private final SettingService settingService;
 	private UiEntrypoint ui;
@@ -95,6 +101,15 @@ public class UiEntrypointController {
 			lastRule = rule;
 		}
 
+	}
+
+	public void loadHomeAssistantData() throws ClientProtocolException, IOException {
+		itemDirectory.clearItems();
+		loadedRules.clear();
+		itemDirectory.addItems(haItemTransformationService.transformItems(
+				homeAssistantApiService.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN))));
+		ui.refreshItems(itemDirectory.getAllItems());
+		lastRule = null;
 	}
 
 }

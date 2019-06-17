@@ -163,6 +163,18 @@ public class UiEntrypoint {
 						entrypointController.getUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
+		
+		JMenuItem mImportFromHomeAssistant = new JMenuItem("HomeAssistant");
+		mConnect.add(mImportFromHomeAssistant);
+		mImportFromHomeAssistant.addActionListener(e -> {
+			try {
+				entrypointController.loadHomeAssistantData();
+//				entrypointController.loadOpenHABRules();
+			} catch (Exception e2) {
+				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
+						entrypointController.getUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
+			}
+		});
 
 		JMenuItem mSettings = new JMenuItem("Settings");
 		mSettings.addActionListener(e -> uiFactory.createSettingsFrame().setVisible(true));
