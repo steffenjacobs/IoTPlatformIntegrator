@@ -3,7 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.service.ui;
 /** @author Steffen Jacobs */
 public enum SettingKey {
 	OPENHAB_URI("http://localhost:8080", "openhab-uri", "OpenHAB URI"), SHOW_WHITESPACES("1", "show-whitespaces", "Show Whitespaces"), //
-	FORMAT_CODE("1", "format-code", "Format Pseudocode");
+	FORMAT_CODE("1", "format-code", "Format Pseudocode"), HOMEASSISTANT_API_TOKEN("<please specify>", "ha-api-token", "Home Assistant API Token");
 	private final String defaultValue;
 	private final String configKey;
 	private final String title;

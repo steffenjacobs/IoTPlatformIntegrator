@@ -83,9 +83,9 @@ public class UiFactory {
 		JButton btnSave = new JButton("Save");
 		JPanel contentPanel = new JPanel();
 
-		contentPanel.add(createSettingField(SettingKey.OPENHAB_URI, btnSave));
-		contentPanel.add(createSettingField(SettingKey.SHOW_WHITESPACES, btnSave));
-		contentPanel.add(createSettingField(SettingKey.FORMAT_CODE, btnSave));
+		for (SettingKey settingKey : SettingKey.values()) {
+			contentPanel.add(createSettingField(settingKey, btnSave));
+		}
 		contentPanel.add(btnSave);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
