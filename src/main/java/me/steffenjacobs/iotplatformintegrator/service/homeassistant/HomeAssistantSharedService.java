@@ -64,21 +64,17 @@ public class HomeAssistantSharedService {
 		return 200 == response.getStatusLine().getStatusCode();
 	}
 
-	public int sendPost(String url, String payload) throws IOException {
-		return sendPost(url, true, payload);
-	}
-
-	public int sendPost(String url, boolean sendHeader, String payload) throws IOException {
+	public HttpResponse sendPost(String url, String bearerToken, String payload) throws IOException {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost post = new HttpPost(url);
 
 		post.setEntity(new ByteArrayEntity(payload.getBytes("UTF-8")));
-		if (sendHeader) {
-			post.addHeader("Content-Type", "application/json");
-		}
+		post.addHeader("Content-Type", "application/json");
+		post.addHeader("Authorization", "Bearer " + bearerToken);
+		
 		HttpResponse response = client.execute(post);
 		System.out.println(response.getStatusLine().getStatusCode());
 		System.out.println(url);
-		return response.getStatusLine().getStatusCode();
+		return response;
 	}
 }

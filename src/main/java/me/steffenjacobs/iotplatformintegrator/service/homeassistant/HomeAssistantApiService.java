@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiAvailabilityMessage;
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiStatusMessage;
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.HomeAssistantEvent;
+import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ValidationMessage;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantApiService {
@@ -53,5 +54,15 @@ public class HomeAssistantApiService {
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.readValue(response.getEntity().getContent(), new TypeReference<List<HomeAssistantEvent>>() {
 		});
+	}
+
+	public boolean validateConfiguration(String urlWithPort, String bearerToken) throws IOException {
+		HttpResponse response = sharedService.sendPost(urlWithPort + "/api/config/core/check_config", bearerToken, "");
+		if (response.getStatusLine().getStatusCode() != 200) {
+			throw new IOException("Error executing request, HTTP status: " + response.getStatusLine().getStatusCode());
+		}
+		ObjectMapper objectMapper = new ObjectMapper();
+		ValidationMessage vm = objectMapper.readValue(response.getEntity().getContent(), ValidationMessage.class);
+		return vm.getErrors() == null || vm.getErrors().isEmpty();
 	}
 }

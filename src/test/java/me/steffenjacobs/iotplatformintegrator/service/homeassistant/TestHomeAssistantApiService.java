@@ -1,7 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.service.homeassistant;
 
-import static org.junit.Assert.assertFalse;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -50,5 +48,11 @@ public class TestHomeAssistantApiService {
 		List<HomeAssistantEvent> events = service.getHomeAssistantEvents(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
 		Assert.assertFalse(events.isEmpty());
 		Assert.assertTrue(events.stream().filter(e -> e.getEvent().equals("homeassistant_start")).count() > 0);
+	}
+
+	@Test
+	public void testApiValid() throws IOException {
+		HomeAssistantApiService service = new HomeAssistantApiService();
+		Assert.assertTrue(service.validateConfiguration(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 	}
 }
