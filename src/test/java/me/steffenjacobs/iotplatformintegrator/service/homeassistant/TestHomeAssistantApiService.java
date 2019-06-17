@@ -1,7 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.service.homeassistant;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,6 +13,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiStatusMessage;
+import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.HomeAssistantEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
@@ -38,5 +42,13 @@ public class TestHomeAssistantApiService {
 		Assert.assertEquals(HOMEASSISTANT_URL_WITH_PORT, versionInfo.getBaseUrl());
 		Assert.assertEquals("Home", versionInfo.getLocationName());
 		Assert.assertTrue(versionInfo.getRequiresApiPassword());
+	}
+
+	@Test
+	public void testGetEvents() throws JsonParseException, JsonMappingException, UnsupportedOperationException, IOException {
+		HomeAssistantApiService service = new HomeAssistantApiService();
+		List<HomeAssistantEvent> events = service.getHomeAssistantEvents(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
+		Assert.assertFalse(events.isEmpty());
+		Assert.assertTrue(events.stream().filter(e -> e.getEvent().equals("homeassistant_start")).count() > 0);
 	}
 }
