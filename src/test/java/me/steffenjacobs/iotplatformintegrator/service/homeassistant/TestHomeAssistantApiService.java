@@ -19,27 +19,26 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 /** @author Steffen Jacobs */
 public class TestHomeAssistantApiService {
-	private static final String HOMEASSISTANT_URL_WITH_PORT = "http://192.168.1.24:8123";
 	private static final SettingService settingService = new SettingService("./settings.config");
 
 	@Test
 	public void testIsTokenCorrect() throws JsonParseException, JsonMappingException, MalformedURLException, IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
 		Assert.assertTrue("Token is invalid. Did you specify a correct token via settings?",
-				service.isTokenCorrect(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
+				service.isTokenCorrect(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 	}
 
 	@Test
 	public void testIsApiAvailable() throws JsonParseException, JsonMappingException, MalformedURLException, IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
-		Assert.assertTrue("API not available", service.isApiAvailable(HOMEASSISTANT_URL_WITH_PORT));
+		Assert.assertTrue("API not available", service.isApiAvailable(settingService.getSetting(SettingKey.HOMEASSISTANT_URI)));
 	}
 
 	@Test
 	public void testGetVersionInfo() throws JsonParseException, JsonMappingException, UnsupportedOperationException, IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
-		ApiStatusMessage versionInfo = service.getVersionInfo(HOMEASSISTANT_URL_WITH_PORT);
-		Assert.assertEquals(HOMEASSISTANT_URL_WITH_PORT, versionInfo.getBaseUrl());
+		ApiStatusMessage versionInfo = service.getVersionInfo(settingService.getSetting(SettingKey.HOMEASSISTANT_URI));
+		Assert.assertEquals(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), versionInfo.getBaseUrl());
 		Assert.assertEquals("Home", versionInfo.getLocationName());
 		Assert.assertTrue(versionInfo.getRequiresApiPassword());
 	}
@@ -47,7 +46,8 @@ public class TestHomeAssistantApiService {
 	@Test
 	public void testGetEvents() throws JsonParseException, JsonMappingException, UnsupportedOperationException, IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
-		List<HomeAssistantEvent> events = service.getHomeAssistantEvents(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
+		List<HomeAssistantEvent> events = service.getHomeAssistantEvents(settingService.getSetting(SettingKey.HOMEASSISTANT_URI),
+				settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
 		Assert.assertFalse(events.isEmpty());
 		Assert.assertTrue(events.stream().filter(e -> e.getEvent().equals("homeassistant_start")).count() > 0);
 	}
@@ -55,13 +55,13 @@ public class TestHomeAssistantApiService {
 	@Test
 	public void testApiValid() throws IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
-		Assert.assertTrue(service.validateConfiguration(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
+		Assert.assertTrue(service.validateConfiguration(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 	}
 
 	@Test
 	public void testGetAllState() throws ClientProtocolException, IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
-		List<State> allState = service.getAllState(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
+		List<State> allState = service.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
 		Assert.assertFalse(allState.isEmpty());
 	}
 }
