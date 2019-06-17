@@ -15,7 +15,8 @@ public enum ItemType {
 	Color(new DataType[] { DataType.Numerical }, Command.getColorCommands()), Image(new DataType[] { DataType.Discrete }, new Command[0]), //
 	Player(new DataType[] { DataType.Discrete }, Command.getPlayerCommands()), Location(new DataType[] { DataType.Discrete }, new Command[] { Command.Point }), //
 	Rollershutter(new DataType[] { DataType.Numerical }, Command.getRollershutterCommands()), //
-	Group(new DataType[] { DataType.Discrete }, new Command[0]), Unknown(new DataType[] { DataType.Unknown }, new Command[0]);
+	Group(new DataType[] { DataType.Discrete }, new Command[0]), Unknown(new DataType[] { DataType.Unknown }, new Command[0]), //
+	AUTOMATION_RULE(new DataType[] { DataType.Unknown }, new Command[0]);
 
 	private final DataType datatype;
 	private final Command[] commands;

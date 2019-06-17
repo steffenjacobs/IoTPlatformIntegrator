@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,9 +107,12 @@ public class UiEntrypointController {
 	public void loadHomeAssistantData() throws ClientProtocolException, IOException {
 		itemDirectory.clearItems();
 		loadedRules.clear();
-		itemDirectory.addItems(haItemTransformationService.transformItems(
-				homeAssistantApiService.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN))));
+		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService.transformItemsAndRules(
+				homeAssistantApiService.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
+		itemDirectory.addItems(itemsAndRules.getLeft());
+		loadedRules.addAll(itemsAndRules.getRight());
 		ui.refreshItems(itemDirectory.getAllItems());
+		ui.refreshRulesTable(loadedRules);
 		lastRule = null;
 	}
 
