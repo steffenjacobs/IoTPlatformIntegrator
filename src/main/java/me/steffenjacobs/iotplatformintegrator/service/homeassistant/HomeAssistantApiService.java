@@ -16,6 +16,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiAvailabili
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiStatusMessage;
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.HomeAssistantEvent;
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ValidationMessage;
+import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.states.State;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantApiService {
@@ -64,5 +65,15 @@ public class HomeAssistantApiService {
 		ObjectMapper objectMapper = new ObjectMapper();
 		ValidationMessage vm = objectMapper.readValue(response.getEntity().getContent(), ValidationMessage.class);
 		return vm.getErrors() == null || vm.getErrors().isEmpty();
+	}
+
+	public List<State> getAllState(String urlWithPort, String bearerToken) throws ClientProtocolException, IOException {
+		HttpResponse response = sharedService.sendGet(urlWithPort + "/api/states", bearerToken);
+		if (200 != response.getStatusLine().getStatusCode()) {
+			throw new IOException("Error executing request, HTTP status: " + response.getStatusLine().getStatusCode());
+		}
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.readValue(response.getEntity().getContent(), new TypeReference<List<State>>() {
+		});
 	}
 }

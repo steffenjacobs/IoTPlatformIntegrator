@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiStatusMessage;
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.HomeAssistantEvent;
+import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.states.State;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
@@ -54,5 +56,12 @@ public class TestHomeAssistantApiService {
 	public void testApiValid() throws IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
 		Assert.assertTrue(service.validateConfiguration(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
+	}
+
+	@Test
+	public void testGetAllState() throws ClientProtocolException, IOException {
+		HomeAssistantApiService service = new HomeAssistantApiService();
+		List<State> allState = service.getAllState(HOMEASSISTANT_URL_WITH_PORT, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN));
+		Assert.assertFalse(allState.isEmpty());
 	}
 }
