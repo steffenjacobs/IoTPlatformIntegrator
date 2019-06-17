@@ -53,7 +53,7 @@ public class HomeAssistantItemTransformationService {
 
 	private SharedRule parseRule(State state) {
 		String name = state.getAttributes().getFriendlyName();
-		String id = state.getEntityId();
+		String id = state.getContext().getId();
 		String description = state.getAttributes().getFriendlyName();
 		String visible = null;
 		String status = state.getState();
