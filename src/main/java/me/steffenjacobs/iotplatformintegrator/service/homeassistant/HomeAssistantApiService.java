@@ -11,14 +11,15 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiAvailabilityMessage;
+import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiStatusMessage;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantApiService {
 
 	private static final HomeAssistantSharedService sharedService = new HomeAssistantSharedService();
 
-	public boolean isApiAvailable(String urlWithPort, String bearerToken) throws ClientProtocolException, IOException {
-		return 200 == sharedService.sendGet(urlWithPort, bearerToken).getStatusLine().getStatusCode();
+	public boolean isApiAvailable(String urlWithPort) throws ClientProtocolException, IOException {
+		return 200 == sharedService.sendGet(urlWithPort, "").getStatusLine().getStatusCode();
 	}
 
 	public boolean isTokenCorrect(String urlWithPort, String bearerToken) throws JsonParseException, JsonMappingException, MalformedURLException, IOException {
@@ -30,7 +31,13 @@ public class HomeAssistantApiService {
 		ApiAvailabilityMessage msg = objectMapper.readValue(response.getEntity().getContent(), ApiAvailabilityMessage.class);
 		return "API running.".equals(msg.getMessage());
 	}
-	// public void getVersionInfo(String urlWithPort, String bearerToken) {
-	// sharedService.sendGet(urlWithPort, bearerToken)
-	// }
+
+	public ApiStatusMessage getVersionInfo(String urlWithPort) throws JsonParseException, JsonMappingException, UnsupportedOperationException, IOException {
+		HttpResponse response = sharedService.sendGet(urlWithPort + "/api/discovery_info", "");
+		ObjectMapper objectMapper = new ObjectMapper();
+		if (200 != response.getStatusLine().getStatusCode()) {
+			throw new IOException("Error executing request, HTTP status: " + response.getStatusLine().getStatusCode());
+		}
+		return objectMapper.readValue(response.getEntity().getContent(), ApiStatusMessage.class);
+	}
 }
