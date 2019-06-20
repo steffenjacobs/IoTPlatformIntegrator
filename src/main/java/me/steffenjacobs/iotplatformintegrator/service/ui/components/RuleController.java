@@ -4,7 +4,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 
 /** @author Steffen Jacobs */
@@ -15,7 +15,7 @@ public class RuleController {
 
 	public RuleController() {
 		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
-			lastRule = ((SelectedRuleChangedEvent) e).getSelectedRule();
+			lastRule = ((SelectedRuleChangeEvent) e).getSelectedRule();
 		});
 		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
 			currentConnection = ((SelectedServerConnectionChangeEvent) e).getServerConnection();

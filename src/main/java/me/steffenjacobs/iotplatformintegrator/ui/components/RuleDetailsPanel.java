@@ -20,7 +20,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 
 /** @author Steffen Jacobs */
 public class RuleDetailsPanel extends JPanel {
@@ -84,7 +84,7 @@ public class RuleDetailsPanel extends JPanel {
 
 		super.add(noRuleSelected, BorderLayout.NORTH);
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> setDisplayedRule(((SelectedRuleChangedEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> setDisplayedRule(((SelectedRuleChangeEvent) e).getSelectedRule()));
 	}
 
 	private void setDisplayedRule(SharedRule rule) {

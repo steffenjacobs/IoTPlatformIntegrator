@@ -10,7 +10,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedTargetRuleChangeEvent;
@@ -62,7 +62,7 @@ public class RuleTableHolder {
 			switch (type) {
 			case Default:
 				if (ruleController.getLastSelectedRule() != rule) {
-					EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(rule));
+					EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(rule));
 				}
 				break;
 			case Source:
@@ -84,7 +84,7 @@ public class RuleTableHolder {
 		}
 		switch (type) {
 		case Default:
-			EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(null));
+			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(null));
 			break;
 		case Source:
 			EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(null));
