@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
@@ -16,6 +20,9 @@ import me.steffenjacobs.iotplatformintegrator.ui.util.StringUtil;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantConditionTransformationAdapter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantConditionTransformationAdapter.class);
+
 	public List<SharedCondition> parseCondition(Object o, ItemDirectory itemDirectory) {
 		if (!(o instanceof Map)) {
 			System.out.println(o);
@@ -81,6 +88,22 @@ public class HomeAssistantConditionTransformationAdapter {
 				String after = "" + map.get("after");
 				SharedItem item = itemDirectory.getItemByName("sun.sun");
 				handleAfterBefore(map, conditions, before, after, item);
+			} else if (map.get("condition").equals("zone")) {
+
+				// TODO: fix handling of zones
+				SharedItem item = itemDirectory.getItemByName("" + map.get("entity_id"));
+				String zone = "" + map.get("zone");
+				Map<String, Object> conditionProperties = new HashMap<>();
+				conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), zone);
+				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.EQUAL);
+				conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
+				// TODO: fix label + description
+				String label = ConditionType.ItemState + " equal condition for zone";
+				String description = String.format("%s is in zone %s", item.getLabel(), zone);
+
+				conditions.add(new SharedCondition(ConditionType.ItemState, conditionProperties, description, label));
+			} else {
+				LOG.error("invalid condition for condition type item state.");
 			}
 			break;
 		case TimeOfDay:
@@ -106,6 +129,9 @@ public class HomeAssistantConditionTransformationAdapter {
 				SharedCondition sc = new SharedCondition(ConditionType.TimeOfDay, conditionProperties, description, label);
 				conditions.add(sc);
 			}
+			break;
+		default:
+			LOG.error("Could not parse condition {}", conditionType);
 			break;
 		}
 		return conditions;
@@ -150,6 +176,7 @@ public class HomeAssistantConditionTransformationAdapter {
 		case "numeric_state":
 		case "state":
 		case "sun":
+		case "zone":
 			return ConditionType.ItemState;
 		case "time":
 			return ConditionType.TimeOfDay;
