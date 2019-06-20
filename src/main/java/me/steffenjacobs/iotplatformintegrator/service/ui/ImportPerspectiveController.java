@@ -103,23 +103,6 @@ public class ImportPerspectiveController {
 		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(serverConnection));
 	}
 
-	public SharedRule getRuleByIndex(int index) {
-		if (selectedConnection == null) {
-			// TODO
-		}
-		if (index < 0 || index >= selectedConnection.getRules().size()) {
-			return null;
-		}
-		return selectedConnection.getRules().get(index);
-	}
-
-	public SharedRule getRuleByIndex(ServerConnection serverConnection, int index) {
-		if (index < 0 || index >= serverConnection.getRules().size()) {
-			return null;
-		}
-		return serverConnection.getRules().get(index);
-	}
-
 	public String getOHUrlWithPort() {
 		return settingService.getSetting(SettingKey.OPENHAB_URI);
 	}
