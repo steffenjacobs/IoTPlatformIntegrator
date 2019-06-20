@@ -40,7 +40,7 @@ public class ImportPerspective {
 		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
-		connectionExplorer = new ConnectionExplorer(perpsectiveController);
+		connectionExplorer = new ConnectionExplorer();
 		perpsectiveController.setCodeText(codeText);
 		perpsectiveController.setImportPerspective(this);
 

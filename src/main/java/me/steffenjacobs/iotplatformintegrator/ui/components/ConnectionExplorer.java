@@ -21,7 +21,7 @@ import javax.swing.tree.TreeNode;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
 
 /** @author Steffen Jacobs */
 public class ConnectionExplorer extends JPanel {
@@ -32,7 +32,7 @@ public class ConnectionExplorer extends JPanel {
 	private final Map<DefaultMutableTreeNode, ServerConnection> nodeTable = new HashMap<>();
 	private final Map<ServerConnection, DefaultMutableTreeNode> nodeTableBackwards = new HashMap<>();
 
-	public ConnectionExplorer(final ImportPerspectiveController controller) {
+	public ConnectionExplorer() {
 		super();
 		this.setLayout(new BorderLayout());
 
@@ -56,7 +56,7 @@ public class ConnectionExplorer extends JPanel {
 			}
 		};
 
-		JTree tree = new ServerConnectionTree(controller, this.model);
+		JTree tree = new ServerConnectionTree(this.model);
 		tree.setExpandsSelectedPaths(true);
 
 		tree.addTreeSelectionListener(e -> {
@@ -100,11 +100,9 @@ public class ConnectionExplorer extends JPanel {
 	private final class ServerConnectionTree extends JTree implements ActionListener {
 		private static final long serialVersionUID = 2462886798062875440L;
 		JPopupMenu popup = new JPopupMenu();
-		private final ImportPerspectiveController controller;
 
-		ServerConnectionTree(ImportPerspectiveController controller, TreeModel dmtn) {
+		ServerConnectionTree(TreeModel dmtn) {
 			super(dmtn);
-			this.controller = controller;
 			JMenuItem mi = new JMenuItem("Disconnect");
 			mi.addActionListener(this);
 			mi.setActionCommand("disconnect");
@@ -139,7 +137,7 @@ public class ConnectionExplorer extends JPanel {
 
 				// update tree at parent node
 				((DefaultTreeModel) this.getModel()).nodeStructureChanged((TreeNode) selectedNode);
-				controller.removeServerConnection(nodeTable.get(selectedNode));
+				EventBus.getInstance().fireEvent(new ServerDisconnectedEvent(nodeTable.get(selectedNode)));
 
 			}
 		}

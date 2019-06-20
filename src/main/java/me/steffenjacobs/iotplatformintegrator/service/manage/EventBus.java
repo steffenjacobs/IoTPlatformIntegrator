@@ -18,7 +18,7 @@ public class EventBus {
 	private static final EventBus INSTANCE = new EventBus();
 
 	public static enum EventType {
-		Test, SelectedServerConnectionChanged;
+		Test, SelectedServerConnectionChanged, ServerDisconnected;
 	}
 
 	private EventBus() {
@@ -35,7 +35,7 @@ public class EventBus {
 	@SuppressWarnings("unchecked")
 	public void addEventHandler(EventType eventType, Consumer<? extends Event> handler) {
 		Collection<Consumer<Event>> handlers = new ArrayList<>();
-		handlers.add((Consumer<Event>)handler);
+		handlers.add((Consumer<Event>) handler);
 		lock.writeLock().lock();
 		if (handlerMap.putIfAbsent(eventType, handlers) != null) {
 			handlers.addAll(handlerMap.get(eventType));

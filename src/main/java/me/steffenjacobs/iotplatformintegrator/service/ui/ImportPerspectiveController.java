@@ -25,6 +25,7 @@ import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistan
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabCommandParser;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
@@ -67,6 +68,9 @@ public class ImportPerspectiveController {
 		this.settingService = settingService;
 		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
 			setSelectedServerConnection(((SelectedServerConnectionChangeEvent) e).getSelectedServerConnection());
+		});
+		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> {
+			removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection());
 		});
 	}
 
@@ -178,10 +182,6 @@ public class ImportPerspectiveController {
 		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(connection));
 	}
 
-	public ServerConnection getSelectedServerConnection() {
-		return selectedConnection;
-	}
-
 	private void setSelectedServerConnection(ServerConnection serverConnection) {
 		if (selectedConnection == serverConnection) {
 			return;
@@ -197,7 +197,7 @@ public class ImportPerspectiveController {
 		}
 	}
 
-	public void removeServerConnection(ServerConnection serverConnection) {
+	private void removeServerConnection(ServerConnection serverConnection) {
 		currentConnections.remove(serverConnection);
 		// TODO: use event system
 		importPerspective.propagateRemovalOfServerConnection(serverConnection);
