@@ -80,36 +80,69 @@ public class HomeAssistantConditionTransformationAdapter {
 				String before = "" + map.get("before");
 				String after = "" + map.get("after");
 				SharedItem item = itemDirectory.getItemByName("sun.sun");
-
-				if (StringUtil.isNonNull(before)) {
-					// TODO: fix label + description
-					String beforeOffset = "" + map.get("before_offset");
-					Map<String, Object> conditionProperties = new HashMap<>();
-					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
-					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
-					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), before + beforeOffset);
-					String description = item.getLabel() + " before " + before;
-					String label = ConditionType.ItemState + " before condition";
-					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
-					conditions.add(sc);
-				}
-				if (StringUtil.isNonNull(after)) {
-					// TODO: fix label + description
-					String afterOffset = "" + map.get("after_offset");
-					Map<String, Object> conditionProperties = new HashMap<>();
-					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
-					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
-					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), after + afterOffset);
-					String description = item.getLabel() + " after " + after;
-					String label = ConditionType.ItemState + " after condition";
-					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
-					conditions.add(sc);
-				}
+				handleAfterBefore(map, conditions, before, after, item);
 			}
+			break;
+		case TimeOfDay:
+			String before = "" + map.get("before");
+			String after = "" + map.get("after");
+			if (StringUtil.isNonNull(before)) {
+				// TODO: fix label + description
+				Map<String, Object> conditionProperties = new HashMap<>();
+				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
 
+				String description = "Time is before " + before;
+				String label = ConditionType.TimeOfDay + " before condition";
+				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+				conditions.add(sc);
+			}
+			if (StringUtil.isNonNull(after)) {
+				// TODO: fix label + description
+				Map<String, Object> conditionProperties = new HashMap<>();
+				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+
+				String description = "Time is after " + after;
+				String label = ConditionType.TimeOfDay + " after condition";
+				SharedCondition sc = new SharedCondition(ConditionType.TimeOfDay, conditionProperties, description, label);
+				conditions.add(sc);
+			}
 			break;
 		}
 		return conditions;
+	}
+
+	private void handleAfterBefore(Map<String, Object> map, final List<SharedCondition> conditions, String before, String after, SharedItem item) {
+		if (StringUtil.isNonNull(before)) {
+			// TODO: fix label + description
+			Map<String, Object> conditionProperties = new HashMap<>();
+			conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
+			conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
+
+			if (map.containsKey("before_offset")) {
+				int beforeOffset = Integer.parseInt("" + map.get("before_offset"));
+				conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), before + (beforeOffset > 0 ? "+" + beforeOffset : beforeOffset));
+			}
+
+			String description = item.getLabel() + " before " + before;
+			String label = ConditionType.ItemState + " before condition";
+			SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+			conditions.add(sc);
+		}
+		if (StringUtil.isNonNull(after)) {
+			// TODO: fix label + description
+			Map<String, Object> conditionProperties = new HashMap<>();
+			conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+			conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
+
+			if (map.containsKey("after_offset")) {
+				int afterOffset = Integer.parseInt("" + map.get("after_offset"));
+				conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), after + (afterOffset > 0 ? "+" + afterOffset : afterOffset));
+			}
+			String description = item.getLabel() + " after " + after;
+			String label = ConditionType.ItemState + " after condition";
+			SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+			conditions.add(sc);
+		}
 	}
 
 	private ConditionType parseConditionType(String conditionType) {
@@ -118,6 +151,8 @@ public class HomeAssistantConditionTransformationAdapter {
 		case "state":
 		case "sun":
 			return ConditionType.ItemState;
+		case "time":
+			return ConditionType.TimeOfDay;
 		default:
 			return ConditionType.Unknown;
 		}
