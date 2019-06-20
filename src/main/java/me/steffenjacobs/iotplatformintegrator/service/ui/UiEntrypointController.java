@@ -50,7 +50,7 @@ public class UiEntrypointController {
 	private UiEntrypoint ui;
 
 	private final List<ServerConnection> currentConnections = new ArrayList<>();
-	private int selectedConnection = 0;
+	private ServerConnection selectedConnection = null;
 
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
 	private final CodeEditorController codeEditorController;
@@ -78,7 +78,6 @@ public class UiEntrypointController {
 		for (ExperimentalRule rule : retrievedRules) {
 			serverConnection.getRules().add(transformer.getRuleTransformer().transformRule(rule, serverConnection.getItemDirectory(), new OpenHabCommandParser()));
 		}
-		ui.refreshRulesTable(serverConnection.getRules());
 		lastRule = null;
 	}
 
@@ -91,18 +90,19 @@ public class UiEntrypointController {
 			SharedItem transformedItem = transformer.getItemTransformer().transformItem(item);
 			serverConnection.getItemDirectory().addItem(transformedItem);
 		}
-		ui.refreshItems(serverConnection.getItemDirectory().getAllItems());
 
 		// avoid generating rule code with stale items
 		lastRule = null;
 	}
 
 	public SharedRule getRuleByIndex(int index) {
-		ServerConnection serverConnection = currentConnections.get(selectedConnection);
-		if (index < 0 || index >= serverConnection.getRules().size()) {
+		if (selectedConnection == null) {
+			// TODO
+		}
+		if (index < 0 || index >= selectedConnection.getRules().size()) {
 			return null;
 		}
-		return serverConnection.getRules().get(index);
+		return selectedConnection.getRules().get(index);
 	}
 
 	public SharedRule getRuleByIndex(ServerConnection serverConnection, int index) {
@@ -147,9 +147,8 @@ public class UiEntrypointController {
 			serverConnection.getRules().addAll(itemsAndRules.getRight());
 		}
 
-		ui.refreshItems(serverConnection.getItemDirectory().getAllItems());
-		ui.refreshRulesTable(serverConnection.getRules());
 		lastRule = null;
+		setSelectedServerConnection(serverConnection);
 	}
 
 	public Object getHAUrlWithPort() {
@@ -168,10 +167,19 @@ public class UiEntrypointController {
 		ui.onConnectionEstablished(connection);
 		loadOpenHABItems(connection);
 		loadOpenHABRules(connection);
+
+		setSelectedServerConnection(connection);
 	}
 
 	public ServerConnection getSelectedServerConnection() {
-		return currentConnections.get(selectedConnection);
+		return selectedConnection;
+	}
+
+	public void setSelectedServerConnection(ServerConnection serverConnection) {
+		selectedConnection = serverConnection;
+		ui.refreshItems(selectedConnection.getItemDirectory().getAllItems());
+		ui.refreshRulesTable(selectedConnection.getRules());
+		ui.resetCodeEditor();
 	}
 
 }

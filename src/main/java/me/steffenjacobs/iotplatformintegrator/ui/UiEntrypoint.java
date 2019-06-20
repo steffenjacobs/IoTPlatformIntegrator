@@ -57,7 +57,7 @@ public class UiEntrypoint {
 		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
-		connectionExplorer = new ConnectionExplorer();
+		connectionExplorer = new ConnectionExplorer(entrypointController);
 	}
 
 	private void setupDockingEnvironment(JFrame frame) {
@@ -79,7 +79,7 @@ public class UiEntrypoint {
 		// create rule details window
 		SingleCDockable ruleDetailsWindow = createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
 		control.addDockable(ruleDetailsWindow);
-		
+
 		// create connection explorer window
 		SingleCDockable connectionExplorerWindow = createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorer);
 		control.addDockable(connectionExplorerWindow);
@@ -171,7 +171,7 @@ public class UiEntrypoint {
 						entrypointController.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
-		
+
 		JMenuItem mImportFromHomeAssistant = new JMenuItem("HomeAssistant");
 		mConnect.add(mImportFromHomeAssistant);
 		mImportFromHomeAssistant.addActionListener(e -> {
@@ -206,8 +206,12 @@ public class UiEntrypoint {
 		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, loadedRules);
 	}
-	
+
 	public void onConnectionEstablished(ServerConnection connection) {
 		connectionExplorer.addConnection(connection);
+	}
+
+	public void resetCodeEditor() {
+		codeText.showHelpText();
 	}
 }

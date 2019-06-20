@@ -120,5 +120,4 @@ public class CodeEditor extends JPanel {
 	public void setController(CodeEditorController controller) {
 		this.controller = controller;
 	}
-
 }
