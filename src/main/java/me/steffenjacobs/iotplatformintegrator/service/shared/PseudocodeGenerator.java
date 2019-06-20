@@ -252,7 +252,12 @@ public class PseudocodeGenerator {
 			tokens2.add(conditionToken("value", "value of item '%s' %s %s"));
 			tokens2.add(conditionToken("of", "value of item '%s' %s %s"));
 			tokens2.add(conditionToken("item", "value of item '%s' %s %s"));
-			tokens2.add(itemToken(item));
+			if(item != null) {
+				tokens2.add(itemToken(item));
+			}
+			else {
+				tokens2.add(unknownToken("<null item>"));
+			}
 			tokens2.add(operatorToken(operator));
 			tokens2.addAll(valueToken(state));
 			return tokens2;
