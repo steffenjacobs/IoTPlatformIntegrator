@@ -3,6 +3,9 @@ package me.steffenjacobs.iotplatformintegrator.ui.perspectives;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
@@ -18,6 +21,7 @@ public class ImportPerspective extends Perspective {
 
 	private final CodeEditor codeText;
 	private final JPanel connectionExplorerPanel = new JPanel();
+	private final JPanel ruleTablePanel = new JPanel();
 
 	public ImportPerspective(SettingService settingService) {
 		codeText = new CodeEditor(settingService);
@@ -25,6 +29,7 @@ public class ImportPerspective extends Perspective {
 		codeText.setController(controller);
 
 		connectionExplorerPanel.setLayout(new BorderLayout());
+		ruleTablePanel.setLayout(new BorderLayout());
 		setupDockingEnvironment();
 	}
 
@@ -32,6 +37,9 @@ public class ImportPerspective extends Perspective {
 	public void onAppear() {
 		ConnectionExplorer connectionExplorer = GlobalComponentHolder.getInstance().getConnectionExplorer();
 		connectionExplorerPanel.add(connectionExplorer, BorderLayout.CENTER);
+		JTable ruleTable = GlobalComponentHolder.getInstance().getRuleTable();
+		ruleTablePanel.removeAll();
+		ruleTablePanel.add(new JScrollPane(ruleTable), BorderLayout.CENTER);
 	}
 
 	private void setupDockingEnvironment() {
@@ -42,7 +50,7 @@ public class ImportPerspective extends Perspective {
 		control.addDockable(itemsTableWindow);
 
 		// create rule table window
-		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", GlobalComponentHolder.getInstance().getRuleTable());
+		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", ruleTablePanel);
 		control.addDockable(ruleTableWindow);
 
 		// create pseudo code window
