@@ -182,7 +182,7 @@ public class UiEntrypointController {
 			return;
 		}
 
-		if (selectedConnection != null) {
+		if (serverConnection != null) {
 			selectedConnection = serverConnection;
 			ui.refreshItems(selectedConnection.getItemDirectory().getAllItems());
 			ui.refreshRulesTable(selectedConnection.getRules());
