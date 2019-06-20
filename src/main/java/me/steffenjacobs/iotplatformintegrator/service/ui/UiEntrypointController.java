@@ -9,6 +9,10 @@ import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.homeassistant.ApiStatusMessage;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection.PlatformType;
+import me.steffenjacobs.iotplatformintegrator.domain.openhab.api.OpenHabApiStatusMessage;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.item.ItemDTO;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
@@ -16,6 +20,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantApiService;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantItemTransformationService;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantManualRuleImporter;
+import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
@@ -25,6 +30,7 @@ import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
+import me.steffenjacobs.iotplatformintegrator.ui.util.UrlUtil;
 
 /** @author Steffen Jacobs */
 public class UiEntrypointController {
@@ -32,6 +38,8 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
+	private static final OpenHabApiService openHabApiService = new OpenHabApiService();
+
 	private static final RuleValidator ruleValidator = new RuleValidator();
 	private static final HomeAssistantManualRuleImporter ruleImporter = new HomeAssistantManualRuleImporter();
 
@@ -76,6 +84,7 @@ public class UiEntrypointController {
 	}
 
 	public void loadOpenHABItems() throws IOException {
+
 		itemDirectory.clearItems();
 		final List<ItemDTO> retrievedItems = itemService.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} items.", retrievedItems.size());
@@ -111,8 +120,17 @@ public class UiEntrypointController {
 	public void loadHomeAssistantData() throws ClientProtocolException, IOException {
 		itemDirectory.clearItems();
 		loadedRules.clear();
-		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService.transformItemsAndRules(
-				homeAssistantApiService.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
+
+		String urlWithPort = settingService.getSetting(SettingKey.HOMEASSISTANT_URI);
+		ApiStatusMessage versionInfo = homeAssistantApiService.getVersionInfo(urlWithPort);
+
+		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
+
+		ui.onConnectionEstablished(new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT, versionInfo.getVersion(), versionInfo.getLocationName(),
+				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight()));
+
+		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService
+				.transformItemsAndRules(homeAssistantApiService.getAllState(urlWithPort, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 		itemDirectory.addItems(itemsAndRules.getLeft());
 		if (ruleValidator.containsEmptyRules(itemsAndRules.getRight())) {
 			// TODO: merge with rules that were empty before
@@ -128,6 +146,17 @@ public class UiEntrypointController {
 
 	public Object getHAUrlWithPort() {
 		return settingService.getSetting(SettingKey.HOMEASSISTANT_URI);
+	}
+
+	public void loadOpenHABData() throws IOException {
+		OpenHabApiStatusMessage statusMessage = openHabApiService.getStatusMessage(getOHUrlWithPort());
+		String urlWithPort = settingService.getSetting(SettingKey.OPENHAB_URI);
+		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
+		String url = parsedUrlAndPort.getLeft();
+		int port = parsedUrlAndPort.getRight();
+		ui.onConnectionEstablished(new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(), "Open Hab Instance on port: " + port, url, port));
+		loadOpenHABItems();
+		loadOpenHABRules();
 	}
 
 }

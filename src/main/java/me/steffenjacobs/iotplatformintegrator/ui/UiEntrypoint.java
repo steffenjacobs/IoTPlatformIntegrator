@@ -26,12 +26,14 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
+import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
@@ -42,7 +44,8 @@ public class UiEntrypoint {
 	private final UiEntrypointController entrypointController;
 	private final JTable rulesTable;
 	private final JTable itemsTable;
-	final RuleDetailsPanel ruleDetailsPanel;
+	private final RuleDetailsPanel ruleDetailsPanel;
+	private final ConnectionExplorer connectionExplorer;
 	private final CodeEditor codeText;
 
 	public UiEntrypoint() {
@@ -54,6 +57,7 @@ public class UiEntrypoint {
 		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
+		connectionExplorer = new ConnectionExplorer();
 	}
 
 	private void setupDockingEnvironment(JFrame frame) {
@@ -75,11 +79,16 @@ public class UiEntrypoint {
 		// create rule details window
 		SingleCDockable ruleDetailsWindow = createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
 		control.addDockable(ruleDetailsWindow);
+		
+		// create connection explorer window
+		SingleCDockable connectionExplorerWindow = createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorer);
+		control.addDockable(connectionExplorerWindow);
 
 		// configure grid
 		CGrid grid = new CGrid(control);
 
-		grid.add(0, 0, 1, 1, pseudocodeWindow);
+		grid.add(0, 0, .2, 1, connectionExplorerWindow);
+		grid.add(.2, 0, 1, 1, pseudocodeWindow);
 		grid.add(0, 1, .5, 1, ruleTableWindow);
 		grid.add(.5, 1, .5, 1, itemsTableWindow);
 		grid.add(1, 0, 1, 2, ruleDetailsWindow);
@@ -156,8 +165,7 @@ public class UiEntrypoint {
 		mConnect.add(mImportFromOpenhab);
 		mImportFromOpenhab.addActionListener(e -> {
 			try {
-				entrypointController.loadOpenHABItems();
-				entrypointController.loadOpenHABRules();
+				entrypointController.loadOpenHABData();
 			} catch (Exception e2) {
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
 						entrypointController.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
@@ -169,7 +177,6 @@ public class UiEntrypoint {
 		mImportFromHomeAssistant.addActionListener(e -> {
 			try {
 				entrypointController.loadHomeAssistantData();
-//				entrypointController.loadOpenHABRules();
 			} catch (Exception e2) {
 				e2.printStackTrace();
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
@@ -198,5 +205,9 @@ public class UiEntrypoint {
 		rulesTable.getSelectionModel().clearSelection();
 		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, loadedRules);
+	}
+	
+	public void onConnectionEstablished(ServerConnection connection) {
+		connectionExplorer.addConnection(connection);
 	}
 }
