@@ -15,4 +15,8 @@ public class Perspective {
 	public void removeFromFrame(JFrame frame) {
 		frame.remove(control.getContentArea());
 	}
+
+	public void onAppear() {
+		// optional
+	}
 }

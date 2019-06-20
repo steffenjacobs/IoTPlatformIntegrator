@@ -1,5 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.ui.perspectives;
 
+import java.awt.BorderLayout;
+
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
@@ -16,6 +19,7 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveContro
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
+import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
@@ -28,6 +32,7 @@ public class ImportPerspective extends Perspective {
 	private final CodeEditor codeText;
 	private final ImportPerspectiveController perpsectiveController;
 	private final UiFactory uiFactory;
+	private final JPanel connectionExplorerPanel = new JPanel();
 
 	public ImportPerspective(SettingService settingService, UiFactory uiFactory) {
 		this.uiFactory = uiFactory;
@@ -42,7 +47,14 @@ public class ImportPerspective extends Perspective {
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 		perpsectiveController.setImportPerspective(this);
 
+		connectionExplorerPanel.setLayout(new BorderLayout());
 		setup();
+	}
+
+	@Override
+	public void onAppear() {
+		ConnectionExplorer connectionExplorer = GlobalComponentHolder.getInstance().getConnectionExplorer();
+		connectionExplorerPanel.add(connectionExplorer, BorderLayout.CENTER);
 	}
 
 	public ImportPerspectiveController getPerpsectiveController() {
@@ -87,8 +99,7 @@ public class ImportPerspective extends Perspective {
 		control.addDockable(ruleDetailsWindow);
 
 		// create connection explorer window
-		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer",
-				GlobalComponentHolder.getInstance().getConnectionExplorer());
+		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorerPanel);
 		control.addDockable(connectionExplorerWindow);
 
 		// configure grid

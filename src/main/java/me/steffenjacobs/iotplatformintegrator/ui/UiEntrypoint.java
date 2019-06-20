@@ -62,6 +62,7 @@ public class UiEntrypoint {
 				currentPerspective.removeFromFrame(frame);
 			}
 			currentPerspective = perspective;
+			currentPerspective.onAppear();
 			currentPerspective.addToFrame(frame);
 			frame.revalidate();
 			frame.repaint();
