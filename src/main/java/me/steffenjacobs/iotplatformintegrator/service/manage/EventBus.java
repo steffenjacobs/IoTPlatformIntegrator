@@ -18,7 +18,7 @@ public class EventBus {
 	private static final EventBus INSTANCE = new EventBus();
 
 	public static enum EventType {
-		Test, SelectedServerConnectionChanged, ServerDisconnected, ServerConnected, SelectedRuleChanged;
+		Test, SelectedServerConnectionChanged, ServerDisconnected, ServerConnected, SelectedRuleChanged, SourceConnectionChanged, TargetConnectionChanged, SelectedSourceRuleChanged, SelectedTargetRuleChanged;
 	}
 
 	private EventBus() {
