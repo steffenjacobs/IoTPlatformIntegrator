@@ -204,12 +204,18 @@ public class PseudocodeGenerator {
 		case TriggerChannelFired:
 			String triggerChannel = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
 			String event = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Event);
+			String eventData = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.EventData);
 			List<Token> tokens5 = new ArrayList<>();
 			tokens5.add(triggerToken("Channel", "Channel '%s' received event '%s'"));
 			tokens5.addAll(valueToken(triggerChannel));
 			tokens5.add(triggerToken("received", "Channel '%s' received event '%s'"));
 			tokens5.add(triggerToken("event", "Channel '%s' received event '%s'"));
 			tokens5.addAll(valueToken(event));
+			if(eventData != null) {
+				tokens5.add(unknownToken("{"));
+				tokens5.addAll(valueToken(eventData));
+				tokens5.add(unknownToken("}"));
+			}
 			return tokens5;
 		default:
 			LOG.error("Invalid trigger type: {}", trigger.getTriggerTypeContainer().getTriggerType());

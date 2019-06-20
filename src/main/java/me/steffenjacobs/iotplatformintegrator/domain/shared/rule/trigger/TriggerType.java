@@ -7,7 +7,7 @@ public enum TriggerType {
 	CommandReceived(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.ItemName, TriggerTypeSpecificKey.Command }), //
 	ItemStateUpdated(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.ItemName, TriggerTypeSpecificKey.State }), //
 	Timed(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.Time }), //
-	TriggerChannelFired(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.Channel, TriggerTypeSpecificKey.Event }), //
+	TriggerChannelFired(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.Channel, TriggerTypeSpecificKey.Event, TriggerTypeSpecificKey.EventData }), //
 	Unknown(new TriggerTypeSpecificKey[0]);
 
 	private final TriggerTypeSpecificKey[] typeSpecificKeys;
@@ -22,7 +22,7 @@ public enum TriggerType {
 
 	public static enum TriggerTypeSpecificKey {
 		Command("command", "Command"), PreviousState("previous_state", "Previous State"), State("state", "State"), Channel("channel", "Channel"), Event("event",
-				"Event"), ItemName("itemName", "Item Name"), Time("time", "Time");
+				"Event"), EventData("event_data", "Event Data"), ItemName("itemName", "Item Name"), Time("time", "Time");
 
 		private final String keyString;
 		private final String displayString;
