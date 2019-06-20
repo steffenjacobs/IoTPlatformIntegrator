@@ -10,16 +10,7 @@ import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 /** @author Steffen Jacobs */
 public class OpenHabActionTransformationAdapter {
 
-	private final ItemDirectory itemDirectory;
-	private final OpenHabCommandParser commandParser;
-
-	public OpenHabActionTransformationAdapter(ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
-		this.itemDirectory = itemDirectory;
-		this.commandParser = commandParser;
-
-	}
-
-	public ActionTypeContainer convertActionTypeContainer(ActionTypeContainer container) {
+	public ActionTypeContainer convertActionTypeContainer(ActionTypeContainer container, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
 
 		// parse item first, if one exists.
 		final SharedItem item;
@@ -35,14 +26,14 @@ public class OpenHabActionTransformationAdapter {
 			}
 			final String strVal = "" + container.getActionTypeSpecificValues().get(key);
 
-			final Object transformedValue = transformForActionTypeSpecificKey(key, strVal);
+			final Object transformedValue = transformForActionTypeSpecificKey(key, strVal, itemDirectory, commandParser);
 			container.getActionTypeSpecificValues().put(key, transformedValue);
 		}
 
 		return container;
 	}
 
-	private Object transformForActionTypeSpecificKey(ActionTypeSpecificKey key, String value) {
+	private Object transformForActionTypeSpecificKey(ActionTypeSpecificKey key, String value, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
 		switch (key) {
 		case ItemName:
 			SharedItem i = itemDirectory.getItemByName(value);

@@ -11,16 +11,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.Trigger
 /** @author Steffen Jacobs */
 public class OpenHabTriggerTransformationAdapter {
 
-	private final ItemDirectory itemDirectory;
-	private final OpenHabCommandParser commandParser;
-
-	public OpenHabTriggerTransformationAdapter(ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
-		this.itemDirectory = itemDirectory;
-		this.commandParser = commandParser;
-
-	}
-
-	public TriggerTypeContainer convertTriggerTypeContainer(TriggerTypeContainer container) {
+	public TriggerTypeContainer convertTriggerTypeContainer(TriggerTypeContainer container, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
 
 		// parse item first, if one exists.
 		final SharedItem item;
@@ -38,20 +29,20 @@ public class OpenHabTriggerTransformationAdapter {
 
 			// parse command as previous value if possible
 			if ((key == TriggerTypeSpecificKey.State || key == TriggerTypeSpecificKey.PreviousState) && item != null) {
-				final Object cmd = transformForTriggerTypeSpecificKey(TriggerTypeSpecificKey.Command, strVal);
+				final Object cmd = transformForTriggerTypeSpecificKey(TriggerTypeSpecificKey.Command, strVal, itemDirectory, commandParser);
 				if (cmd != Command.Unknown) {
 					container.getTriggerTypeSpecificValues().put(key, cmd);
 					continue;
 				}
 			}
-			final Object transformedValue = transformForTriggerTypeSpecificKey(key, strVal);
+			final Object transformedValue = transformForTriggerTypeSpecificKey(key, strVal, itemDirectory, commandParser);
 			container.getTriggerTypeSpecificValues().put(key, transformedValue);
 		}
 
 		return container;
 	}
 
-	private Object transformForTriggerTypeSpecificKey(TriggerTypeSpecificKey key, String value) {
+	private Object transformForTriggerTypeSpecificKey(TriggerTypeSpecificKey key, String value, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
 		switch (key) {
 		case Command:
 			return commandParser.parseCommand(value);

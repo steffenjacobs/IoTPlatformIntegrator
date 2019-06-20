@@ -1,5 +1,11 @@
 package me.steffenjacobs.iotplatformintegrator.domain.manage;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
+
 /** @author Steffen Jacobs */
 public class ServerConnection {
 
@@ -12,6 +18,9 @@ public class ServerConnection {
 	private final String instanceName;
 	private final String url;
 	private final int port;
+
+	private final ItemDirectory itemDirectory = new ItemDirectory();
+	private final List<SharedRule> rules = new ArrayList<>();
 
 	public ServerConnection(PlatformType platformType, String version, String instanceName, String url, int port) {
 		super();
@@ -40,6 +49,14 @@ public class ServerConnection {
 
 	public int getPort() {
 		return port;
+	}
+
+	public ItemDirectory getItemDirectory() {
+		return itemDirectory;
+	}
+
+	public List<SharedRule> getRules() {
+		return rules;
 	}
 
 }

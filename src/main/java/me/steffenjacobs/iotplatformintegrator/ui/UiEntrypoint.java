@@ -87,8 +87,8 @@ public class UiEntrypoint {
 		// configure grid
 		CGrid grid = new CGrid(control);
 
-		grid.add(0, 0, .2, 1, connectionExplorerWindow);
-		grid.add(.2, 0, 1, 1, pseudocodeWindow);
+		grid.add(0, 0, .4, 1, connectionExplorerWindow);
+		grid.add(.4, 0, 1, 1, pseudocodeWindow);
 		grid.add(0, 1, .5, 1, ruleTableWindow);
 		grid.add(.5, 1, .5, 1, itemsTableWindow);
 		grid.add(1, 0, 1, 2, ruleDetailsWindow);

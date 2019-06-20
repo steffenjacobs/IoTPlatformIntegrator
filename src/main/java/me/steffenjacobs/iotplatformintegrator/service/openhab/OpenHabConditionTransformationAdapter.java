@@ -11,14 +11,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 /** @author Steffen Jacobs */
 public class OpenHabConditionTransformationAdapter {
 
-	private final ItemDirectory itemDirectory;
-
-	public OpenHabConditionTransformationAdapter(ItemDirectory itemDirectory) {
-		this.itemDirectory = itemDirectory;
-
-	}
-
-	public ConditionTypeContainer convertConditionTypeContainer(ConditionTypeContainer container) {
+	public ConditionTypeContainer convertConditionTypeContainer(ConditionTypeContainer container, ItemDirectory itemDirectory) {
 
 		// parse item first, if one exists.
 		final SharedItem item;
@@ -34,14 +27,14 @@ public class OpenHabConditionTransformationAdapter {
 			}
 			final String strVal = "" + container.getConditionTypeSpecificValues().get(key);
 
-			final Object transformedValue = transformForConditionTypeSpecificKey(key, strVal);
+			final Object transformedValue = transformForConditionTypeSpecificKey(key, strVal, itemDirectory);
 			container.getConditionTypeSpecificValues().put(key, transformedValue);
 		}
 
 		return container;
 	}
 
-	private Object transformForConditionTypeSpecificKey(ConditionTypeSpecificKey key, String value) {
+	private Object transformForConditionTypeSpecificKey(ConditionTypeSpecificKey key, String value, ItemDirectory itemDirectory) {
 		switch (key) {
 		case ItemName:
 			SharedItem i = itemDirectory.getItemByName(value);

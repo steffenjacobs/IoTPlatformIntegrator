@@ -21,10 +21,10 @@ import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistan
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantItemTransformationService;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantManualRuleImporter;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
+import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabCommandParser;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
-import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
@@ -49,17 +49,16 @@ public class UiEntrypointController {
 	private final SettingService settingService;
 	private UiEntrypoint ui;
 
-	private final List<SharedRule> loadedRules = new ArrayList<>();
-	private final ItemDirectory itemDirectory;
-	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer;
+	private final List<ServerConnection> currentConnections = new ArrayList<>();
+	private int selectedConnection = 0;
+
+	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
 	private final CodeEditorController codeEditorController;
 
 	private SharedRule lastRule = null;
 
 	public UiEntrypointController(SettingService settingService, CodeEditor codeEditor) {
 		this.settingService = settingService;
-		itemDirectory = new ItemDirectory();
-		transformer = new OpenHabTransformationAdapter(itemDirectory);
 		codeEditorController = new CodeEditorController(codeEditor, settingService);
 		codeEditor.setController(codeEditorController);
 	}
@@ -72,37 +71,45 @@ public class UiEntrypointController {
 		this.ui = ui;
 	}
 
-	public void loadOpenHABRules() throws IOException {
-		loadedRules.clear();
+	public void loadOpenHABRules(ServerConnection serverConnection) throws IOException {
+		serverConnection.getRules().clear();
 		final List<ExperimentalRule> retrievedRules = ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} rules.", retrievedRules.size());
 		for (ExperimentalRule rule : retrievedRules) {
-			loadedRules.add(transformer.getRuleTransformer().transformRule(rule));
+			serverConnection.getRules().add(transformer.getRuleTransformer().transformRule(rule, serverConnection.getItemDirectory(), new OpenHabCommandParser()));
 		}
-		ui.refreshRulesTable(loadedRules);
+		ui.refreshRulesTable(serverConnection.getRules());
 		lastRule = null;
 	}
 
-	public void loadOpenHABItems() throws IOException {
+	public void loadOpenHABItems(ServerConnection serverConnection) throws IOException {
 
-		itemDirectory.clearItems();
+		serverConnection.getItemDirectory().clearItems();
 		final List<ItemDTO> retrievedItems = itemService.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} items.", retrievedItems.size());
 		for (ItemDTO item : retrievedItems) {
 			SharedItem transformedItem = transformer.getItemTransformer().transformItem(item);
-			itemDirectory.addItem(transformedItem);
+			serverConnection.getItemDirectory().addItem(transformedItem);
 		}
-		ui.refreshItems(itemDirectory.getAllItems());
+		ui.refreshItems(serverConnection.getItemDirectory().getAllItems());
 
 		// avoid generating rule code with stale items
 		lastRule = null;
 	}
 
 	public SharedRule getRuleByIndex(int index) {
-		if (index < 0 || index >= loadedRules.size()) {
+		ServerConnection serverConnection = currentConnections.get(selectedConnection);
+		if (index < 0 || index >= serverConnection.getRules().size()) {
 			return null;
 		}
-		return loadedRules.get(index);
+		return serverConnection.getRules().get(index);
+	}
+
+	public SharedRule getRuleByIndex(ServerConnection serverConnection, int index) {
+		if (index < 0 || index >= serverConnection.getRules().size()) {
+			return null;
+		}
+		return serverConnection.getRules().get(index);
 	}
 
 	public String getOHUrlWithPort() {
@@ -118,29 +125,30 @@ public class UiEntrypointController {
 	}
 
 	public void loadHomeAssistantData() throws ClientProtocolException, IOException {
-		itemDirectory.clearItems();
-		loadedRules.clear();
 
 		String urlWithPort = settingService.getSetting(SettingKey.HOMEASSISTANT_URI);
 		ApiStatusMessage versionInfo = homeAssistantApiService.getVersionInfo(urlWithPort);
 
 		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
 
-		ui.onConnectionEstablished(new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT, versionInfo.getVersion(), versionInfo.getLocationName(),
-				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight()));
+		ServerConnection serverConnection = new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT, versionInfo.getVersion(), versionInfo.getLocationName(),
+				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
+		currentConnections.add(serverConnection);
+		ui.onConnectionEstablished(serverConnection);
 
 		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService
 				.transformItemsAndRules(homeAssistantApiService.getAllState(urlWithPort, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
-		itemDirectory.addItems(itemsAndRules.getLeft());
+
+		serverConnection.getItemDirectory().addItems(itemsAndRules.getLeft());
 		if (ruleValidator.containsEmptyRules(itemsAndRules.getRight())) {
 			// TODO: merge with rules that were empty before
-			loadedRules.addAll(ruleImporter.importRules(itemDirectory));
+			serverConnection.getRules().addAll(ruleImporter.importRules(serverConnection.getItemDirectory()));
 		} else {
-			loadedRules.addAll(itemsAndRules.getRight());
+			serverConnection.getRules().addAll(itemsAndRules.getRight());
 		}
 
-		ui.refreshItems(itemDirectory.getAllItems());
-		ui.refreshRulesTable(loadedRules);
+		ui.refreshItems(serverConnection.getItemDirectory().getAllItems());
+		ui.refreshRulesTable(serverConnection.getRules());
 		lastRule = null;
 	}
 
@@ -150,13 +158,20 @@ public class UiEntrypointController {
 
 	public void loadOpenHABData() throws IOException {
 		OpenHabApiStatusMessage statusMessage = openHabApiService.getStatusMessage(getOHUrlWithPort());
+
 		String urlWithPort = settingService.getSetting(SettingKey.OPENHAB_URI);
 		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
-		String url = parsedUrlAndPort.getLeft();
-		int port = parsedUrlAndPort.getRight();
-		ui.onConnectionEstablished(new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(), "Open Hab Instance on port: " + port, url, port));
-		loadOpenHABItems();
-		loadOpenHABRules();
+		ServerConnection connection = new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(), "Open Hab Instance on port: " + parsedUrlAndPort.getRight(),
+				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
+		currentConnections.add(connection);
+
+		ui.onConnectionEstablished(connection);
+		loadOpenHABItems(connection);
+		loadOpenHABRules(connection);
+	}
+
+	public ServerConnection getSelectedServerConnection() {
+		return currentConnections.get(selectedConnection);
 	}
 
 }
