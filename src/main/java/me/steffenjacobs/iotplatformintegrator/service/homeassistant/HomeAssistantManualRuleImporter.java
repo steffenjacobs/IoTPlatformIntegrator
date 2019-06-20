@@ -170,6 +170,11 @@ public class HomeAssistantManualRuleImporter {
 				SharedItem itemByName = itemDirectory.getItemByName(itemName2);
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemByName != null ? itemByName : itemName2);
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("zone"));
+			} else if (map.get("platform").equals("zone")) {
+				// home zone event
+				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("" + map.get("entity_id")));
+				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
+				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("zone"));
 			} else if (map.get("platform").equals("homeassistant")) {
 				// home assistant event
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("homeassistant.instance"));
@@ -184,7 +189,7 @@ public class HomeAssistantManualRuleImporter {
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("sun.sun"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), "offset=" + map.get("offset"));
-			}else if (map.get("platform").equals("webhook")) {
+			} else if (map.get("platform").equals("webhook")) {
 				// webhook event
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), "Webhook #" + map.get("webhook_id"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("Webhook-Event"));
@@ -225,6 +230,7 @@ public class HomeAssistantManualRuleImporter {
 		case "event":
 			return TriggerType.TriggerChannelFired;
 		case "geo_location":
+		case "zone":
 			return TriggerType.TriggerChannelFired;
 		case "homeassistant":
 			return TriggerType.TriggerChannelFired;
@@ -237,7 +243,7 @@ public class HomeAssistantManualRuleImporter {
 			return TriggerType.Timed;
 		case "webhook":
 			return TriggerType.TriggerChannelFired;
-				
+
 		default:
 			return TriggerType.Unknown;
 		}
