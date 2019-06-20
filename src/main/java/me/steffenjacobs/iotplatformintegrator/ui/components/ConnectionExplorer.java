@@ -34,8 +34,27 @@ public class ConnectionExplorer extends JPanel {
 		super();
 		this.setLayout(new BorderLayout());
 
-		JTree tree = new ServerConnectionTree(controller, new DefaultTreeModel(new DefaultMutableTreeNode("Connections", true)));
-		this.model = (DefaultTreeModel) tree.getModel();
+		final DefaultMutableTreeNode helpTextNode = new DefaultMutableTreeNode("Not connected to any server.", false);
+
+		this.model = new DefaultTreeModel(new DefaultMutableTreeNode("Connections", true)) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void nodeStructureChanged(TreeNode node) {
+				super.nodeStructureChanged(node);
+				DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) model.getRoot();
+				if (rootNode.getChildCount() == 0) {
+					insertNodeInto(helpTextNode, rootNode, 0);
+					super.nodeStructureChanged(node);
+				} else {
+					if (helpTextNode.getParent() != null) {
+						removeNodeFromParent(helpTextNode);
+					}
+				}
+			}
+		};
+
+		JTree tree = new ServerConnectionTree(controller, this.model);
 		tree.setExpandsSelectedPaths(true);
 
 		tree.addTreeSelectionListener(e -> {
@@ -44,6 +63,8 @@ public class ConnectionExplorer extends JPanel {
 				controller.setSelectedServerConnection(nodeTable.get(node));
 			}
 		});
+
+		model.nodeStructureChanged((TreeNode) model.getRoot());
 
 		super.add(tree, BorderLayout.CENTER);
 	}
