@@ -29,6 +29,7 @@ public class HomeAssistantManualRuleImporter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantManualRuleImporter.class);
 	private static final HomeAssistantTriggerTransformationAdapter triggerTransformer = new HomeAssistantTriggerTransformationAdapter();
+	private static final HomeAssistantConditionTransformationAdapter conditionTransformer = new HomeAssistantConditionTransformationAdapter();
 
 	public List<SharedRule> importRules(ItemDirectory itemDirectory) {
 		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Empty rules detected. Do you want to import data for the missing rules?", "Warning",
@@ -88,6 +89,13 @@ public class HomeAssistantManualRuleImporter {
 						}
 						break;
 					case "condition":
+						if (e.getValue() instanceof List) {
+							for (Object li : (Iterable<?>) e.getValue()) {
+								conditions.addAll(conditionTransformer.parseCondition(li, itemDirectory));
+							}
+						} else {
+							conditions.addAll(conditionTransformer.parseCondition(e, itemDirectory));
+						}
 					case "action":
 					}
 					System.out.println(e);
