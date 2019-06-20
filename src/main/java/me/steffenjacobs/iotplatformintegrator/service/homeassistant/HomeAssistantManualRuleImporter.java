@@ -106,10 +106,16 @@ public class HomeAssistantManualRuleImporter {
 					case "action":
 						if (e.getValue() instanceof List) {
 							for (Object li : (Iterable<?>) e.getValue()) {
-								actions.add(actionTransformer.parseAction(li, itemDirectory));
+								SharedAction action = actionTransformer.parseAction(li, itemDirectory);
+								if (action != null) {
+									actions.add(action);
+								}
 							}
 						} else {
-							actions.add(actionTransformer.parseAction(e, itemDirectory));
+							SharedAction action = actionTransformer.parseAction(e, itemDirectory);
+							if (action != null) {
+								actions.add(action);
+							}
 						}
 						break;
 					}
