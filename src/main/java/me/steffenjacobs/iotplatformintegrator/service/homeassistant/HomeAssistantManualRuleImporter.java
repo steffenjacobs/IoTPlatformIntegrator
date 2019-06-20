@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
@@ -130,37 +131,60 @@ public class HomeAssistantManualRuleImporter {
 		switch (triggerType) {
 		case ItemStateChanged:
 
-			String below = "" + map.get("below");
-			String above = "" + map.get("above");
-			String itemName = "" + map.get("entity_id");
+			if (map.get("platform").equals("numerical_state")) {
 
-			if (isNonNull(below)) {
-				// TODO: fix label + description
-				Map<String, Object> conditionProperties = new HashMap<>();
-				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
-				conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
-				conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), below);
-				String description = itemName + " below " + below;
-				String label = ConditionType.ItemState + " below condition";
-				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
-				conditions.add(sc);
+				String below = "" + map.get("below");
+				String above = "" + map.get("above");
+				String itemName = "" + map.get("entity_id");
+
+				if (isNonNull(below)) {
+					// TODO: fix label + description
+					Map<String, Object> conditionProperties = new HashMap<>();
+					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
+					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
+					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), below);
+					String description = itemName + " below " + below;
+					String label = ConditionType.ItemState + " below condition";
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					conditions.add(sc);
+				}
+				if (isNonNull(above)) {
+					// TODO: fix label + description
+					Map<String, Object> conditionProperties = new HashMap<>();
+					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
+					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), above);
+					String description = itemName + " above " + above;
+					String label = ConditionType.ItemState + " above condition";
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					conditions.add(sc);
+				}
+
+				properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
+
+				// optional: TODO: Implement
+				String forr = "" + map.get("for");
+			} else if (map.get("platform").equals("state")) {
+				Object from = map.get("from");
+				String to = "" + map.get("to");
+				SharedItem item = itemDirectory.getItemByName("" + map.get("entity_id"));
+				properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), item);
+
+				Command cmdFrom = Command.parse("" + from);
+				if (cmdFrom != Command.Unknown) {
+					properties.put(TriggerTypeSpecificKey.PreviousState.getKeyString(), cmdFrom);
+				} else {
+					properties.put(TriggerTypeSpecificKey.PreviousState.getKeyString(), from);
+				}
+
+				Command cmdTo = Command.parse("" + to);
+				if (cmdTo != Command.Unknown) {
+					properties.put(TriggerTypeSpecificKey.State.getKeyString(), cmdTo);
+				} else {
+					properties.put(TriggerTypeSpecificKey.State.getKeyString(), to);
+				}
+
 			}
-			if (isNonNull(above)) {
-				// TODO: fix label + description
-				Map<String, Object> conditionProperties = new HashMap<>();
-				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
-				conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
-				conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), above);
-				String description = itemName + " above " + above;
-				String label = ConditionType.ItemState + " above condition";
-				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
-				conditions.add(sc);
-			}
-
-			properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
-
-			// optional: TODO: Implement
-			String forr = "" + map.get("for");
 			break;
 		case TriggerChannelFired:
 			if (map.get("platform").equals("geo_location")) {
@@ -226,6 +250,7 @@ public class HomeAssistantManualRuleImporter {
 	private TriggerType parseTriggerType(String triggerTypeString) {
 		switch (triggerTypeString) {
 		case "numeric_state":
+		case "state":
 			return TriggerType.ItemStateChanged;
 		case "event":
 			return TriggerType.TriggerChannelFired;
