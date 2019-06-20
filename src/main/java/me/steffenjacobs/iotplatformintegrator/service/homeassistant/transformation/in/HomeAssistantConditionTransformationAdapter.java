@@ -14,8 +14,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.manage.util.StringUtil;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
-import me.steffenjacobs.iotplatformintegrator.ui.util.StringUtil;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantConditionTransformationAdapter {

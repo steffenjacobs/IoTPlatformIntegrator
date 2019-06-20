@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.ui.util;
+package me.steffenjacobs.iotplatformintegrator.service.manage.util;
 
 import org.apache.commons.lang3.tuple.Pair;
 

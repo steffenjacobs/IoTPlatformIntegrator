@@ -18,8 +18,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.manage.util.StringUtil;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
-import me.steffenjacobs.iotplatformintegrator.ui.util.StringUtil;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantTriggerTransformationAdapter {

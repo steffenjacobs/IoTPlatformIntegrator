@@ -4,6 +4,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
+import me.steffenjacobs.iotplatformintegrator.service.manage.util.UrlUtil;
+
 /** @author Steffen Jacobs */
 public class UrlUtilTest {
 	@Test

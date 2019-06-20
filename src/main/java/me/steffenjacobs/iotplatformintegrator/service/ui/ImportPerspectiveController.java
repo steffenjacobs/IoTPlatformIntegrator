@@ -27,6 +27,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.util.UrlUtil;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
@@ -35,7 +36,6 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in.
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
-import me.steffenjacobs.iotplatformintegrator.ui.util.UrlUtil;
 
 /** @author Steffen Jacobs */
 public class ImportPerspectiveController {

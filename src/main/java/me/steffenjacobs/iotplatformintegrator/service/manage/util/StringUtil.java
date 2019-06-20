@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.ui.util;
+package me.steffenjacobs.iotplatformintegrator.service.manage.util;
 
 /** @author Steffen Jacobs */
 public class StringUtil {
