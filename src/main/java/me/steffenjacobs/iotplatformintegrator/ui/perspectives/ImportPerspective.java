@@ -1,16 +1,12 @@
 package me.steffenjacobs.iotplatformintegrator.ui.perspectives;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
-import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
@@ -18,10 +14,11 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorCo
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
+import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
-import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
+import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
 public class ImportPerspective {
@@ -29,7 +26,6 @@ public class ImportPerspective {
 	private final JTable rulesTable;
 	private final JTable itemsTable;
 	private final RuleDetailsPanel ruleDetailsPanel;
-	private final ConnectionExplorer connectionExplorer;
 	private final CodeEditor codeText;
 	private final ImportPerspectiveController perpsectiveController;
 	private final UiFactory uiFactory;
@@ -47,7 +43,6 @@ public class ImportPerspective {
 		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
-		connectionExplorer = new ConnectionExplorer();
 		perpsectiveController.setImportPerspective(this);
 
 		setup();
@@ -83,23 +78,23 @@ public class ImportPerspective {
 		control = new CControl();
 
 		// create items table window
-		SingleCDockable itemsTableWindow = createDockable("ItemTable-Window", "Items", itemsTable);
+		SingleCDockable itemsTableWindow = DockableUtil.createDockable("ItemTable-Window", "Items", itemsTable);
 		control.addDockable(itemsTableWindow);
 
 		// create rule table window
-		SingleCDockable ruleTableWindow = createDockable("RuleTable-Window", "Rules", rulesTable);
+		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", rulesTable);
 		control.addDockable(ruleTableWindow);
 
 		// create pseudo code window
-		SingleCDockable pseudocodeWindow = createDockable("Pseudocode-Window", "Generated Pseudocode", codeText);
+		SingleCDockable pseudocodeWindow = DockableUtil.createDockable("Pseudocode-Window", "Generated Pseudocode", codeText);
 		control.addDockable(pseudocodeWindow);
 
 		// create rule details window
-		SingleCDockable ruleDetailsWindow = createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
+		SingleCDockable ruleDetailsWindow = DockableUtil.createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
 		control.addDockable(ruleDetailsWindow);
 
 		// create connection explorer window
-		SingleCDockable connectionExplorerWindow = createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorer);
+		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer", GlobalComponentHolder.getInstance().getConnectionExplorer());
 		control.addDockable(connectionExplorerWindow);
 
 		// configure grid
@@ -114,14 +109,6 @@ public class ImportPerspective {
 		control.getContentArea().deploy(grid);
 	}
 
-	private SingleCDockable createDockable(String id, String title, JComponent component) {
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(id, title);
-		dockable.setTitleText(title);
-		dockable.setCloseable(false);
-		dockable.add(new JScrollPane(component));
-		return dockable;
-	}
-
 	public void refreshItems(Iterable<SharedItem> loadedItems) {
 		itemsTable.getSelectionModel().clearSelection();
 		uiFactory.updateItemsTable(itemsTable, loadedItems);
@@ -133,15 +120,8 @@ public class ImportPerspective {
 		EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(null));
 	}
 
-	public void onConnectionEstablished(ServerConnection connection) {
-		connectionExplorer.addConnection(connection);
-	}
-
 	public void resetCodeEditor() {
 		codeText.showHelpText();
 	}
 
-	public void propagateRemovalOfServerConnection(ServerConnection serverConnection) {
-		connectionExplorer.removeServerConnection(serverConnection);
-	}
 }

@@ -20,7 +20,9 @@ import javax.swing.tree.TreeNode;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerConnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
 
 /** @author Steffen Jacobs */
@@ -69,9 +71,12 @@ public class ConnectionExplorer extends JPanel {
 		model.nodeStructureChanged((TreeNode) model.getRoot());
 
 		super.add(tree, BorderLayout.CENTER);
+
+		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection()));
+		EventBus.getInstance().addEventHandler(EventType.ServerConnected, e -> addServerConnection(((ServerConnectedEvent) e).getServerConnection()));
 	}
 
-	public void addConnection(ServerConnection connection) {
+	private void addServerConnection(ServerConnection connection) {
 
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 
@@ -93,7 +98,7 @@ public class ConnectionExplorer extends JPanel {
 		model.nodeStructureChanged(root);
 	}
 
-	public void removeServerConnection(ServerConnection serverConnection) {
+	private void removeServerConnection(ServerConnection serverConnection) {
 		nodeTable.remove(nodeTableBackwards.remove(serverConnection));
 	}
 

@@ -26,6 +26,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerConnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.UrlUtil;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
@@ -134,7 +135,7 @@ public class ImportPerspectiveController {
 		ServerConnection serverConnection = new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT, versionInfo.getVersion(), versionInfo.getLocationName(),
 				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
 		currentConnections.add(serverConnection);
-		importPerspective.onConnectionEstablished(serverConnection);
+		EventBus.getInstance().fireEvent(new ServerConnectedEvent(serverConnection));
 
 		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService
 				.transformItemsAndRules(homeAssistantApiService.getAllState(urlWithPort, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
@@ -164,7 +165,7 @@ public class ImportPerspectiveController {
 				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
 		currentConnections.add(connection);
 
-		importPerspective.onConnectionEstablished(connection);
+		EventBus.getInstance().fireEvent(new ServerConnectedEvent(connection));
 		loadOpenHABItems(connection);
 		loadOpenHABRules(connection);
 
@@ -188,8 +189,6 @@ public class ImportPerspectiveController {
 
 	private void removeServerConnection(ServerConnection serverConnection) {
 		currentConnections.remove(serverConnection);
-		// TODO: use event system
-		importPerspective.propagateRemovalOfServerConnection(serverConnection);
 		clearSelection();
 	}
 
