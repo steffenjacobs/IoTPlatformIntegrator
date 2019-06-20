@@ -184,6 +184,10 @@ public class HomeAssistantManualRuleImporter {
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("sun.sun"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), "offset=" + map.get("offset"));
+			}else if (map.get("platform").equals("webhook")) {
+				// webhook event
+				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), "Webhook #" + map.get("webhook_id"));
+				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("Webhook-Event"));
 			} else {
 				// parse "Event" or "homeassistant
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event_type"));
@@ -231,6 +235,9 @@ public class HomeAssistantManualRuleImporter {
 		case "time":
 		case "time_pattern":
 			return TriggerType.Timed;
+		case "webhook":
+			return TriggerType.TriggerChannelFired;
+				
 		default:
 			return TriggerType.Unknown;
 		}
