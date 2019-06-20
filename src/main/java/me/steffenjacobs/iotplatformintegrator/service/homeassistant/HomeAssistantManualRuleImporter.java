@@ -1,6 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.service.homeassistant;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ public class HomeAssistantManualRuleImporter {
 		int result = fileChooser.showOpenDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fileChooser.getSelectedFile();
+			if (!selectedFile.exists()) {
+				JOptionPane.showMessageDialog(null, String.format("File %s does not exist.", selectedFile.getAbsolutePath()),
+						"Could not load HomeAssistant configuration from file.", JOptionPane.ERROR_MESSAGE);
+			}
 			return importRules(selectedFile, itemDirectory);
 		}
 		return new ArrayList<SharedRule>();
