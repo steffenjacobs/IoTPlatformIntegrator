@@ -6,15 +6,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -22,18 +18,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
-import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
-import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
-import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
-import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
+import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
 
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
@@ -41,82 +27,24 @@ public class UiEntrypoint {
 	private final static Logger LOG = LoggerFactory.getLogger(UiEntrypoint.class);
 
 	private final UiFactory uiFactory;
-	private final UiEntrypointController entrypointController;
-	private final JTable rulesTable;
-	private final JTable itemsTable;
-	private final RuleDetailsPanel ruleDetailsPanel;
-	private final ConnectionExplorer connectionExplorer;
-	private final CodeEditor codeText;
+
+	private final ImportPerspective importPerspective;
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
-		codeText = new CodeEditor(settingService);
-		entrypointController = new UiEntrypointController(settingService, codeText);
 		uiFactory = new UiFactory(settingService);
-
-		rulesTable = uiFactory.createRulesTable();
-		itemsTable = uiFactory.createItemsTable();
-		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
-		connectionExplorer = new ConnectionExplorer(entrypointController);
-	}
-
-	private void setupDockingEnvironment(JFrame frame) {
-		CControl control = new CControl(frame);
-		frame.add(control.getContentArea());
-
-		// create items table window
-		SingleCDockable itemsTableWindow = createDockable("ItemTable-Window", "Items", itemsTable);
-		control.addDockable(itemsTableWindow);
-
-		// create rule table window
-		SingleCDockable ruleTableWindow = createDockable("RuleTable-Window", "Rules", rulesTable);
-		control.addDockable(ruleTableWindow);
-
-		// create pseudo code window
-		SingleCDockable pseudocodeWindow = createDockable("Pseudocode-Window", "Generated Pseudocode", codeText);
-		control.addDockable(pseudocodeWindow);
-
-		// create rule details window
-		SingleCDockable ruleDetailsWindow = createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
-		control.addDockable(ruleDetailsWindow);
-
-		// create connection explorer window
-		SingleCDockable connectionExplorerWindow = createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorer);
-		control.addDockable(connectionExplorerWindow);
-
-		// configure grid
-		CGrid grid = new CGrid(control);
-
-		grid.add(0, 0, .4, 1, connectionExplorerWindow);
-		grid.add(.4, 0, 1, 1, pseudocodeWindow);
-		grid.add(0, 1, .5, 1, ruleTableWindow);
-		grid.add(.5, 1, .5, 1, itemsTableWindow);
-		grid.add(1, 0, 1, 2, ruleDetailsWindow);
-
-		control.getContentArea().deploy(grid);
-	}
-
-	private SingleCDockable createDockable(String id, String title, JComponent component) {
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(id, title);
-		dockable.setTitleText(title);
-		dockable.setCloseable(false);
-		dockable.add(new JScrollPane(component));
-		return dockable;
+		importPerspective = new ImportPerspective(settingService, uiFactory);
 	}
 
 	private void createAndShowGUI() {
-		entrypointController.setUi(this);
 		// Creating the Frame
 		JFrame frame = setupFrame();
 
 		// Creating the MenuBar and adding components
 		frame.setJMenuBar(setupMenu(frame));
 
-		// Rule Details Panel
-		createRuleDetailsPanel();
-
 		// setup docking environment
-		setupDockingEnvironment(frame);
+		importPerspective.addToFrame(frame);
 
 		frame.setVisible(true);
 	}
@@ -144,15 +72,6 @@ public class UiEntrypoint {
 		return frame;
 	}
 
-	private void createRuleDetailsPanel() {
-		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		rulesTable.getSelectionModel().addListSelectionListener(e -> {
-			SharedRule rule = entrypointController.getRuleByIndex(rulesTable.getSelectedRow());
-			ruleDetailsPanel.setDisplayedRule(rule);
-			entrypointController.renderPseudocode(rule);
-		});
-	}
-
 	private JMenuBar setupMenu(JFrame frame) {
 		JMenuBar mb = new JMenuBar();
 		JMenu m1 = new JMenu("File");
@@ -165,10 +84,12 @@ public class UiEntrypoint {
 		mConnect.add(mImportFromOpenhab);
 		mImportFromOpenhab.addActionListener(e -> {
 			try {
-				entrypointController.loadOpenHABData();
+				importPerspective.getPerpsectiveController().loadOpenHABData();
 			} catch (Exception e2) {
-				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						entrypointController.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(frame,
+						String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
+								importPerspective.getPerpsectiveController().getOHUrlWithPort(), e2.getMessage()),
+						"Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 
@@ -176,11 +97,13 @@ public class UiEntrypoint {
 		mConnect.add(mImportFromHomeAssistant);
 		mImportFromHomeAssistant.addActionListener(e -> {
 			try {
-				entrypointController.loadHomeAssistantData();
+				importPerspective.getPerpsectiveController().loadHomeAssistantData();
 			} catch (Exception e2) {
 				e2.printStackTrace();
-				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						entrypointController.getHAUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(frame,
+						String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
+								importPerspective.getPerpsectiveController().getHAUrlWithPort(), e2.getMessage()),
+						"Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 
@@ -196,26 +119,4 @@ public class UiEntrypoint {
 		javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
 	}
 
-	public void refreshItems(Iterable<SharedItem> loadedItems) {
-		itemsTable.getSelectionModel().clearSelection();
-		uiFactory.updateItemsTable(itemsTable, loadedItems);
-	}
-
-	public void refreshRulesTable(Iterable<SharedRule> loadedRules) {
-		rulesTable.getSelectionModel().clearSelection();
-		ruleDetailsPanel.setDisplayedRule(null);
-		uiFactory.updateRuleTable(rulesTable, loadedRules);
-	}
-
-	public void onConnectionEstablished(ServerConnection connection) {
-		connectionExplorer.addConnection(connection);
-	}
-
-	public void resetCodeEditor() {
-		codeText.showHelpText();
-	}
-
-	public void propagateRemovalOfServerConnection(ServerConnection serverConnection) {
-		connectionExplorer.removeServerConnection(serverConnection);
-	}
 }

@@ -30,14 +30,14 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformat
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
-import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
+import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.util.UrlUtil;
 
 /** @author Steffen Jacobs */
-public class UiEntrypointController {
+public class ImportPerspectiveController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ImportPerspectiveController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
 	private static final OpenHabApiService openHabApiService = new OpenHabApiService();
@@ -49,28 +49,27 @@ public class UiEntrypointController {
 	private static final HomeAssistantItemTransformationService haItemTransformationService = new HomeAssistantItemTransformationService();
 
 	private final SettingService settingService;
-	private UiEntrypoint ui;
+
+	private ImportPerspective importPerspective;
 
 	private final Set<ServerConnection> currentConnections = new HashSet<>();
 	private ServerConnection selectedConnection = null;
 
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
-	private final CodeEditorController codeEditorController;
+	private CodeEditorController codeEditorController;
 
 	private SharedRule lastRule = null;
 
-	public UiEntrypointController(SettingService settingService, CodeEditor codeEditor) {
+	public ImportPerspectiveController(SettingService settingService) {
 		this.settingService = settingService;
-		codeEditorController = new CodeEditorController(codeEditor, settingService);
-		codeEditor.setController(codeEditorController);
 	}
 
 	public CodeEditorController getCodeEditorController() {
 		return codeEditorController;
 	}
 
-	public void setUi(UiEntrypoint ui) {
-		this.ui = ui;
+	public void setImportPerspective(ImportPerspective importPerspective) {
+		this.importPerspective = importPerspective;
 	}
 
 	public void loadOpenHABRules(ServerConnection serverConnection) throws IOException {
@@ -136,7 +135,7 @@ public class UiEntrypointController {
 		ServerConnection serverConnection = new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT, versionInfo.getVersion(), versionInfo.getLocationName(),
 				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
 		currentConnections.add(serverConnection);
-		ui.onConnectionEstablished(serverConnection);
+		importPerspective.onConnectionEstablished(serverConnection);
 
 		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService
 				.transformItemsAndRules(homeAssistantApiService.getAllState(urlWithPort, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
@@ -166,7 +165,7 @@ public class UiEntrypointController {
 				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
 		currentConnections.add(connection);
 
-		ui.onConnectionEstablished(connection);
+		importPerspective.onConnectionEstablished(connection);
 		loadOpenHABItems(connection);
 		loadOpenHABRules(connection);
 
@@ -184,9 +183,9 @@ public class UiEntrypointController {
 
 		if (serverConnection != null) {
 			selectedConnection = serverConnection;
-			ui.refreshItems(selectedConnection.getItemDirectory().getAllItems());
-			ui.refreshRulesTable(selectedConnection.getRules());
-			ui.resetCodeEditor();
+			importPerspective.refreshItems(selectedConnection.getItemDirectory().getAllItems());
+			importPerspective.refreshRulesTable(selectedConnection.getRules());
+			importPerspective.resetCodeEditor();
 		} else {
 			clearSelection();
 		}
@@ -194,16 +193,21 @@ public class UiEntrypointController {
 
 	public void removeServerConnection(ServerConnection serverConnection) {
 		currentConnections.remove(serverConnection);
-		//TODO: use event system
-		ui.propagateRemovalOfServerConnection(serverConnection);
+		// TODO: use event system
+		importPerspective.propagateRemovalOfServerConnection(serverConnection);
 		clearSelection();
 	}
 
 	private void clearSelection() {
 		selectedConnection = null;
-		ui.refreshItems(new ArrayList<SharedItem>());
-		ui.refreshRulesTable(new ArrayList<SharedRule>());
-		ui.resetCodeEditor();
+		importPerspective.refreshItems(new ArrayList<SharedItem>());
+		importPerspective.refreshRulesTable(new ArrayList<SharedRule>());
+		importPerspective.resetCodeEditor();
+	}
+
+	public void setCodeText(CodeEditor codeEditor) {
+		codeEditorController = new CodeEditorController(codeEditor, settingService);
+		codeEditor.setController(codeEditorController);
 	}
 
 }

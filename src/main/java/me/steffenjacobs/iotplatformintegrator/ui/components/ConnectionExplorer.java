@@ -19,7 +19,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
-import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
+import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
 
 /** @author Steffen Jacobs */
 public class ConnectionExplorer extends JPanel {
@@ -30,7 +30,7 @@ public class ConnectionExplorer extends JPanel {
 	private final Map<DefaultMutableTreeNode, ServerConnection> nodeTable = new HashMap<>();
 	private final Map<ServerConnection, DefaultMutableTreeNode> nodeTableBackwards = new HashMap<>();
 
-	public ConnectionExplorer(final UiEntrypointController controller) {
+	public ConnectionExplorer(final ImportPerspectiveController controller) {
 		super();
 		this.setLayout(new BorderLayout());
 
@@ -98,9 +98,9 @@ public class ConnectionExplorer extends JPanel {
 	private final class ServerConnectionTree extends JTree implements ActionListener {
 		private static final long serialVersionUID = 2462886798062875440L;
 		JPopupMenu popup = new JPopupMenu();
-		private final UiEntrypointController controller;
+		private final ImportPerspectiveController controller;
 
-		ServerConnectionTree(UiEntrypointController controller, TreeModel dmtn) {
+		ServerConnectionTree(ImportPerspectiveController controller, TreeModel dmtn) {
 			super(dmtn);
 			this.controller = controller;
 			JMenuItem mi = new JMenuItem("Disconnect");
