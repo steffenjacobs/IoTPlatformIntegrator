@@ -86,8 +86,10 @@ public enum ItemType {
 		public static Command parse(String command) {
 			switch (command.toLowerCase()) {
 			case "on":
+			case "turn_on":
 				return On;
 			case "off":
+			case "turn_off":
 				return Off;
 			case "open":
 			case "opened":
