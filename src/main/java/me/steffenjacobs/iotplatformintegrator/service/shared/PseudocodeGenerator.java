@@ -161,7 +161,12 @@ public class PseudocodeGenerator {
 			}
 			List<Token> tokens = new ArrayList<>();
 			tokens.add(triggerToken("Item", "Item '%s' changed to %s"));
-			tokens.add(itemToken(item));
+			if(item == null) {
+				tokens.add(unknownToken("<unknownItem>"));
+			}
+			else {
+				tokens.add(itemToken(item));
+			}
 			tokens.add(triggerToken("changed", "Item '%s' changed to %s"));
 			tokens.addAll(valueToken(state));
 			return tokens;
