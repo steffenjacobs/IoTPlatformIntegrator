@@ -33,7 +33,7 @@ public final class OpenHabItemService {
 		}
 		return new ArrayList<>();
 	}
-	
+
 	public Optional<ItemDTO> requestItemByName(String openHabUrlWithPort, String itemname) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
@@ -49,7 +49,7 @@ public final class OpenHabItemService {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			String itemJson = "[" + objectMapper.writeValueAsString(item) + "]";
-			
+
 			return sharedService.sendPutWithPathParameters(openHabUrlWithPort + "/rest/items", itemJson);
 
 		} catch (IOException e) {
@@ -57,32 +57,31 @@ public final class OpenHabItemService {
 		}
 		return -1;
 	}
-	
+
 	public int createItemByName(String openHabUrlWithPort, ItemCreationDTO item, Optional<String> itemname) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			String itemJson = objectMapper.writeValueAsString(item);
-			System.out.println(itemname.map(val -> "/"+ val).orElse(""));
-			return sharedService.sendPutWithPathParameters(openHabUrlWithPort + "/rest/items" + itemname.map(val -> "/"+ val).orElse(""), itemJson);
+			System.out.println(itemname.map(val -> "/" + val).orElse(""));
+			return sharedService.sendPutWithPathParameters(openHabUrlWithPort + "/rest/items" + itemname.map(val -> "/" + val).orElse(""), itemJson);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
-	
-	public int postItem(String openHabUrlWithPort, String itemname, String body){
-		
+
+	public int postItem(String openHabUrlWithPort, String itemname, String body) {
+
 		try {
 			return sharedService.sendPost(openHabUrlWithPort + "/rest/items/" + itemname, false, body);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return -1;
-		
-	}	
-	
+
+	}
+
 	public boolean deleteItem(String openHabUrlwithPort, String itemname) {
 		try {
 			return sharedService.sendDelete(openHabUrlwithPort + "/rest/items/" + itemname);
@@ -91,31 +90,28 @@ public final class OpenHabItemService {
 		}
 		return false;
 	}
-	
+
 	public String getItemState(String openHabUrlwithPort, String itemname) {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpGet get = new HttpGet(openHabUrlwithPort + "/rest/items/" + itemname + "/state");
-		
 
-		
 		HttpResponse response;
 		try {
 			response = client.execute(get);
 			System.out.println(response.getStatusLine().getStatusCode());
-			
+
 			BasicResponseHandler basicResponseHandler = new BasicResponseHandler();
-			
+
 			String handleResponse = basicResponseHandler.handleResponse(response);
-			
+
 			return handleResponse;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
-		
-	
+
 	}
-	
+
 	public int updateItemState(String openHabUrlwithPort, String itemname, String body) {
 		try {
 			return sharedService.sendPost(openHabUrlwithPort + "/rest/items/" + itemname, false, body);
@@ -124,5 +120,5 @@ public final class OpenHabItemService {
 		}
 		return -1;
 	}
-	
+
 }

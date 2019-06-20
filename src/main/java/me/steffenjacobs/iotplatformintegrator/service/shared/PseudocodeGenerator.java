@@ -217,7 +217,7 @@ public class PseudocodeGenerator {
 			tokens5.add(triggerToken("received", "Channel '%s' received event '%s'"));
 			tokens5.add(triggerToken("event", "Channel '%s' received event '%s'"));
 			tokens5.addAll(valueToken(event));
-			if (eventData != null && !eventData.isEmpty() && ! "null".equals(eventData)) {
+			if (eventData != null && !eventData.isEmpty() && !"null".equals(eventData)) {
 				tokens5.add(unknownToken("{"));
 				tokens5.addAll(valueToken(eventData));
 				tokens5.add(unknownToken("}"));
@@ -252,10 +252,9 @@ public class PseudocodeGenerator {
 			tokens2.add(conditionToken("value", "value of item '%s' %s %s"));
 			tokens2.add(conditionToken("of", "value of item '%s' %s %s"));
 			tokens2.add(conditionToken("item", "value of item '%s' %s %s"));
-			if(item != null) {
+			if (item != null) {
 				tokens2.add(itemToken(item));
-			}
-			else {
+			} else {
 				tokens2.add(unknownToken("<null item>"));
 			}
 			tokens2.add(operatorToken(operator));

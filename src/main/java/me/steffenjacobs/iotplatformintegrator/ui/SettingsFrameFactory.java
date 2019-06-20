@@ -72,7 +72,7 @@ public class SettingsFrameFactory {
 
 	}
 
-	public JPanel wrapToPanel(String label, JComponent... components) {
+	private JPanel wrapToPanel(String label, JComponent... components) {
 		JPanel panel = new JPanel();
 		panel.add(new JLabel(label));
 		for (JComponent component : components) {

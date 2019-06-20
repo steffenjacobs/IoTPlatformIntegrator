@@ -71,7 +71,7 @@ public class HomeAssistantSharedService {
 		post.setEntity(new ByteArrayEntity(payload.getBytes("UTF-8")));
 		post.addHeader("Content-Type", "application/json");
 		post.addHeader("Authorization", "Bearer " + bearerToken);
-		
+
 		HttpResponse response = client.execute(post);
 		System.out.println(response.getStatusLine().getStatusCode());
 		System.out.println(url);

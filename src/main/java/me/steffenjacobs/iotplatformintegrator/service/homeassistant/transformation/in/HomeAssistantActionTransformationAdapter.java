@@ -42,7 +42,7 @@ public class HomeAssistantActionTransformationAdapter {
 			properties.put(ActionTypeSpecificKey.Command.getKeyString(), cmd);
 			return new SharedAction(ActionType.ItemCommand, properties, description, label);
 		} else {
-			//TODO: implement
+			// TODO: implement
 			LOG.error("Not implemented yet.");
 		}
 

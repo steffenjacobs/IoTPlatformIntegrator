@@ -32,7 +32,7 @@ public class CodeEditorController {
 	}
 
 	private void renderPseudoCode(SharedRule rule) {
-		if(rule==null) {
+		if (rule == null) {
 			codeEditor.showHelpText();
 		}
 		clear();
