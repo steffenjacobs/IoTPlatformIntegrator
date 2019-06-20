@@ -38,7 +38,7 @@ public class EventBus {
 			handlerMap.put(eventType, handlers);
 		}
 		lock.writeLock().unlock();
-		LOG.info("Added event handler for type {}", eventType);
+		LOG.debug("Added event handler for type {}", eventType);
 	}
 
 	public boolean removeEventHandler(EventType eventType, Runnable handler) {
@@ -56,7 +56,7 @@ public class EventBus {
 			}
 		} finally {
 			lock.writeLock().unlock();
-			LOG.info("Removed event handler for type {}", eventType);
+			LOG.debug("Removed event handler for type {}", eventType);
 		}
 	}
 
