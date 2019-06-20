@@ -8,6 +8,7 @@ public enum TriggerType {
 	ItemStateUpdated(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.ItemName, TriggerTypeSpecificKey.State }), //
 	Timed(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.Time }), //
 	TriggerChannelFired(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.Channel, TriggerTypeSpecificKey.Event, TriggerTypeSpecificKey.EventData }), //
+	GeoLocationChanged(new TriggerTypeSpecificKey[] { TriggerTypeSpecificKey.Event, TriggerTypeSpecificKey.EventData, TriggerTypeSpecificKey.ItemName }), //
 	Unknown(new TriggerTypeSpecificKey[0]);
 
 	private final TriggerTypeSpecificKey[] typeSpecificKeys;

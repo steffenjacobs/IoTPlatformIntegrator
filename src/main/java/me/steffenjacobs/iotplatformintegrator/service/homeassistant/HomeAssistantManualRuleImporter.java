@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
@@ -27,6 +28,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 
 /** @author Steffen Jacobs */
@@ -78,10 +80,20 @@ public class HomeAssistantManualRuleImporter {
 						id = "" + e.getValue();
 						break;
 					case "trigger":
-						Pair<SharedTrigger, Set<SharedCondition>> triggerWithConditions = parseTrigger(e.getValue(), itemDirectory);
-						if(triggerWithConditions!=null) {
-							triggers.add(triggerWithConditions.getLeft());
-							conditions.addAll(triggerWithConditions.getRight());
+						if (e.getValue() instanceof List) {
+							for (Object li : (Iterable<?>) e.getValue()) {
+								Pair<SharedTrigger, Set<SharedCondition>> triggerWithConditions = parseTrigger(li, itemDirectory);
+								if (triggerWithConditions != null) {
+									triggers.add(triggerWithConditions.getLeft());
+									conditions.addAll(triggerWithConditions.getRight());
+								}
+							}
+						} else {
+							Pair<SharedTrigger, Set<SharedCondition>> triggerWithConditions = parseTrigger(e.getValue(), itemDirectory);
+							if (triggerWithConditions != null) {
+								triggers.add(triggerWithConditions.getLeft());
+								conditions.addAll(triggerWithConditions.getRight());
+							}
 						}
 						break;
 					case "condition":
@@ -101,7 +113,7 @@ public class HomeAssistantManualRuleImporter {
 	}
 
 	private Pair<SharedTrigger, Set<SharedCondition>> parseTrigger(Object o, ItemDirectory itemDirectory) {
-		if(!(o instanceof Map )) {
+		if (!(o instanceof Map)) {
 			System.out.println(o);
 			return null;
 		}
@@ -117,6 +129,7 @@ public class HomeAssistantManualRuleImporter {
 		Map<String, Object> properties = new HashMap<>();
 		switch (triggerType) {
 		case ItemStateChanged:
+
 			String below = "" + map.get("below");
 			String above = "" + map.get("above");
 			String itemName = "" + map.get("entity_id");
@@ -144,13 +157,28 @@ public class HomeAssistantManualRuleImporter {
 				conditions.add(sc);
 			}
 
-			properties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
+			properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
 
 			// optional: TODO: Implement
 			String forr = "" + map.get("for");
 			break;
-			default:
-				System.out.println("not implemented");
+		case TriggerChannelFired:
+			if (map.get("platform").equals("geo_location")) {
+				//parse GeoEvent
+				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
+				String itemName2 = "" + map.get("source");
+				SharedItem itemByName = itemDirectory.getItemByName(itemName2);
+				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemByName != null ? itemByName : itemName2);
+				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("zone"));
+			} else {
+				// parse "Event"
+				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event_type"));
+				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("event_data"));
+			}
+			break;
+
+		default:
+			System.out.println("not implemented");
 		}
 		String description = "";
 		String label = "";
@@ -158,7 +186,7 @@ public class HomeAssistantManualRuleImporter {
 
 		return Pair.of(st, conditions);
 	}
-	
+
 	private boolean isNonNull(String s) {
 		return s != null && !s.isEmpty() && !s.equals("null");
 	}
@@ -167,6 +195,10 @@ public class HomeAssistantManualRuleImporter {
 		switch (triggerTypeString) {
 		case "numeric_state":
 			return TriggerType.ItemStateChanged;
+		case "event":
+			return TriggerType.TriggerChannelFired;
+		case "geo_location":
+			return TriggerType.TriggerChannelFired;
 		default:
 			return TriggerType.Unknown;
 		}
