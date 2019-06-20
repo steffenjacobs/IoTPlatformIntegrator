@@ -19,6 +19,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
+import me.steffenjacobs.iotplatformintegrator.ui.util.StringUtil;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantTriggerTransformationAdapter {
@@ -49,7 +50,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 				String above = "" + map.get("above");
 				String itemName = "" + map.get("entity_id");
 
-				if (isNonNull(below)) {
+				if (StringUtil.isNonNull(below)) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
 					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
@@ -60,7 +61,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
 					conditions.add(sc);
 				}
-				if (isNonNull(above)) {
+				if (StringUtil.isNonNull(above)) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
 					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
@@ -154,10 +155,6 @@ public class HomeAssistantTriggerTransformationAdapter {
 		SharedTrigger st = new SharedTrigger(triggerType, properties, description, label);
 
 		return Pair.of(st, conditions);
-	}
-
-	private boolean isNonNull(String s) {
-		return s != null && !s.isEmpty() && !s.equals("null");
 	}
 
 	private TriggerType parseTriggerType(String triggerTypeString) {
