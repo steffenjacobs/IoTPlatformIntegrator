@@ -44,7 +44,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 		switch (triggerType) {
 		case ItemStateChanged:
 
-			if (map.get("platform").equals("numerical_state")) {
+			if (map.get("platform").equals("numeric_state")) {
 
 				String below = "" + map.get("below");
 				String above = "" + map.get("above");
