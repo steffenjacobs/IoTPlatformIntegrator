@@ -109,26 +109,15 @@ public class HomeAssistantConditionTransformationAdapter {
 		case TimeOfDay:
 			String before = "" + map.get("before");
 			String after = "" + map.get("after");
-			if (StringUtil.isNonNull(before)) {
-				// TODO: fix label + description
-				Map<String, Object> conditionProperties = new HashMap<>();
-				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
+			// TODO: fix label + description
+			Map<String, Object> conditionProperties = new HashMap<>();
+			conditionProperties.put(ConditionTypeSpecificKey.StartTime.getKeyString(), before);
+			conditionProperties.put(ConditionTypeSpecificKey.EndTime.getKeyString(), after);
 
-				String description = "Time is before " + before;
-				String label = ConditionType.TimeOfDay + " before condition";
-				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
-				conditions.add(sc);
-			}
-			if (StringUtil.isNonNull(after)) {
-				// TODO: fix label + description
-				Map<String, Object> conditionProperties = new HashMap<>();
-				conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
-
-				String description = "Time is after " + after;
-				String label = ConditionType.TimeOfDay + " after condition";
-				SharedCondition sc = new SharedCondition(ConditionType.TimeOfDay, conditionProperties, description, label);
-				conditions.add(sc);
-			}
+			String description = String.format("Time is between %s and %s", before, after);
+			String label = ConditionType.TimeOfDay + " condition";
+			SharedCondition sc = new SharedCondition(ConditionType.TimeOfDay, conditionProperties, description, label);
+			conditions.add(sc);
 			break;
 		default:
 			LOG.error("Could not parse condition {}", conditionType);
