@@ -13,9 +13,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
-import me.steffenjacobs.iotplatformintegrator.ui.components.ItemTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
-import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
@@ -59,11 +57,11 @@ public class ImportPerspective extends Perspective {
 		control = new CControl();
 
 		// create items table window
-		SingleCDockable itemsTableWindow = DockableUtil.createDockable("ItemTable-Window", "Items", new ItemTableHolder().getItemsTable());
+		SingleCDockable itemsTableWindow = DockableUtil.createDockable("ItemTable-Window", "Items", GlobalComponentHolder.getInstance().getItemTable());
 		control.addDockable(itemsTableWindow);
 
 		// create rule table window
-		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", new RuleTableHolder().getRulesTable());
+		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", GlobalComponentHolder.getInstance().getRuleTable());
 		control.addDockable(ruleTableWindow);
 
 		// create pseudo code window

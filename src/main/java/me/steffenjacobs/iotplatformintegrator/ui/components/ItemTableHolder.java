@@ -1,6 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
-import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -22,7 +21,7 @@ public class ItemTableHolder {
 		});
 	}
 
-	public JComponent getItemsTable() {
+	public JTable getItemsTable() {
 		return itemsTable;
 	}
 
