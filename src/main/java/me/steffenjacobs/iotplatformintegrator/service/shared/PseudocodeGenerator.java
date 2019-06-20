@@ -145,13 +145,21 @@ public class PseudocodeGenerator {
 
 		switch (trigger.getTriggerTypeContainer().getTriggerType()) {
 		case ItemStateChanged:
-			SharedItem item = (SharedItem) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+			Object item = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
 			String previousState = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.PreviousState);
 			String state = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
+			Token itemToken;
+			if (item instanceof SharedItem) {
+				itemToken = itemToken((SharedItem) item);
+			} else if (item instanceof String) {
+				itemToken = unknownToken("<invalid item name '" + item + "'>");
+			} else {
+				itemToken = unknownToken("<null item>");
+			}
 			if (previousState != null && !previousState.equals("") && !previousState.equals("null")) {
 				List<Token> tokens = new ArrayList<>();
 				tokens.add(triggerToken("Item", "Item '%s' changed from %s to %s"));
-				tokens.add(itemToken(item));
+				tokens.add(itemToken);
 				tokens.add(triggerToken("changed", "Item '%s' changed from %s to %s"));
 				tokens.add(triggerToken("from", "Item '%s' changed from %s to %s"));
 				tokens.addAll(valueToken(previousState));
@@ -161,12 +169,7 @@ public class PseudocodeGenerator {
 			}
 			List<Token> tokens = new ArrayList<>();
 			tokens.add(triggerToken("Item", "Item '%s' changed to %s"));
-			if(item == null) {
-				tokens.add(unknownToken("<unknownItem>"));
-			}
-			else {
-				tokens.add(itemToken(item));
-			}
+			tokens.add(itemToken);
 			tokens.add(triggerToken("changed", "Item '%s' changed to %s"));
 			tokens.addAll(valueToken(state));
 			return tokens;
