@@ -45,6 +45,7 @@ public class HomeAssistantManualRuleImporter {
 			if (!selectedFile.exists()) {
 				JOptionPane.showMessageDialog(null, String.format("File %s does not exist.", selectedFile.getAbsolutePath()),
 						"Could not load HomeAssistant configuration from file.", JOptionPane.ERROR_MESSAGE);
+				return new ArrayList<SharedRule>();
 			}
 			return importRules(selectedFile, itemDirectory);
 		}
