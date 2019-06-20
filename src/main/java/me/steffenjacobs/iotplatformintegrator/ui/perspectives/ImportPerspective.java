@@ -4,29 +4,24 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
-import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
+import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
 public class ImportPerspective extends Perspective {
 
-	private final JTable rulesTable;
 	private final JTable itemsTable;
 	private final RuleDetailsPanel ruleDetailsPanel;
 	private final CodeEditor codeText;
@@ -42,7 +37,6 @@ public class ImportPerspective extends Perspective {
 		CodeEditorController controller = new CodeEditorController(codeText, settingService);
 		codeText.setController(controller);
 
-		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 		perpsectiveController.setImportPerspective(this);
@@ -62,21 +56,8 @@ public class ImportPerspective extends Perspective {
 	}
 
 	private void setup() {
-		// Rule Details Panel
-		createRuleDetailsPanel();
-
 		// setup layout
 		setupDockingEnvironment();
-	}
-
-	private void createRuleDetailsPanel() {
-		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		rulesTable.getSelectionModel().addListSelectionListener(e -> {
-			SharedRule rule = perpsectiveController.getRuleByIndex(rulesTable.getSelectedRow());
-			if (perpsectiveController.getLastSelectedRule() != rule) {
-				EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(rule));
-			}
-		});
 	}
 
 	private void setupDockingEnvironment() {
@@ -87,7 +68,7 @@ public class ImportPerspective extends Perspective {
 		control.addDockable(itemsTableWindow);
 
 		// create rule table window
-		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", rulesTable);
+		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", new RuleTableHolder().getRulesTable());
 		control.addDockable(ruleTableWindow);
 
 		// create pseudo code window
@@ -117,12 +98,6 @@ public class ImportPerspective extends Perspective {
 	public void refreshItems(Iterable<SharedItem> loadedItems) {
 		itemsTable.getSelectionModel().clearSelection();
 		uiFactory.updateItemsTable(itemsTable, loadedItems);
-	}
-
-	public void refreshRulesTable(Iterable<SharedRule> loadedRules) {
-		rulesTable.getSelectionModel().clearSelection();
-		uiFactory.updateRuleTable(rulesTable, loadedRules);
-		EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(null));
 	}
 
 	public void resetCodeEditor() {

@@ -14,7 +14,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DocumentAdapter;
@@ -26,37 +25,6 @@ public class UiFactory {
 
 	public UiFactory(SettingService settingService) {
 		this.settingService = settingService;
-	}
-
-	public void updateRuleTable(JTable rulesTable, Iterable<SharedRule> rules) {
-		DefaultTableModel tableModel = (DefaultTableModel) rulesTable.getModel();
-
-		tableModel.setNumRows(0);
-		for (SharedRule rule : rules) {
-			String[] arr = new String[3];
-			arr[0] = rule.getName();
-			arr[1] = rule.getId();
-			arr[2] = rule.getVisible();
-			tableModel.addRow(arr);
-		}
-		tableModel.fireTableDataChanged();
-	}
-
-	public JTable createRulesTable() {
-
-		// create table model
-		DefaultTableModel tableModel = new DefaultTableModel();
-		tableModel.setColumnCount(3);
-
-		// setup columns
-		String[] columnNames = { "Name", "UUID", "visible" };
-		tableModel.setColumnIdentifiers(columnNames);
-
-		// create JTable
-		JTable table = new JTable(tableModel);
-		table.setBounds(30, 40, 200, 300);
-
-		return table;
 	}
 
 	public JTable createItemsTable() {

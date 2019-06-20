@@ -24,7 +24,6 @@ import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformati
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.in.HomeAssistantManualRuleImporter;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerConnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
@@ -61,8 +60,6 @@ public class ImportPerspectiveController {
 
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
 
-	private SharedRule lastRule = null;
-
 	public ImportPerspectiveController(SettingService settingService) {
 		this.settingService = settingService;
 		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
@@ -71,9 +68,9 @@ public class ImportPerspectiveController {
 		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> {
 			removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection());
 		});
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
-			lastRule = ((SelectedRuleChangedEvent) e).getSelectedRule();
-		});
+		// EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
+		// lastRule = ((SelectedRuleChangedEvent) e).getSelectedRule();
+		// });
 	}
 
 	public void setImportPerspective(ImportPerspective importPerspective) {
@@ -87,7 +84,9 @@ public class ImportPerspectiveController {
 		for (ExperimentalRule rule : retrievedRules) {
 			serverConnection.getRules().add(transformer.getRuleTransformer().transformRule(rule, serverConnection.getItemDirectory(), new OpenHabCommandParser()));
 		}
-		lastRule = null;
+
+		// avoid generating rule code with stale items
+		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(serverConnection));
 	}
 
 	public void loadOpenHABItems(ServerConnection serverConnection) throws IOException {
@@ -101,7 +100,7 @@ public class ImportPerspectiveController {
 		}
 
 		// avoid generating rule code with stale items
-		lastRule = null;
+		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(serverConnection));
 	}
 
 	public SharedRule getRuleByIndex(int index) {
@@ -148,7 +147,6 @@ public class ImportPerspectiveController {
 			serverConnection.getRules().addAll(itemsAndRules.getRight());
 		}
 
-		lastRule = null;
 		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(serverConnection));
 	}
 
@@ -180,7 +178,6 @@ public class ImportPerspectiveController {
 		if (serverConnection != null) {
 			selectedConnection = serverConnection;
 			importPerspective.refreshItems(selectedConnection.getItemDirectory().getAllItems());
-			importPerspective.refreshRulesTable(selectedConnection.getRules());
 			importPerspective.resetCodeEditor();
 		} else {
 			clearSelection();
@@ -195,12 +192,6 @@ public class ImportPerspectiveController {
 	private void clearSelection() {
 		selectedConnection = null;
 		importPerspective.refreshItems(new ArrayList<SharedItem>());
-		importPerspective.refreshRulesTable(new ArrayList<SharedRule>());
 		importPerspective.resetCodeEditor();
 	}
-
-	public SharedRule getLastSelectedRule() {
-		return lastRule;
-	}
-
 }
