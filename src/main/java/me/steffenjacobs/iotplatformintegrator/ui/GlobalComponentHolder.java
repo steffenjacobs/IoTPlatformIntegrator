@@ -7,6 +7,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.InstanceChooserPanel
 import me.steffenjacobs.iotplatformintegrator.ui.components.ItemTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder;
+import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder.RuleTableHolderType;
 
 /** @author Steffen Jacobs */
 public class GlobalComponentHolder {
@@ -19,7 +20,9 @@ public class GlobalComponentHolder {
 
 	private final ConnectionExplorer connectionExplorer = new ConnectionExplorer();
 
-	private final RuleTableHolder ruleTableHolder = new RuleTableHolder();
+	private final RuleTableHolder ruleTableHolder = new RuleTableHolder(RuleTableHolderType.Default);
+	private final RuleTableHolder ruleTableSourceHolder = new RuleTableHolder(RuleTableHolderType.Source);
+	private final RuleTableHolder ruleTableTargetHolder = new RuleTableHolder(RuleTableHolderType.Target);
 	private final ItemTableHolder itemTableHolder = new ItemTableHolder();
 
 	private final RuleDetailsPanel ruleDetailsPanel = new RuleDetailsPanel();
@@ -31,6 +34,14 @@ public class GlobalComponentHolder {
 
 	public JTable getRuleTable() {
 		return ruleTableHolder.getRulesTable();
+	}
+
+	public JTable getRuleTableSource() {
+		return ruleTableSourceHolder.getRulesTable();
+	}
+
+	public JTable getRuleTableTarget() {
+		return ruleTableTargetHolder.getRulesTable();
 	}
 
 	public JTable getItemTable() {

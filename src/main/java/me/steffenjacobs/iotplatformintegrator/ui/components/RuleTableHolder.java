@@ -12,21 +12,45 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedTargetRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SourceConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.TargetConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.RuleController;
 
 /** @author Steffen Jacobs */
 public class RuleTableHolder {
 
+	public static enum RuleTableHolderType {
+		Default, Source, Target
+	}
+
 	private final JTable rulesTable;
 	private final RuleController ruleController = new RuleController();
+	private final RuleTableHolderType type;
 
-	public RuleTableHolder() {
+	public RuleTableHolder(RuleTableHolderType type) {
+		this.type = type;
 		rulesTable = createRulesTable();
 		setupRulesTable();
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
-			refreshRulesTable(((SelectedServerConnectionChangeEvent) e).getServerConnection());
-		});
+		switch (type) {
+		case Default:
+			EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+				refreshRulesTable(((SelectedServerConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		case Source:
+			EventBus.getInstance().addEventHandler(EventType.SourceConnectionChanged, e -> {
+				refreshRulesTable(((SourceConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		case Target:
+			EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
+				refreshRulesTable(((TargetConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		}
 
 	}
 
@@ -34,8 +58,19 @@ public class RuleTableHolder {
 		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		rulesTable.getSelectionModel().addListSelectionListener(e -> {
 			SharedRule rule = ruleController.getRuleByIndex(rulesTable.getSelectedRow());
-			if (ruleController.getLastSelectedRule() != rule) {
-				EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(rule));
+
+			switch (type) {
+			case Default:
+				if (ruleController.getLastSelectedRule() != rule) {
+					EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(rule));
+				}
+				break;
+			case Source:
+				EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(rule));
+				break;
+			case Target:
+				EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(rule));
+				break;
 			}
 		});
 	}
@@ -47,7 +82,15 @@ public class RuleTableHolder {
 		} else {
 			updateRuleTable(rulesTable, serverConnection.getRules());
 		}
-		EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(null));
+		switch (type) {
+		case Default:
+			EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(null));
+			break;
+		case Source:
+			EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(null));
+		case Target:
+			EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(null));
+		}
 	}
 
 	private void updateRuleTable(JTable rulesTable, Iterable<SharedRule> rules) {
