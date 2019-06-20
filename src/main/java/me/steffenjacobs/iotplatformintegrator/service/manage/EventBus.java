@@ -65,13 +65,14 @@ public class EventBus {
 	}
 
 	public void fireEvent(Event event) {
-		Collection<Consumer<Event>> runnables = new ArrayList<>();
+		Collection<Consumer<Event>> handlers = new ArrayList<>();
 		lock.readLock().lock();
 		if (handlerMap.containsKey(event.getEventType())) {
-			runnables.addAll(handlerMap.get(event.getEventType()));
+			handlers.addAll(handlerMap.get(event.getEventType()));
 		}
 		lock.readLock().unlock();
-		runnables.forEach(r -> r.accept(event));
+		handlers.forEach(r -> r.accept(event));
+		LOG.debug("delivered event {} to {} listeners.", event.getEventType(), handlers.size());
 	}
 
 	public void reset() {
