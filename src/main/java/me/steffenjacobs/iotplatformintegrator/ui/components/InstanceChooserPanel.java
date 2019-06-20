@@ -44,12 +44,18 @@ public class InstanceChooserPanel extends JPanel {
 	private void addServerConnection(ServerConnection serverConnection) {
 		sourceModel.addElement(serverConnection);
 		targetModel.addElement(serverConnection);
+		onServerConnctionModify();
 	}
 
 	private void removeServerConnection(ServerConnection serverConnection) {
 		sourceModel.removeElement(serverConnection);
 		targetModel.removeElement(serverConnection);
+		onServerConnctionModify();
+	}
 
+	private void onServerConnctionModify() {
+		EventBus.getInstance().fireEvent(new SourceConnectionChangeEvent((ServerConnection) sourceModel.getSelectedItem()));
+		EventBus.getInstance().fireEvent(new TargetConnectionChangeEvent((ServerConnection) targetModel.getSelectedItem()));
 	}
 
 	private JPanel createChooserPanelPanel(JComboBox<ServerConnection> chooseSourceServer, JComboBox<ServerConnection> chooseTargetServer) {
