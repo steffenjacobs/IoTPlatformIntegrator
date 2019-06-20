@@ -13,6 +13,8 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerConnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SourceConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.TargetConnectionChangeEvent;
 
 /** @author Steffen Jacobs */
 public class InstanceChooserPanel extends JPanel {
@@ -34,6 +36,9 @@ public class InstanceChooserPanel extends JPanel {
 
 		EventBus.getInstance().addEventHandler(EventType.ServerConnected, e -> addServerConnection(((ServerConnectedEvent) e).getServerConnection()));
 		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection()));
+
+		chooseSourceServer.addActionListener(e -> EventBus.getInstance().fireEvent(new SourceConnectionChangeEvent((ServerConnection) chooseSourceServer.getSelectedItem())));
+		chooseTargetServer.addActionListener(e -> EventBus.getInstance().fireEvent(new TargetConnectionChangeEvent((ServerConnection) chooseTargetServer.getSelectedItem())));
 	}
 
 	private void addServerConnection(ServerConnection serverConnection) {
