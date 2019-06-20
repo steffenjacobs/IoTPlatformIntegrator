@@ -1,7 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -160,7 +159,6 @@ public class ImportPerspectiveController {
 
 		if (serverConnection != null) {
 			selectedConnection = serverConnection;
-			importPerspective.refreshItems(selectedConnection.getItemDirectory().getAllItems());
 			importPerspective.resetCodeEditor();
 		} else {
 			clearSelection();
@@ -174,7 +172,6 @@ public class ImportPerspectiveController {
 
 	private void clearSelection() {
 		selectedConnection = null;
-		importPerspective.refreshItems(new ArrayList<SharedItem>());
 		importPerspective.resetCodeEditor();
 	}
 }
