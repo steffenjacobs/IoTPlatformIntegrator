@@ -241,7 +241,7 @@ public class HomeAssistantManualRuleImporter {
 			}
 			break;
 		default:
-			System.out.println("not implemented");
+			LOG.error("trigger type not implemented: " + triggerType);
 		}
 		String description = "";
 		String label = "";
@@ -277,6 +277,7 @@ public class HomeAssistantManualRuleImporter {
 			return TriggerType.TriggerChannelFired;
 
 		default:
+			LOG.error("invalid trigger type: " + triggerTypeString);
 			return TriggerType.Unknown;
 		}
 
