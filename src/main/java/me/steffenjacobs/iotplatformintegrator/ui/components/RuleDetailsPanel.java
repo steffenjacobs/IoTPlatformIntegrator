@@ -21,7 +21,6 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.Trigger
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
-import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 
 /** @author Steffen Jacobs */
 public class RuleDetailsPanel extends JPanel {
@@ -38,7 +37,7 @@ public class RuleDetailsPanel extends JPanel {
 
 	private final JPanel noRuleSelected, ruleSelected;
 
-	public RuleDetailsPanel(UiFactory uiFactory) {
+	public RuleDetailsPanel() {
 		super();
 		final JPanel form = new JPanel();
 		form.setLayout(new GridBagLayout());

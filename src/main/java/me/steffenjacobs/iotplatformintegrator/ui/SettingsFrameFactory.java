@@ -15,11 +15,11 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DocumentAdapter;
 
 /** @author Steffen Jacobs */
-public class UiFactory {
+public class SettingsFrameFactory {
 
 	private final SettingService settingService;
 
-	public UiFactory(SettingService settingService) {
+	public SettingsFrameFactory(SettingService settingService) {
 		this.settingService = settingService;
 	}
 

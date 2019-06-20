@@ -4,6 +4,7 @@ import javax.swing.JTable;
 
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ItemTableHolder;
+import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder;
 
 /** @author Steffen Jacobs */
@@ -20,6 +21,8 @@ public class GlobalComponentHolder {
 	private final RuleTableHolder ruleTableHolder = new RuleTableHolder();
 	private final ItemTableHolder itemTableHolder = new ItemTableHolder();
 
+	private final RuleDetailsPanel ruleDetailsPanel = new RuleDetailsPanel();
+
 	public ConnectionExplorer getConnectionExplorer() {
 		return connectionExplorer;
 	}
@@ -32,4 +35,7 @@ public class GlobalComponentHolder {
 		return itemTableHolder.getItemsTable();
 	}
 
+	public RuleDetailsPanel getRuleDetailsPanel() {
+		return ruleDetailsPanel;
+	}
 }

@@ -9,25 +9,20 @@ import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
-import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
-import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
 public class ImportPerspective extends Perspective {
 
-	private final RuleDetailsPanel ruleDetailsPanel;
 	private final CodeEditor codeText;
 	private final JPanel connectionExplorerPanel = new JPanel();
 
-	public ImportPerspective(SettingService settingService, UiFactory uiFactory) {
+	public ImportPerspective(SettingService settingService) {
 		codeText = new CodeEditor(settingService);
 		CodeEditorController controller = new CodeEditorController(codeText, settingService);
 		codeText.setController(controller);
-
-		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 
 		connectionExplorerPanel.setLayout(new BorderLayout());
 		setupDockingEnvironment();
@@ -55,7 +50,7 @@ public class ImportPerspective extends Perspective {
 		control.addDockable(pseudocodeWindow);
 
 		// create rule details window
-		SingleCDockable ruleDetailsWindow = DockableUtil.createDockable("RuleDetails-Window", "Rule Details", ruleDetailsPanel);
+		SingleCDockable ruleDetailsWindow = DockableUtil.createDockable("RuleDetails-Window", "Rule Details", GlobalComponentHolder.getInstance().getRuleDetailsPanel());
 		control.addDockable(ruleDetailsWindow);
 
 		// create connection explorer window

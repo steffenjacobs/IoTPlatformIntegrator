@@ -29,7 +29,7 @@ public class UiEntrypoint {
 
 	private final static Logger LOG = LoggerFactory.getLogger(UiEntrypoint.class);
 
-	private final UiFactory uiFactory;
+	private final SettingsFrameFactory settingsFrameFactory;
 
 	private final ImportPerspective importPerspective;
 	private final AdoptionPerspective adoptionPerspective;
@@ -40,8 +40,8 @@ public class UiEntrypoint {
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
-		uiFactory = new UiFactory(settingService);
-		importPerspective = new ImportPerspective(settingService, uiFactory);
+		settingsFrameFactory = new SettingsFrameFactory(settingService);
+		importPerspective = new ImportPerspective(settingService);
 		adoptionPerspective = new AdoptionPerspective();
 		serverConnectionManager = new ServerConnectionManager(settingService);
 	}
@@ -129,7 +129,7 @@ public class UiEntrypoint {
 		});
 
 		JMenuItem mSettings = new JMenuItem("Settings");
-		mSettings.addActionListener(e -> uiFactory.createSettingsFrame().setVisible(true));
+		mSettings.addActionListener(e -> settingsFrameFactory.createSettingsFrame().setVisible(true));
 
 		m1.add(mConnect);
 		m1.add(mSettings);
