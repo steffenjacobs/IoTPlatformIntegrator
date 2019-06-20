@@ -18,6 +18,9 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 
 /** @author Steffen Jacobs */
@@ -81,9 +84,11 @@ public class RuleDetailsPanel extends JPanel {
 		noRuleSelected.add(new JLabel("Please select a rule to display the details.                                                                          "));
 
 		super.add(noRuleSelected, BorderLayout.NORTH);
+
+		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> setDisplayedRule(((SelectedRuleChangedEvent) e).getSelectedRule()));
 	}
 
-	public void setDisplayedRule(SharedRule rule) {
+	private void setDisplayedRule(SharedRule rule) {
 		if (rule == null) {
 			super.removeAll();
 			super.add(noRuleSelected, BorderLayout.NORTH);

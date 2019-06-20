@@ -24,6 +24,7 @@ import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistan
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantManualRuleImporter;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ServerDisconnectedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
@@ -71,6 +72,9 @@ public class ImportPerspectiveController {
 		});
 		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> {
 			removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection());
+		});
+		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
+			lastRule = ((SelectedRuleChangedEvent) e).getSelectedRule();
 		});
 	}
 
@@ -125,14 +129,6 @@ public class ImportPerspectiveController {
 
 	public String getOHUrlWithPort() {
 		return settingService.getSetting(SettingKey.OPENHAB_URI);
-	}
-
-	public void renderPseudocode(SharedRule rule) {
-		if (lastRule != rule) {
-			codeEditorController.renderPseudocode(rule);
-			lastRule = rule;
-		}
-
 	}
 
 	public void loadHomeAssistantData() throws ClientProtocolException, IOException {
@@ -214,6 +210,10 @@ public class ImportPerspectiveController {
 	public void setCodeText(CodeEditor codeEditor) {
 		codeEditorController = new CodeEditorController(codeEditor, settingService);
 		codeEditor.setController(codeEditorController);
+	}
+
+	public SharedRule getLastSelectedRule() {
+		return lastRule;
 	}
 
 }

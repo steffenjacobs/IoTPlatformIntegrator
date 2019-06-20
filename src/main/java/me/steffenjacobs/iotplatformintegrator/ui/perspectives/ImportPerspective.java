@@ -14,6 +14,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
@@ -63,8 +65,9 @@ public class ImportPerspective {
 		rulesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		rulesTable.getSelectionModel().addListSelectionListener(e -> {
 			SharedRule rule = perpsectiveController.getRuleByIndex(rulesTable.getSelectedRow());
-			ruleDetailsPanel.setDisplayedRule(rule);
-			perpsectiveController.renderPseudocode(rule);
+			if (perpsectiveController.getLastSelectedRule() != rule) {
+				EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(rule));
+			}
 		});
 	}
 
@@ -122,8 +125,8 @@ public class ImportPerspective {
 
 	public void refreshRulesTable(Iterable<SharedRule> loadedRules) {
 		rulesTable.getSelectionModel().clearSelection();
-		ruleDetailsPanel.setDisplayedRule(null);
 		uiFactory.updateRuleTable(rulesTable, loadedRules);
+		EventBus.getInstance().fireEvent(new SelectedRuleChangedEvent(null));
 	}
 
 	public void onConnectionEstablished(ServerConnection connection) {

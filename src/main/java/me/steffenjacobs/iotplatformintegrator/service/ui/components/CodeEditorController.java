@@ -6,6 +6,9 @@ import java.util.List;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
@@ -24,9 +27,11 @@ public class CodeEditorController {
 	public CodeEditorController(CodeEditor codeEditor, SettingService settingService) {
 		this.codeEditor = codeEditor;
 		this.settingService = settingService;
+
+		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> renderPseudoCode(((SelectedRuleChangedEvent) e).getSelectedRule()));
 	}
 
-	public void renderPseudocode(SharedRule rule) {
+	private void renderPseudoCode(SharedRule rule) {
 		clear();
 		List<Token> generatedTokens = pseudocodeGenerator.generateCodeForRule(rule);
 		renderFormatted(generatedTokens);
