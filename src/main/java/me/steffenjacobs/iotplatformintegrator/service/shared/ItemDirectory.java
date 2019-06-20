@@ -11,11 +11,9 @@ public class ItemDirectory {
 
 	private final Map<String, SharedItem> items = new HashMap<>();
 
-	private static final SharedItem UNKNOWN_ITEM = new SharedItem("<unknown-item>", "Unknown Item", ItemType.Unknown);
-
 	public SharedItem getItemByName(String name) {
 		SharedItem item = items.get(name);
-		return item == null ? UNKNOWN_ITEM : item;
+		return item == null ? new SharedItem("<unknown-item>", String.format("Unknown Item '%s'", name), ItemType.Unknown) : item;
 	}
 
 	public void addItems(Iterable<SharedItem> addedItems) {
