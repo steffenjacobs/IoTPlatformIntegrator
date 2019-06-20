@@ -160,7 +160,7 @@ public class UiEntrypoint {
 				entrypointController.loadOpenHABRules();
 			} catch (Exception e2) {
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						entrypointController.getUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
+						entrypointController.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 		
@@ -172,7 +172,7 @@ public class UiEntrypoint {
 //				entrypointController.loadOpenHABRules();
 			} catch (Exception e2) {
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						entrypointController.getUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
+						entrypointController.getHAUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 

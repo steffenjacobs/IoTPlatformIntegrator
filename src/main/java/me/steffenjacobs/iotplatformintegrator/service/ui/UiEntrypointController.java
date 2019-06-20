@@ -92,7 +92,7 @@ public class UiEntrypointController {
 		return loadedRules.get(index);
 	}
 
-	public String getUrlWithPort() {
+	public String getOHUrlWithPort() {
 		return settingService.getSetting(SettingKey.OPENHAB_URI);
 	}
 
@@ -114,6 +114,10 @@ public class UiEntrypointController {
 		ui.refreshItems(itemDirectory.getAllItems());
 		ui.refreshRulesTable(loadedRules);
 		lastRule = null;
+	}
+
+	public Object getHAUrlWithPort() {
+		return settingService.getSetting(SettingKey.HOMEASSISTANT_URI);
 	}
 
 }
