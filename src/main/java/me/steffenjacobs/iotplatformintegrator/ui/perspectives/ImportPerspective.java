@@ -8,7 +8,6 @@ import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
-import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.UiFactory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
@@ -24,8 +23,6 @@ public class ImportPerspective extends Perspective {
 	private final JPanel connectionExplorerPanel = new JPanel();
 
 	public ImportPerspective(SettingService settingService, UiFactory uiFactory) {
-		new ImportPerspectiveController(settingService);
-
 		codeText = new CodeEditor(settingService);
 		CodeEditorController controller = new CodeEditorController(codeText, settingService);
 		codeText.setController(controller);
@@ -33,18 +30,13 @@ public class ImportPerspective extends Perspective {
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 
 		connectionExplorerPanel.setLayout(new BorderLayout());
-		setup();
+		setupDockingEnvironment();
 	}
 
 	@Override
 	public void onAppear() {
 		ConnectionExplorer connectionExplorer = GlobalComponentHolder.getInstance().getConnectionExplorer();
 		connectionExplorerPanel.add(connectionExplorer, BorderLayout.CENTER);
-	}
-
-	private void setup() {
-		// setup layout
-		setupDockingEnvironment();
 	}
 
 	private void setupDockingEnvironment() {

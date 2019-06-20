@@ -18,7 +18,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
+import me.steffenjacobs.iotplatformintegrator.service.ui.ServerConnectionManager;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.AdoptionPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
@@ -33,7 +33,7 @@ public class UiEntrypoint {
 
 	private final ImportPerspective importPerspective;
 	private final AdoptionPerspective adoptionPerspective;
-	private final ImportPerspectiveController importPerspectiveController;
+	private final ServerConnectionManager serverConnectionManager;
 
 	private Perspective currentPerspective = null;
 	private JFrame frame;
@@ -43,7 +43,7 @@ public class UiEntrypoint {
 		uiFactory = new UiFactory(settingService);
 		importPerspective = new ImportPerspective(settingService, uiFactory);
 		adoptionPerspective = new AdoptionPerspective();
-		importPerspectiveController = new ImportPerspectiveController(settingService);
+		serverConnectionManager = new ServerConnectionManager(settingService);
 	}
 
 	private void createAndShowGUI() {
@@ -109,10 +109,10 @@ public class UiEntrypoint {
 		mConnect.add(mImportFromOpenhab);
 		mImportFromOpenhab.addActionListener(e -> {
 			try {
-				importPerspectiveController.loadOpenHABData();
+				serverConnectionManager.loadOpenHABData();
 			} catch (Exception e2) {
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						importPerspectiveController.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
+						serverConnectionManager.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 
@@ -120,11 +120,11 @@ public class UiEntrypoint {
 		mConnect.add(mImportFromHomeAssistant);
 		mImportFromHomeAssistant.addActionListener(e -> {
 			try {
-				importPerspectiveController.loadHomeAssistantData();
+				serverConnectionManager.loadHomeAssistantData();
 			} catch (Exception e2) {
 				e2.printStackTrace();
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						importPerspectiveController.getHAUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
+						serverConnectionManager.getHAUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 

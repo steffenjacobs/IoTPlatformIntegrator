@@ -36,9 +36,9 @@ import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformat
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 
 /** @author Steffen Jacobs */
-public class ImportPerspectiveController {
+public class ServerConnectionManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ImportPerspectiveController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ServerConnectionManager.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
 	private static final OpenHabApiService openHabApiService = new OpenHabApiService();
@@ -56,7 +56,7 @@ public class ImportPerspectiveController {
 
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
 
-	public ImportPerspectiveController(SettingService settingService) {
+	public ServerConnectionManager(SettingService settingService) {
 		this.settingService = settingService;
 		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
 			setSelectedServerConnection(((SelectedServerConnectionChangeEvent) e).getServerConnection());
