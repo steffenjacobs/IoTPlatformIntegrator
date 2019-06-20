@@ -41,7 +41,7 @@ public class CodeEditor extends JPanel {
 
 				// viewToModel does not take "\n" into account -> quick fix
 				int lines = StringUtils.countMatches(textToCursor, '\n');
-				textToCursor = tp.getText().substring(0, pos + lines );
+				textToCursor = tp.getText().substring(0, pos + lines);
 
 				// remove whitespaces
 				int cnt = StringUtils.countMatches(textToCursor.replaceAll("\\s+", " "), " ");

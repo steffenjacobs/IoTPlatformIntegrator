@@ -34,7 +34,6 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in.
 import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in.OpenHabTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
-import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
 
 /** @author Steffen Jacobs */
 public class ImportPerspectiveController {
@@ -52,8 +51,6 @@ public class ImportPerspectiveController {
 
 	private final SettingService settingService;
 
-	private ImportPerspective importPerspective;
-
 	private final Set<ServerConnection> currentConnections = new HashSet<>();
 	private ServerConnection selectedConnection = null;
 
@@ -67,13 +64,6 @@ public class ImportPerspectiveController {
 		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> {
 			removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection());
 		});
-		// EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
-		// lastRule = ((SelectedRuleChangedEvent) e).getSelectedRule();
-		// });
-	}
-
-	public void setImportPerspective(ImportPerspective importPerspective) {
-		this.importPerspective = importPerspective;
 	}
 
 	public void loadOpenHABRules(ServerConnection serverConnection) throws IOException {
@@ -159,7 +149,6 @@ public class ImportPerspectiveController {
 
 		if (serverConnection != null) {
 			selectedConnection = serverConnection;
-			importPerspective.resetCodeEditor();
 		} else {
 			clearSelection();
 		}
@@ -172,6 +161,5 @@ public class ImportPerspectiveController {
 
 	private void clearSelection() {
 		selectedConnection = null;
-		importPerspective.resetCodeEditor();
 	}
 }

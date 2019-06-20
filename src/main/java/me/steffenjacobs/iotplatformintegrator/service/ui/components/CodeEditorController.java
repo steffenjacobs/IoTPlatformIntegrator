@@ -32,6 +32,9 @@ public class CodeEditorController {
 	}
 
 	private void renderPseudoCode(SharedRule rule) {
+		if(rule==null) {
+			codeEditor.showHelpText();
+		}
 		clear();
 		List<Token> generatedTokens = pseudocodeGenerator.generateCodeForRule(rule);
 		renderFormatted(generatedTokens);

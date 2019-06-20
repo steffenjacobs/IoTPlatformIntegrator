@@ -21,18 +21,16 @@ public class ImportPerspective extends Perspective {
 
 	private final RuleDetailsPanel ruleDetailsPanel;
 	private final CodeEditor codeText;
-	private final ImportPerspectiveController perpsectiveController;
 	private final JPanel connectionExplorerPanel = new JPanel();
 
 	public ImportPerspective(SettingService settingService, UiFactory uiFactory) {
-		this.perpsectiveController = new ImportPerspectiveController(settingService);
+		new ImportPerspectiveController(settingService);
 
 		codeText = new CodeEditor(settingService);
 		CodeEditorController controller = new CodeEditorController(codeText, settingService);
 		codeText.setController(controller);
 
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
-		perpsectiveController.setImportPerspective(this);
 
 		connectionExplorerPanel.setLayout(new BorderLayout());
 		setup();
@@ -42,10 +40,6 @@ public class ImportPerspective extends Perspective {
 	public void onAppear() {
 		ConnectionExplorer connectionExplorer = GlobalComponentHolder.getInstance().getConnectionExplorer();
 		connectionExplorerPanel.add(connectionExplorer, BorderLayout.CENTER);
-	}
-
-	public ImportPerspectiveController getPerpsectiveController() {
-		return perpsectiveController;
 	}
 
 	private void setup() {
@@ -87,9 +81,4 @@ public class ImportPerspective extends Perspective {
 
 		control.getContentArea().deploy(grid);
 	}
-
-	public void resetCodeEditor() {
-		codeText.showHelpText();
-	}
-
 }
