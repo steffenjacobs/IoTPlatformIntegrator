@@ -45,10 +45,15 @@ public class AdoptionPerspective extends Perspective {
 		SingleCDockable ruleTableWindow = DockableUtil.createDockable("RuleTable-Window", "Rules", ruleTablePanel);
 		control.addDockable(ruleTableWindow);
 
+		// create instance chooser window
+		SingleCDockable instanceChooserWindow = DockableUtil.createDockable("InstanceChooser-Window", "Instance Chooser", GlobalComponentHolder.getInstance().getInstanceChooser());
+		control.addDockable(instanceChooserWindow);
+
 		// configure grid
 		CGrid grid = new CGrid(control);
 
-		grid.add(0, 0, .4, 1, connectionExplorerWindow);
+		grid.add(0, 0, .4, .8, connectionExplorerWindow);
+		grid.add(0, .8, .4, .2, instanceChooserWindow);
 		grid.add(0, 1, .5, 1, ruleTableWindow);
 		control.getContentArea().deploy(grid);
 	}

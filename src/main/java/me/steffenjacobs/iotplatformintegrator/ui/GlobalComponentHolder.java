@@ -3,6 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.ui;
 import javax.swing.JTable;
 
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
+import me.steffenjacobs.iotplatformintegrator.ui.components.InstanceChooserPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ItemTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder;
@@ -22,6 +23,7 @@ public class GlobalComponentHolder {
 	private final ItemTableHolder itemTableHolder = new ItemTableHolder();
 
 	private final RuleDetailsPanel ruleDetailsPanel = new RuleDetailsPanel();
+	private final InstanceChooserPanel instanceChooser = new InstanceChooserPanel();
 
 	public ConnectionExplorer getConnectionExplorer() {
 		return connectionExplorer;
@@ -37,5 +39,9 @@ public class GlobalComponentHolder {
 
 	public RuleDetailsPanel getRuleDetailsPanel() {
 		return ruleDetailsPanel;
+	}
+
+	public InstanceChooserPanel getInstanceChooser() {
+		return instanceChooser;
 	}
 }
