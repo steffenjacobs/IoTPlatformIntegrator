@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.openhab;
+package me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.homeassistant;
+package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.in;
 
 import java.util.HashMap;
 import java.util.Map;

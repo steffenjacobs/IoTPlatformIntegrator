@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.openhab;
+package me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;

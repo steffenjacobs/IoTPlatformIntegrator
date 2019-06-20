@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.homeassistant;
+package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.in;
 
 import java.io.File;
 import java.io.IOException;

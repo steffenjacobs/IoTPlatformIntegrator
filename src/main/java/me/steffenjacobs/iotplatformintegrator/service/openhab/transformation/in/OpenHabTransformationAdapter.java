@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.openhab;
+package me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in;
 
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.ExperimentalRule;
 import me.steffenjacobs.iotplatformintegrator.domain.openhab.item.ItemDTO;

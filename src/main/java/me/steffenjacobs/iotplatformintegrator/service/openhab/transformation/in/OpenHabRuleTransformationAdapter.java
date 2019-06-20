@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.openhab;
+package me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in;
 
 import java.util.HashMap;
 import java.util.HashSet;

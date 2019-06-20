@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.in.HomeAssistantItemTransformationService;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.in.HomeAssistantManualRuleImporter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
