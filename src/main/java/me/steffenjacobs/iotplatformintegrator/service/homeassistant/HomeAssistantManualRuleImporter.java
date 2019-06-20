@@ -100,7 +100,7 @@ public class HomeAssistantManualRuleImporter {
 								conditions.addAll(conditionTransformer.parseCondition(li, itemDirectory));
 							}
 						} else {
-							conditions.addAll(conditionTransformer.parseCondition(e, itemDirectory));
+							conditions.addAll(conditionTransformer.parseCondition(e.getValue(), itemDirectory));
 						}
 						break;
 					case "action":
@@ -112,7 +112,7 @@ public class HomeAssistantManualRuleImporter {
 								}
 							}
 						} else {
-							SharedAction action = actionTransformer.parseAction(e, itemDirectory);
+							SharedAction action = actionTransformer.parseAction(e.getValue(), itemDirectory);
 							if (action != null) {
 								actions.add(action);
 							}
