@@ -19,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
+import me.steffenjacobs.iotplatformintegrator.ui.perspectives.AdoptionPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
+import me.steffenjacobs.iotplatformintegrator.ui.perspectives.Perspective;
 
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
@@ -29,24 +31,41 @@ public class UiEntrypoint {
 	private final UiFactory uiFactory;
 
 	private final ImportPerspective importPerspective;
+	private final AdoptionPerspective adoptionPerspective;
+
+	private Perspective currentPerspective = null;
+	private JFrame frame;
 
 	public UiEntrypoint() {
 		final SettingService settingService = new SettingService("./settings.config");
 		uiFactory = new UiFactory(settingService);
 		importPerspective = new ImportPerspective(settingService, uiFactory);
+		adoptionPerspective = new AdoptionPerspective();
 	}
 
 	private void createAndShowGUI() {
 		// Creating the Frame
-		JFrame frame = setupFrame();
+		frame = setupFrame();
 
 		// Creating the MenuBar and adding components
 		frame.setJMenuBar(setupMenu(frame));
 
 		// setup docking environment
-		importPerspective.addToFrame(frame);
+		setActivePerspective(importPerspective);
 
 		frame.setVisible(true);
+	}
+
+	private void setActivePerspective(Perspective perspective) {
+		if (currentPerspective != perspective) {
+			if (currentPerspective != null) {
+				currentPerspective.removeFromFrame(frame);
+			}
+			currentPerspective = perspective;
+			currentPerspective.addToFrame(frame);
+			frame.revalidate();
+			frame.repaint();
+		}
 	}
 
 	private JFrame setupFrame() {
@@ -76,8 +95,10 @@ public class UiEntrypoint {
 		JMenuBar mb = new JMenuBar();
 		JMenu m1 = new JMenu("File");
 		JMenu m2 = new JMenu("Help");
+		JMenu mPerspective = new JMenu("Perspective");
 		mb.add(m1);
 		mb.add(m2);
+		mb.add(mPerspective);
 		JMenu mConnect = new JMenu("Connect");
 
 		JMenuItem mImportFromOpenhab = new JMenuItem("OpenHAB");
@@ -112,6 +133,18 @@ public class UiEntrypoint {
 
 		m1.add(mConnect);
 		m1.add(mSettings);
+
+		JMenuItem mImportPerspective = new JMenuItem("Import Perspective");
+		mImportPerspective.addActionListener(e -> {
+			setActivePerspective(importPerspective);
+		});
+		JMenuItem mAdoptionPerspective = new JMenuItem("Adoption Perspective");
+		mAdoptionPerspective.addActionListener(e -> {
+			setActivePerspective(adoptionPerspective);
+		});
+
+		mPerspective.add(mImportPerspective);
+		mPerspective.add(mAdoptionPerspective);
 		return mb;
 	}
 

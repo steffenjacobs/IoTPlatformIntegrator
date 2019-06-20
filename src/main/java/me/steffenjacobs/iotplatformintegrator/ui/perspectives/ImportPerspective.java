@@ -1,6 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.ui.perspectives;
 
-import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
@@ -21,7 +20,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
-public class ImportPerspective {
+public class ImportPerspective extends Perspective {
 
 	private final JTable rulesTable;
 	private final JTable itemsTable;
@@ -29,8 +28,6 @@ public class ImportPerspective {
 	private final CodeEditor codeText;
 	private final ImportPerspectiveController perpsectiveController;
 	private final UiFactory uiFactory;
-
-	private CControl control;
 
 	public ImportPerspective(SettingService settingService, UiFactory uiFactory) {
 		this.uiFactory = uiFactory;
@@ -70,10 +67,6 @@ public class ImportPerspective {
 		});
 	}
 
-	public void addToFrame(JFrame frame) {
-		frame.add(control.getContentArea());
-	}
-
 	private void setupDockingEnvironment() {
 		control = new CControl();
 
@@ -94,7 +87,8 @@ public class ImportPerspective {
 		control.addDockable(ruleDetailsWindow);
 
 		// create connection explorer window
-		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer", GlobalComponentHolder.getInstance().getConnectionExplorer());
+		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer",
+				GlobalComponentHolder.getInstance().getConnectionExplorer());
 		control.addDockable(connectionExplorerWindow);
 
 		// configure grid
