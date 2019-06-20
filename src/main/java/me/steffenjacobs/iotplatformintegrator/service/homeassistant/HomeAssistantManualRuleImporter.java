@@ -224,9 +224,10 @@ public class HomeAssistantManualRuleImporter {
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), "Webhook #" + map.get("webhook_id"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("Webhook-Event"));
 			} else {
-				// parse "Event" or "homeassistant
+				// parse generic "Event"
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event_type"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("event_data"));
+				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("homeassistant.instance"));
 			}
 			break;
 		case Timed:
@@ -236,7 +237,7 @@ public class HomeAssistantManualRuleImporter {
 			} else {
 				// in xx:xx:xx hours/mins/seconds
 				// TODO: improve support for relative time
-				properties.put(TriggerTypeSpecificKey.Time.getKeyString(), String.format("in %s:%s:%S", map.get("hours"), map.get("minutes"), map.get("seconds")));
+				properties.put(TriggerTypeSpecificKey.Time.getKeyString(), String.format("now+%s:%s:%S", map.get("hours"), map.get("minutes"), map.get("seconds")));
 			}
 			break;
 		default:
