@@ -102,6 +102,7 @@ public class HomeAssistantManualRuleImporter {
 						} else {
 							conditions.addAll(conditionTransformer.parseCondition(e, itemDirectory));
 						}
+						break;
 					case "action":
 						if (e.getValue() instanceof List) {
 							for (Object li : (Iterable<?>) e.getValue()) {
@@ -110,6 +111,7 @@ public class HomeAssistantManualRuleImporter {
 						} else {
 							actions.add(actionTransformer.parseAction(e, itemDirectory));
 						}
+						break;
 					}
 					System.out.println(e);
 				}
