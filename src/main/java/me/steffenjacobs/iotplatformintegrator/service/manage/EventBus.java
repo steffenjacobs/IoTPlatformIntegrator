@@ -5,9 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.Event;
 
 /** @author Steffen Jacobs */
 public class EventBus {
@@ -15,23 +18,24 @@ public class EventBus {
 	private static final EventBus INSTANCE = new EventBus();
 
 	public static enum EventType {
-		ServerConnectionChanged;
+		Test, SelectedServerConnectionChanged;
 	}
 
 	private EventBus() {
 
 	}
 
-	private final Map<EventType, Collection<Runnable>> handlerMap = new HashMap<>();
+	private final Map<EventType, Collection<Consumer<Event>>> handlerMap = new HashMap<>();
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
 	public static EventBus getInstance() {
 		return INSTANCE;
 	}
 
-	public void addEventHandler(EventType eventType, Runnable handler) {
-		Collection<Runnable> handlers = new ArrayList<Runnable>();
-		handlers.add(handler);
+	@SuppressWarnings("unchecked")
+	public void addEventHandler(EventType eventType, Consumer<? extends Event> handler) {
+		Collection<Consumer<Event>> handlers = new ArrayList<>();
+		handlers.add((Consumer<Event>)handler);
 		lock.writeLock().lock();
 		if (handlerMap.putIfAbsent(eventType, handlers) != null) {
 			handlers.addAll(handlerMap.get(eventType));
@@ -41,11 +45,11 @@ public class EventBus {
 		LOG.debug("Added event handler for type {}", eventType);
 	}
 
-	public boolean removeEventHandler(EventType eventType, Runnable handler) {
+	public boolean removeEventHandler(EventType eventType, Consumer<? extends Event> handler) {
 		try {
 			lock.writeLock().lock();
 			if (handlerMap.containsKey(eventType)) {
-				Collection<Runnable> collection = handlerMap.get(eventType);
+				Collection<Consumer<Event>> collection = handlerMap.get(eventType);
 				boolean result = collection.remove(handler);
 				if (collection.isEmpty()) {
 					handlerMap.remove(eventType);
@@ -60,14 +64,14 @@ public class EventBus {
 		}
 	}
 
-	public void fireEvent(EventType eventType) {
-		Collection<Runnable> runnables = new ArrayList<>();
+	public void fireEvent(Event event) {
+		Collection<Consumer<Event>> runnables = new ArrayList<>();
 		lock.readLock().lock();
-		if (handlerMap.containsKey(eventType)) {
-			runnables.addAll(handlerMap.get(eventType));
+		if (handlerMap.containsKey(event.getEventType())) {
+			runnables.addAll(handlerMap.get(event.getEventType()));
 		}
 		lock.readLock().unlock();
-		runnables.forEach(r -> r.run());
+		runnables.forEach(r -> r.accept(event));
 	}
 
 	public void reset() {
