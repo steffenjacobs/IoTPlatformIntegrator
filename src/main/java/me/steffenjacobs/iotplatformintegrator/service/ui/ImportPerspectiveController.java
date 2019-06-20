@@ -22,6 +22,9 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantApiService;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantItemTransformationService;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantManualRuleImporter;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabApiService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabCommandParser;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
@@ -62,6 +65,9 @@ public class ImportPerspectiveController {
 
 	public ImportPerspectiveController(SettingService settingService) {
 		this.settingService = settingService;
+		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+			setSelectedServerConnection(((SelectedServerConnectionChangeEvent) e).getSelectedServerConnection());
+		});
 	}
 
 	public CodeEditorController getCodeEditorController() {
@@ -149,7 +155,7 @@ public class ImportPerspectiveController {
 		}
 
 		lastRule = null;
-		setSelectedServerConnection(serverConnection);
+		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(serverConnection));
 	}
 
 	public Object getHAUrlWithPort() {
@@ -169,14 +175,14 @@ public class ImportPerspectiveController {
 		loadOpenHABItems(connection);
 		loadOpenHABRules(connection);
 
-		setSelectedServerConnection(connection);
+		EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(connection));
 	}
 
 	public ServerConnection getSelectedServerConnection() {
 		return selectedConnection;
 	}
 
-	public void setSelectedServerConnection(ServerConnection serverConnection) {
+	private void setSelectedServerConnection(ServerConnection serverConnection) {
 		if (selectedConnection == serverConnection) {
 			return;
 		}

@@ -19,6 +19,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
 
 /** @author Steffen Jacobs */
@@ -60,7 +62,7 @@ public class ConnectionExplorer extends JPanel {
 		tree.addTreeSelectionListener(e -> {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 			if (nodeTable.containsKey(node)) {
-				controller.setSelectedServerConnection(nodeTable.get(node));
+				EventBus.getInstance().fireEvent(new SelectedServerConnectionChangeEvent(nodeTable.get(node)));
 			}
 		});
 
