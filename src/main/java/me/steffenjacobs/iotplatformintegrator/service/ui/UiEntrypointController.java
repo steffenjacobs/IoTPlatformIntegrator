@@ -15,11 +15,13 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantApiService;
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantItemTransformationService;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.HomeAssistantManualRuleImporter;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimentalRulesService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
+import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
@@ -30,9 +32,11 @@ public class UiEntrypointController {
 	private static final Logger LOG = LoggerFactory.getLogger(UiEntrypointController.class);
 	private static final OpenHabExperimentalRulesService ruleService = new OpenHabExperimentalRulesService();
 	private static final OpenHabItemService itemService = new OpenHabItemService();
+	private static final RuleValidator ruleValidator = new RuleValidator();
+	private static final HomeAssistantManualRuleImporter ruleImporter = new HomeAssistantManualRuleImporter();
 
-	private final HomeAssistantApiService homeAssistantApiService = new HomeAssistantApiService();
-	private final HomeAssistantItemTransformationService haItemTransformationService = new HomeAssistantItemTransformationService();
+	private static final HomeAssistantApiService homeAssistantApiService = new HomeAssistantApiService();
+	private static final HomeAssistantItemTransformationService haItemTransformationService = new HomeAssistantItemTransformationService();
 
 	private final SettingService settingService;
 	private UiEntrypoint ui;
@@ -110,7 +114,13 @@ public class UiEntrypointController {
 		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService.transformItemsAndRules(
 				homeAssistantApiService.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 		itemDirectory.addItems(itemsAndRules.getLeft());
-		loadedRules.addAll(itemsAndRules.getRight());
+		if (ruleValidator.containsEmptyRules(itemsAndRules.getRight())) {
+			// TODO: merge with rules that were empty before
+			loadedRules.addAll(ruleImporter.importRules(itemDirectory));
+		} else {
+			loadedRules.addAll(itemsAndRules.getRight());
+		}
+
 		ui.refreshItems(itemDirectory.getAllItems());
 		ui.refreshRulesTable(loadedRules);
 		lastRule = null;

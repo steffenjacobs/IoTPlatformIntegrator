@@ -171,6 +171,7 @@ public class UiEntrypoint {
 				entrypointController.loadHomeAssistantData();
 //				entrypointController.loadOpenHABRules();
 			} catch (Exception e2) {
+				e2.printStackTrace();
 				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
 						entrypointController.getHAUrlWithPort(), e2.getMessage()), "Could not connect to HomeAssistant server.", JOptionPane.ERROR_MESSAGE);
 			}
