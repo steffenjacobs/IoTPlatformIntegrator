@@ -4,17 +4,9 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 
 /** @author Steffen Jacobs */
-public class SelectedServerConnectionChangeEvent extends Event {
-
-	private final ServerConnection selectedServerConnection;
+public class SelectedServerConnectionChangeEvent extends WithServerConnectionEvent {
 
 	public SelectedServerConnectionChangeEvent(ServerConnection selectedServerConnection) {
-		super(EventType.SelectedServerConnectionChanged);
-		this.selectedServerConnection = selectedServerConnection;
+		super(EventType.SelectedServerConnectionChanged, selectedServerConnection);
 	}
-
-	public ServerConnection getSelectedServerConnection() {
-		return selectedServerConnection;
-	}
-
 }

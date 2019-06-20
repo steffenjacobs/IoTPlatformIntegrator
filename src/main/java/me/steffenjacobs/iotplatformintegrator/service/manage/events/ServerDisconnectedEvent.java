@@ -4,17 +4,9 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 
 /** @author Steffen Jacobs */
-public class ServerDisconnectedEvent extends Event {
-
-	private final ServerConnection serverConnection;
+public class ServerDisconnectedEvent extends WithServerConnectionEvent {
 
 	public ServerDisconnectedEvent(ServerConnection serverConnection) {
-		super(EventType.ServerDisconnected);
-		this.serverConnection = serverConnection;
+		super(EventType.ServerDisconnected, serverConnection);
 	}
-
-	public ServerConnection getServerConnection() {
-		return serverConnection;
-	}
-
 }

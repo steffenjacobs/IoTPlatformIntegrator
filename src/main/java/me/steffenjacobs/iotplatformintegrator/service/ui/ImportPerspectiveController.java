@@ -66,7 +66,7 @@ public class ImportPerspectiveController {
 	public ImportPerspectiveController(SettingService settingService) {
 		this.settingService = settingService;
 		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
-			setSelectedServerConnection(((SelectedServerConnectionChangeEvent) e).getSelectedServerConnection());
+			setSelectedServerConnection(((SelectedServerConnectionChangeEvent) e).getServerConnection());
 		});
 		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> {
 			removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection());
