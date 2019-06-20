@@ -50,6 +50,7 @@ public class CodeEditor extends JPanel {
 			}
 		};
 		tp.setToolTipText("test");
+		tp.setEditable(false);
 		super.add(tp, BorderLayout.CENTER);
 		showHelpText();
 	}
@@ -79,7 +80,9 @@ public class CodeEditor extends JPanel {
 		int len = tp.getDocument().getLength();
 		tp.setCaretPosition(len);
 		tp.setCharacterAttributes(aset, false);
+		tp.setEditable(true);
 		tp.replaceSelection(" ");
+		tp.setEditable(false);
 	}
 
 	private void appendStringToPane(String msg, Color c, boolean bold) {
@@ -97,12 +100,16 @@ public class CodeEditor extends JPanel {
 			int len = tp.getDocument().getLength();
 			tp.setCaretPosition(len);
 			tp.setCharacterAttributes(aset, false);
+			tp.setEditable(true);
 			tp.replaceSelection(msg);
+			tp.setEditable(false);
 		}
 	}
 
 	public void clear() {
+		tp.setEditable(true);
 		tp.setText("");
+		tp.setEditable(false);
 	}
 
 	public void showHelpText() {
