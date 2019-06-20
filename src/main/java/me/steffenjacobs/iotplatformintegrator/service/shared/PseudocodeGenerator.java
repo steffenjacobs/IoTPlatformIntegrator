@@ -202,16 +202,22 @@ public class PseudocodeGenerator {
 			tokens4.addAll(valueToken(time));
 			return tokens4;
 		case TriggerChannelFired:
-			String triggerChannel = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
+			Object triggerChannel = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
 			String event = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Event);
 			String eventData = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.EventData);
 			List<Token> tokens5 = new ArrayList<>();
 			tokens5.add(triggerToken("Channel", "Channel '%s' received event '%s'"));
-			tokens5.addAll(valueToken(triggerChannel));
+			if (triggerChannel instanceof String) {
+				tokens5.addAll(valueToken("" + triggerChannel));
+			}
+			if (triggerChannel instanceof SharedItem) {
+				tokens5.add(itemToken((SharedItem) triggerChannel));
+			}
+
 			tokens5.add(triggerToken("received", "Channel '%s' received event '%s'"));
 			tokens5.add(triggerToken("event", "Channel '%s' received event '%s'"));
 			tokens5.addAll(valueToken(event));
-			if(eventData != null) {
+			if (eventData != null && !eventData.isEmpty() && ! "null".equals(eventData)) {
 				tokens5.add(unknownToken("{"));
 				tokens5.addAll(valueToken(eventData));
 				tokens5.add(unknownToken("}"));
