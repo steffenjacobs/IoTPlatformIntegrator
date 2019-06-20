@@ -174,13 +174,13 @@ public class HomeAssistantManualRuleImporter {
 				// home assistant event
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("homeassistant.instance"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
-			}else if (map.get("platform").equals("mqtt")) {
-				//MQTT event
+			} else if (map.get("platform").equals("mqtt")) {
+				// MQTT event
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), map.get("topic"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("payload"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("MQTT"));
 			} else if (map.get("platform").equals("sun")) {
-				//sun event
+				// sun event
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("sun.sun"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), "offset=" + map.get("offset"));
@@ -190,7 +190,16 @@ public class HomeAssistantManualRuleImporter {
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("event_data"));
 			}
 			break;
-
+		case Timed:
+			if (map.get("platform").equals("time")) {
+				// at xx:xx
+				properties.put(TriggerTypeSpecificKey.Time.getKeyString(), map.get("at"));
+			} else {
+				// in xx:xx:xx hours/mins/seconds
+				// TODO: improve support for relative time
+				properties.put(TriggerTypeSpecificKey.Time.getKeyString(), String.format("in %s:%s:%S", map.get("hours"), map.get("minutes"), map.get("seconds")));
+			}
+			break;
 		default:
 			System.out.println("not implemented");
 		}
@@ -219,6 +228,9 @@ public class HomeAssistantManualRuleImporter {
 			return TriggerType.TriggerChannelFired;
 		case "sun":
 			return TriggerType.TriggerChannelFired;
+		case "time":
+		case "time_pattern":
+			return TriggerType.Timed;
 		default:
 			return TriggerType.Unknown;
 		}
