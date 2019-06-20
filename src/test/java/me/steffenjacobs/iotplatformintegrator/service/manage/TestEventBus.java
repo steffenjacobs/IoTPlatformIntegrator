@@ -1,11 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.service.manage;
 
-import static org.junit.Assert.fail;
-
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,38 +18,21 @@ public class TestEventBus {
 	public void testSimple() throws InterruptedException {
 
 		EventBus.getInstance().reset();
-		Semaphore sem = new Semaphore(0);
-		AtomicInteger i = new AtomicInteger(0);
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				i.incrementAndGet();
-				sem.release(1);
-			}
-		};
+		CallAwareRunnable r = new CallAwareRunnable();
 
 		Assert.assertNotNull(EventBus.getInstance());
 		EventBus.getInstance().addEventHandler(EventType.ServerConnectionChanged, r);
 
 		EventBus.getInstance().fireEvent(EventType.ServerConnectionChanged);
-		sem.tryAcquire(1, 2, TimeUnit.SECONDS);
-		Assert.assertEquals(1, i.get());
-		Assert.assertEquals(0, sem.availablePermits());
+		Assert.assertTrue(r.isCalled());
+		Assert.assertEquals(1, r.getCallCount());
 	}
 
 	@Test
 	public void testAddAndRemove() throws InterruptedException {
 
 		EventBus.getInstance().reset();
-		Semaphore sem = new Semaphore(0);
-		AtomicInteger i = new AtomicInteger(0);
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				i.incrementAndGet();
-				sem.release(1);
-			}
-		};
+		CallAwareRunnable r = new CallAwareRunnable();
 
 		Assert.assertNotNull(EventBus.getInstance());
 		EventBus.getInstance().addEventHandler(EventType.ServerConnectionChanged, r);
@@ -60,14 +40,13 @@ public class TestEventBus {
 
 		EventBus.getInstance().fireEvent(EventType.ServerConnectionChanged);
 
-		Assert.assertFalse(sem.tryAcquire(1, 2, TimeUnit.SECONDS));
-		Assert.assertEquals(0, i.get());
-		Assert.assertEquals(0, sem.availablePermits());
+		Assert.assertFalse(r.isCalled());
 	}
 
 	@Test
 	public void concurrencyTest() throws InterruptedException {
 		final int threadCount = 2000;
+
 		EventBus.getInstance().reset();
 
 		CopyOnWriteArrayList<CallAwareRunnable> runnables = new CopyOnWriteArrayList<CallAwareRunnable>();
@@ -94,15 +73,19 @@ public class TestEventBus {
 	}
 
 	class CallAwareRunnable implements Runnable {
-		boolean called = false;
+		private final AtomicInteger callCount = new AtomicInteger(0);
 
 		@Override
 		public void run() {
-			called = true;
+			callCount.incrementAndGet();
 		}
 
 		public boolean isCalled() {
-			return called;
+			return callCount.get() > 0;
+		}
+
+		public int getCallCount() {
+			return callCount.get();
 		}
 
 	}
