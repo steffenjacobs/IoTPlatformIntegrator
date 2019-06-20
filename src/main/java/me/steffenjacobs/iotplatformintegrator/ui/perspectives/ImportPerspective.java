@@ -14,6 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ImportPerspectiveController;
@@ -38,12 +39,15 @@ public class ImportPerspective {
 	public ImportPerspective(SettingService settingService, UiFactory uiFactory) {
 		this.uiFactory = uiFactory;
 		this.perpsectiveController = new ImportPerspectiveController(settingService);
+
 		codeText = new CodeEditor(settingService);
+		CodeEditorController controller = new CodeEditorController(codeText, settingService);
+		codeText.setController(controller);
+
 		rulesTable = uiFactory.createRulesTable();
 		itemsTable = uiFactory.createItemsTable();
 		ruleDetailsPanel = new RuleDetailsPanel(uiFactory);
 		connectionExplorer = new ConnectionExplorer();
-		perpsectiveController.setCodeText(codeText);
 		perpsectiveController.setImportPerspective(this);
 
 		setup();

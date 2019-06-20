@@ -34,8 +34,6 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
-import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.util.UrlUtil;
 
@@ -61,7 +59,6 @@ public class ImportPerspectiveController {
 	private ServerConnection selectedConnection = null;
 
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
-	private CodeEditorController codeEditorController;
 
 	private SharedRule lastRule = null;
 
@@ -76,10 +73,6 @@ public class ImportPerspectiveController {
 		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
 			lastRule = ((SelectedRuleChangedEvent) e).getSelectedRule();
 		});
-	}
-
-	public CodeEditorController getCodeEditorController() {
-		return codeEditorController;
 	}
 
 	public void setImportPerspective(ImportPerspective importPerspective) {
@@ -205,11 +198,6 @@ public class ImportPerspectiveController {
 		importPerspective.refreshItems(new ArrayList<SharedItem>());
 		importPerspective.refreshRulesTable(new ArrayList<SharedRule>());
 		importPerspective.resetCodeEditor();
-	}
-
-	public void setCodeText(CodeEditor codeEditor) {
-		codeEditorController = new CodeEditorController(codeEditor, settingService);
-		codeEditor.setController(codeEditorController);
 	}
 
 	public SharedRule getLastSelectedRule() {
