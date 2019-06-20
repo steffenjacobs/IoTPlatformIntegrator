@@ -2,7 +2,9 @@ package me.steffenjacobs.iotplatformintegrator.service.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.ClientProtocolException;
@@ -49,7 +51,7 @@ public class UiEntrypointController {
 	private final SettingService settingService;
 	private UiEntrypoint ui;
 
-	private final List<ServerConnection> currentConnections = new ArrayList<>();
+	private final Set<ServerConnection> currentConnections = new HashSet<>();
 	private ServerConnection selectedConnection = null;
 
 	private final PlatformTransformationAdapter<ItemDTO, ExperimentalRule> transformer = new OpenHabTransformationAdapter();
@@ -176,9 +178,31 @@ public class UiEntrypointController {
 	}
 
 	public void setSelectedServerConnection(ServerConnection serverConnection) {
-		selectedConnection = serverConnection;
-		ui.refreshItems(selectedConnection.getItemDirectory().getAllItems());
-		ui.refreshRulesTable(selectedConnection.getRules());
+		if (selectedConnection == serverConnection) {
+			return;
+		}
+
+		if (selectedConnection != null) {
+			selectedConnection = serverConnection;
+			ui.refreshItems(selectedConnection.getItemDirectory().getAllItems());
+			ui.refreshRulesTable(selectedConnection.getRules());
+			ui.resetCodeEditor();
+		} else {
+			clearSelection();
+		}
+	}
+
+	public void removeServerConnection(ServerConnection serverConnection) {
+		currentConnections.remove(serverConnection);
+		//TODO: use event system
+		ui.propagateRemovalOfServerConnection(serverConnection);
+		clearSelection();
+	}
+
+	private void clearSelection() {
+		selectedConnection = null;
+		ui.refreshItems(new ArrayList<SharedItem>());
+		ui.refreshRulesTable(new ArrayList<SharedRule>());
 		ui.resetCodeEditor();
 	}
 

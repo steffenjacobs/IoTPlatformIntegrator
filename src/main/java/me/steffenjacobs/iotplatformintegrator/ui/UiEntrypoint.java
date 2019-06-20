@@ -214,4 +214,8 @@ public class UiEntrypoint {
 	public void resetCodeEditor() {
 		codeText.showHelpText();
 	}
+
+	public void propagateRemovalOfServerConnection(ServerConnection serverConnection) {
+		connectionExplorer.removeServerConnection(serverConnection);
+	}
 }

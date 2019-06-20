@@ -1,15 +1,23 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.ui.UiEntrypointController;
@@ -21,25 +29,20 @@ public class ConnectionExplorer extends JPanel {
 	private final DefaultTreeModel model;
 
 	private final Map<DefaultMutableTreeNode, ServerConnection> nodeTable = new HashMap<>();
+	private final Map<ServerConnection, DefaultMutableTreeNode> nodeTableBackwards = new HashMap<>();
 
 	public ConnectionExplorer(final UiEntrypointController controller) {
 		super();
 		this.setLayout(new BorderLayout());
 
-		JTree tree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode("Connections", true)));
+		JTree tree = new ServerConnectionTree(controller, new DefaultTreeModel(new DefaultMutableTreeNode("Connections", true)));
 		this.model = (DefaultTreeModel) tree.getModel();
 		tree.setExpandsSelectedPaths(true);
 
-		tree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			@Override
-
-			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-				if (nodeTable.get(node) != null) {
-					controller.setSelectedServerConnection(nodeTable.get(node));
-				}
-
+		tree.addTreeSelectionListener(e -> {
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+			if (nodeTable.containsKey(node)) {
+				controller.setSelectedServerConnection(nodeTable.get(node));
 			}
 		});
 
@@ -63,9 +66,60 @@ public class ConnectionExplorer extends JPanel {
 
 		model.insertNodeInto(node, root, root.getChildCount());
 		nodeTable.put(node, connection);
+		nodeTableBackwards.put(connection, node);
 
-		this.repaint();
-		this.revalidate();
+		model.nodeStructureChanged(root);
 	}
 
+	public void removeServerConnection(ServerConnection serverConnection) {
+		nodeTable.remove(nodeTableBackwards.remove(serverConnection));
+	}
+
+	private final class ServerConnectionTree extends JTree implements ActionListener {
+		private static final long serialVersionUID = 2462886798062875440L;
+		JPopupMenu popup = new JPopupMenu();
+		private final UiEntrypointController controller;
+
+		ServerConnectionTree(UiEntrypointController controller, TreeModel dmtn) {
+			super(dmtn);
+			this.controller = controller;
+			JMenuItem mi = new JMenuItem("Disconnect");
+			mi.addActionListener(this);
+			mi.setActionCommand("disconnect");
+			popup.add(mi);
+
+			addMouseListener(new MouseAdapter() {
+				public void mouseReleased(MouseEvent e) {
+					if (e.isPopupTrigger()) {
+
+						// select this row
+						ServerConnectionTree.this.setSelectionRow(ServerConnectionTree.this.getClosestRowForLocation(e.getX(), e.getY()));
+
+						if (nodeTable.containsKey(ServerConnectionTree.this.getSelectionPath().getLastPathComponent())) {
+							popup.show((JComponent) e.getSource(), e.getX(), e.getY());
+						}
+					}
+				}
+			});
+
+		}
+
+		public void actionPerformed(ActionEvent ae) {
+
+			if (ae.getActionCommand().equals("disconnect")) {
+				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) this.getSelectionPath().getLastPathComponent();
+				selectedNode.removeAllChildren();
+
+				// remove from parent
+				DefaultMutableTreeNode parentOfSelectedNode = (DefaultMutableTreeNode) selectedNode.getParent();
+				int nodeIndex = parentOfSelectedNode.getIndex(selectedNode);
+				parentOfSelectedNode.remove(nodeIndex);
+
+				// update tree at parent node
+				((DefaultTreeModel) this.getModel()).nodeStructureChanged((TreeNode) selectedNode);
+				controller.removeServerConnection(nodeTable.get(selectedNode));
+
+			}
+		}
+	}
 }
