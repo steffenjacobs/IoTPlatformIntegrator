@@ -179,6 +179,11 @@ public class HomeAssistantManualRuleImporter {
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), map.get("topic"));
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("payload"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("MQTT"));
+			} else if (map.get("platform").equals("sun")) {
+				//sun event
+				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("sun.sun"));
+				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
+				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), "offset=" + map.get("offset"));
 			} else {
 				// parse "Event" or "homeassistant
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event_type"));
@@ -211,6 +216,8 @@ public class HomeAssistantManualRuleImporter {
 		case "homeassistant":
 			return TriggerType.TriggerChannelFired;
 		case "mqtt":
+			return TriggerType.TriggerChannelFired;
+		case "sun":
 			return TriggerType.TriggerChannelFired;
 		default:
 			return TriggerType.Unknown;
