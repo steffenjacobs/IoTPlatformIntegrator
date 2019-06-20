@@ -30,6 +30,10 @@ public class HomeAssistantItemTransformationService {
 				items.add(new SharedItem(name, label, type));
 			}
 		}
+
+		// add homeassistant meta instance item
+		// TODO: maybe add meta type for instance
+		items.add(new SharedItem("homeassistant.instance", "The HomeAssistant Instance", ItemType.Unknown));
 		return Pair.of(items, rules);
 	}
 

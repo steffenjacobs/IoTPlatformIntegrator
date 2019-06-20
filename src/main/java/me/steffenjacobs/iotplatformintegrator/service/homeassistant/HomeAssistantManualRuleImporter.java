@@ -164,14 +164,18 @@ public class HomeAssistantManualRuleImporter {
 			break;
 		case TriggerChannelFired:
 			if (map.get("platform").equals("geo_location")) {
-				//parse GeoEvent
+				// parse GeoEvent
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
 				String itemName2 = "" + map.get("source");
 				SharedItem itemByName = itemDirectory.getItemByName(itemName2);
 				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemByName != null ? itemByName : itemName2);
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("zone"));
+			} else if (map.get("platform").equals("homeassistant")) {
+				// home assistant event
+				properties.put(TriggerTypeSpecificKey.Channel.getKeyString(), itemDirectory.getItemByName("homeassistant.instance"));
+				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event"));
 			} else {
-				// parse "Event"
+				// parse "Event" or "homeassistant
 				properties.put(TriggerTypeSpecificKey.Event.getKeyString(), map.get("event_type"));
 				properties.put(TriggerTypeSpecificKey.EventData.getKeyString(), map.get("event_data"));
 			}
@@ -198,6 +202,8 @@ public class HomeAssistantManualRuleImporter {
 		case "event":
 			return TriggerType.TriggerChannelFired;
 		case "geo_location":
+			return TriggerType.TriggerChannelFired;
+		case "homeassistant":
 			return TriggerType.TriggerChannelFired;
 		default:
 			return TriggerType.Unknown;
