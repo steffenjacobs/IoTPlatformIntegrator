@@ -82,6 +82,57 @@ public enum ItemType {
 		static Command[] getRollershutterCommands() {
 			return new Command[] { Up, Down, StopMove, Percent };
 		}
+
+		public static Command parse(String command) {
+			switch (command.toLowerCase()) {
+			case "on":
+				return On;
+			case "off":
+				return Off;
+			case "open":
+			case "opened":
+				return Open;
+			case "close":
+			case "closed":
+				return Closed;
+			case "string":
+				return String;
+			case "decimal":
+			case "number":
+			case "numerical":
+				return Decimal;
+			case "increase":
+				return Increase;
+			case "decrease":
+				return Decrease;
+			case "percent":
+				return Percent;
+			case "hsb":
+				return HSB;
+			case "point":
+				return Point;
+			case "play":
+				return Play;
+			case "pause":
+				return Pause;
+			case "next":
+				return Next;
+			case "previous":
+				return Previous;
+			case "rewind":
+				return Rewind;
+			case "fastforward":
+				return Fastforward;
+			case "up":
+				return Up;
+			case "down":
+				return Down;
+			case "StopMove":
+				return StopMove;
+			default:
+				return Unknown;
+			}
+		}
 	}
 
 	/** Operations to execute with the items. */
