@@ -102,7 +102,6 @@ public final class OpenHabItemService {
 		try {
 			response = client.execute(get);
 			System.out.println(response.getStatusLine().getStatusCode());
-//			System.out.println(url);
 			
 			BasicResponseHandler basicResponseHandler = new BasicResponseHandler();
 			
@@ -110,7 +109,6 @@ public final class OpenHabItemService {
 			
 			return handleResponse;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -122,7 +120,6 @@ public final class OpenHabItemService {
 		try {
 			return sharedService.sendPost(openHabUrlwithPort + "/rest/items/" + itemname, false, body);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return -1;
