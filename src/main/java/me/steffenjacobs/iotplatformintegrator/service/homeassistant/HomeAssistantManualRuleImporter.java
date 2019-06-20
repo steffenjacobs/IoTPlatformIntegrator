@@ -70,6 +70,11 @@ public class HomeAssistantManualRuleImporter {
 				Set<SharedTrigger> triggers = new HashSet<>();
 				Set<SharedCondition> conditions = new HashSet<>();
 				Set<SharedAction> actions = new HashSet<>();
+				if (!(o instanceof Map)) {
+					LOG.error("not a map:" + o);
+					continue;
+				}
+				@SuppressWarnings("unchecked")
 				Map<String, Object> map = (Map<String, Object>) o;
 				for (Entry<String, Object> e : map.entrySet()) {
 					switch (e.getKey()) {
@@ -118,6 +123,7 @@ public class HomeAssistantManualRuleImporter {
 			System.out.println(o);
 			return null;
 		}
+		@SuppressWarnings("unchecked")
 		Map<String, Object> map = (Map<String, Object>) o;
 
 		TriggerType triggerType = parseTriggerType("" + map.get("platform"));
@@ -163,7 +169,7 @@ public class HomeAssistantManualRuleImporter {
 				properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
 
 				// optional: TODO: Implement
-				String forr = "" + map.get("for");
+				// String forr = "" + map.get("for");
 			} else if (map.get("platform").equals("state")) {
 				Object from = map.get("from");
 				String to = "" + map.get("to");
