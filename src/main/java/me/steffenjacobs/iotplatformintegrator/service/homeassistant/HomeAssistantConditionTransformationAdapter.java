@@ -7,6 +7,7 @@ import java.util.Map;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
@@ -75,6 +76,35 @@ public class HomeAssistantConditionTransformationAdapter {
 				String label = ConditionType.ItemState + " equal condition";
 				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
 				conditions.add(sc);
+			} else if (map.get("condition").equals("sun")) {
+				String before = "" + map.get("before");
+				String after = "" + map.get("after");
+				SharedItem item = itemDirectory.getItemByName("sun.sun");
+
+				if (StringUtil.isNonNull(before)) {
+					// TODO: fix label + description
+					String beforeOffset = "" + map.get("before_offset");
+					Map<String, Object> conditionProperties = new HashMap<>();
+					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
+					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
+					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), before + beforeOffset);
+					String description = item.getLabel() + " before " + before;
+					String label = ConditionType.ItemState + " before condition";
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					conditions.add(sc);
+				}
+				if (StringUtil.isNonNull(after)) {
+					// TODO: fix label + description
+					String afterOffset = "" + map.get("after_offset");
+					Map<String, Object> conditionProperties = new HashMap<>();
+					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
+					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), after + afterOffset);
+					String description = item.getLabel() + " after " + after;
+					String label = ConditionType.ItemState + " after condition";
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					conditions.add(sc);
+				}
 			}
 
 			break;
@@ -86,6 +116,7 @@ public class HomeAssistantConditionTransformationAdapter {
 		switch (conditionType) {
 		case "numeric_state":
 		case "state":
+		case "sun":
 			return ConditionType.ItemState;
 		default:
 			return ConditionType.Unknown;
