@@ -8,6 +8,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operat
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
@@ -23,15 +24,24 @@ public class CodeEditorController {
 	private final SettingService settingService;
 
 	private final ArrayList<Token> tokens = new ArrayList<>();
+	private SharedRule rule = null;
 
 	public CodeEditorController(CodeEditor codeEditor, SettingService settingService) {
 		this.codeEditor = codeEditor;
 		this.settingService = settingService;
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> renderPseudoCode(((SelectedRuleChangeEvent) e).getSelectedRule()));
+
+		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
+			RuleChangeEvent event = (RuleChangeEvent) e;
+			if (event.getSelectedRule() == rule) {
+				renderPseudoCode(event.getSelectedRule());
+			}
+		});
 	}
 
 	private void renderPseudoCode(SharedRule rule) {
+		this.rule = rule;
 		if (rule == null) {
 			codeEditor.showHelpText();
 		}
