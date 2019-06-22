@@ -12,6 +12,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
@@ -45,6 +46,12 @@ public class RuleBuilderRenderController {
 
 		EventBus.getInstance().addEventHandler(EventType.RuleElementAdded, e -> addRuleElement(((RuleElementAddedEvent) e).getSourceId()));
 		EventBus.getInstance().addEventHandler(EventType.RuleElementRemoved, e -> removeRuleElement(((RuleElementRemovedEvent) e).getSourceId()));
+		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
+			RuleChangeEvent event = (RuleChangeEvent) e;
+			if (event.getSelectedRule() == rule) {
+				renderRule(rule);
+			}
+		});
 	}
 
 	private void addRuleElement(UUID sourceId) {
@@ -63,7 +70,7 @@ public class RuleBuilderRenderController {
 				SharedAction action = (SharedAction) elem;
 				rule.getActions().remove(action);
 			}
-			renderRule(rule);
+			EventBus.getInstance().fireEvent(new RuleChangeEvent(rule));
 		}
 	}
 
