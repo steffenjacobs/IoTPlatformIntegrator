@@ -2,6 +2,7 @@ package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
@@ -76,6 +77,14 @@ public abstract class DynamicElement extends JPanel {
 		header.setBackground(headerColor);
 		this.setBackground(backgroundColor);
 		this.setBorder(BorderFactory.createLineBorder(borderColor, 1));
+	}
 
+	public void setStrategyElements(Iterable<Component> components) {
+		for (Component c : components) {
+			strategyPanel.add(c);
+		}
+
+		revalidate();
+		repaint();
 	}
 }
