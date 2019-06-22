@@ -8,17 +8,38 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SourceConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.TargetConnectionChangeEvent;
 
 /** @author Steffen Jacobs */
 public class ItemTableHolder {
+
+	public static enum ItemTableHolderType {
+		Default, Source, Target
+	}
+
 	private final JTable itemsTable;
 
-	public ItemTableHolder() {
+	public ItemTableHolder(ItemTableHolderType type) {
 		itemsTable = createItemsTable();
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
-			updateItemsTable(((SelectedServerConnectionChangeEvent) e).getServerConnection());
-		});
+		switch (type) {
+		case Default:
+			EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+				updateItemsTable(((SelectedServerConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		case Source:
+			EventBus.getInstance().addEventHandler(EventType.SourceConnectionChanged, e -> {
+				updateItemsTable(((SourceConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		case Target:
+			EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
+				updateItemsTable(((TargetConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		}
 	}
 
 	public JTable getItemsTable() {
