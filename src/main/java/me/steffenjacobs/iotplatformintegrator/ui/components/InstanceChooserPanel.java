@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.GridBagLayout;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
