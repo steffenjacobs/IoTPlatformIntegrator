@@ -25,15 +25,14 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorCo
 public class PseudocodeGenerator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PseudocodeGenerator.class);
+	private static final TriggerRenderer<Token> triggerRenderer = new TriggerRenderer<>(new PseudoCodeRenderingStrategy(TokenType.TRIGGER_CONDITION));
+	private static final ConditionRenderer<Token> conditionRenderer = new ConditionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.CONDITION));
+	private static final ActionRenderer<Token> actionRenderer = new ActionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.ACTION));
 
 	public List<Token> generateCodeForRule(SharedRule sharedRule) {
 		if (sharedRule == null) {
 			return Arrays.asList(new Token("Please select a rule to generate pseudocode for.", Token.TokenType.UNCLASSIFIED, ""));
 		}
-
-		final TriggerRenderer<Token> triggerRenderer = new TriggerRenderer<>(new PseudoCodeRenderingStrategy(TokenType.TRIGGER_CONDITION));
-		final ConditionRenderer<Token> conditionRenderer = new ConditionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.CONDITION));
-		final ActionRenderer<Token> actionRenderer = new ActionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.ACTION));
 
 		List<Token> tokens = new ArrayList<>();
 

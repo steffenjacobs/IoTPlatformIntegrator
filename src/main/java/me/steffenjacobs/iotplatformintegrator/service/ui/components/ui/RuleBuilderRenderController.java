@@ -19,19 +19,21 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuil
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.TriggerElement;
 
 /** @author Steffen Jacobs */
-public class RuleRenderController {
+public class RuleBuilderRenderController {
+
+	private static final TriggerRenderer<Component> triggerRenderer = new TriggerRenderer<>(new VisualRenderingStrategy());
+	private static final ConditionRenderer<Component> conditionRenderer = new ConditionRenderer<>(new VisualRenderingStrategy());
+	private static final ActionRenderer<Component> actionRenderer = new ActionRenderer<>(new VisualRenderingStrategy());
+
 	private final RuleBuilder ruleBuilder;
 
-	public RuleRenderController(RuleBuilder ruleBuilder) {
+	public RuleBuilderRenderController(RuleBuilder ruleBuilder) {
 		this.ruleBuilder = ruleBuilder;
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedSourceRuleChanged, e -> renderRule(((SelectedSourceRuleChangeEvent) e).getSelectedRule()));
 	}
 
 	public void renderRule(SharedRule rule) {
-		final TriggerRenderer<Component> triggerRenderer = new TriggerRenderer<>(new VisualRenderingStrategy());
-		final ConditionRenderer<Component> conditionRenderer = new ConditionRenderer<>(new VisualRenderingStrategy());
-		final ActionRenderer<Component> actionRenderer = new ActionRenderer<>(new VisualRenderingStrategy());
 		ruleBuilder.clear();
 		if (rule == null) {
 			return;

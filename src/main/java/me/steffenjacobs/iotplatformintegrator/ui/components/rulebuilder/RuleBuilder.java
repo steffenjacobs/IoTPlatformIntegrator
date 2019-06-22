@@ -6,7 +6,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleRenderController;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
 
 /** @author Steffen Jacobs */
 public class RuleBuilder extends JPanel {
@@ -18,7 +18,7 @@ public class RuleBuilder extends JPanel {
 
 		rulePanel.setLayout(new BoxLayout(rulePanel, BoxLayout.Y_AXIS));
 		this.add(rulePanel);
-		new RuleRenderController(this);
+		new RuleBuilderRenderController(this);
 	}
 
 	public void appendDynamicElement(DynamicElement dynamicElement) {
