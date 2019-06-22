@@ -20,6 +20,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 
 /** @author Steffen Jacobs */
@@ -36,6 +37,8 @@ public class RuleDetailsPanel extends JPanel {
 	private final JPanel actionsPanel;
 
 	private final JPanel noRuleSelected, ruleSelected;
+
+	private SharedRule rule = null;
 
 	public RuleDetailsPanel() {
 		super();
@@ -85,9 +88,17 @@ public class RuleDetailsPanel extends JPanel {
 		super.add(noRuleSelected, BorderLayout.NORTH);
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> setDisplayedRule(((SelectedRuleChangeEvent) e).getSelectedRule()));
+
+		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
+			RuleChangeEvent event = (RuleChangeEvent) e;
+			if (rule == event.getSelectedRule()) {
+				setDisplayedRule(event.getSelectedRule());
+			}
+		});
 	}
 
 	private void setDisplayedRule(SharedRule rule) {
+		this.rule = rule;
 		if (rule == null) {
 			super.removeAll();
 			super.add(noRuleSelected, BorderLayout.NORTH);
