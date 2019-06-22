@@ -11,6 +11,7 @@ import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
+import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
@@ -69,7 +70,7 @@ public class AdoptionPerspective extends Perspective {
 		control.addDockable(targetItemWindow);
 
 		// create rule builder window
-		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new JPanel());
+		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new RuleBuilder());
 		control.addDockable(ruleBuilderWindow);
 
 		// configure grid
