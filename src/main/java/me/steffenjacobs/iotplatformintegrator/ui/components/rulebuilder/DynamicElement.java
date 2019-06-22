@@ -1,6 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
@@ -36,20 +37,20 @@ public abstract class DynamicElement extends JPanel {
 	protected final JButton addButton;
 	protected final JPanel strategyPanel;
 
+	private final JPanel header;
+
 	public DynamicElement() {
 		elementType = new JLabel();
 		subType = new JLabel();
 		addButton = new JButton("+");
 		strategyPanel = new JPanel();
 		strategyPanel.setMinimumSize(new Dimension(50, 200));
-		strategyPanel.setBackground(RuleColors.CONDITION_STRATEGY_PANEL_COLOR);
 
-		final JPanel header = new JPanel();
+		header = new JPanel();
 		header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
 		header.add(elementType);
 		header.add(Box.createHorizontalGlue());
 		header.add(subType);
-		header.setBackground(RuleColors.CONDITION_HEADER_COLOR);
 
 		final JPanel footer = new JPanel();
 		footer.setLayout(new BorderLayout());
@@ -68,6 +69,13 @@ public abstract class DynamicElement extends JPanel {
 
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setBackground(RuleColors.CONDITION_COLOR);
-		this.setBorder(BorderFactory.createLineBorder(RuleColors.CONDITION_BORDER_COLOR, 1));
+	}
+
+	protected void setColors(Color strategyPanelColor, Color headerColor, Color backgroundColor, Color borderColor) {
+		strategyPanel.setBackground(strategyPanelColor);
+		header.setBackground(headerColor);
+		this.setBackground(backgroundColor);
+		this.setBorder(BorderFactory.createLineBorder(borderColor, 1));
+
 	}
 }
