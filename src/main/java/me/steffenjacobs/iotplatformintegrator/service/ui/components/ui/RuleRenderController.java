@@ -1,8 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
 import java.awt.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
@@ -18,8 +16,6 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.TriggerE
 
 /** @author Steffen Jacobs */
 public class RuleRenderController {
-	private static final Logger LOG = LoggerFactory.getLogger(RuleRenderController.class);
-
 	private final RuleBuilder ruleBuilder;
 
 	public RuleRenderController(RuleBuilder ruleBuilder) {
@@ -30,6 +26,8 @@ public class RuleRenderController {
 
 	public void renderRule(SharedRule rule) {
 		final TriggerRenderer<Component> triggerRenderer = new TriggerRenderer<>(new VisualRenderingStrategy());
+		final ConditionRenderer<Component> conditionRenderer = new ConditionRenderer<>(new VisualRenderingStrategy());
+		final ActionRenderer<Component> actionRenderer = new ActionRenderer<>(new VisualRenderingStrategy());
 		ruleBuilder.clear();
 		if (rule == null) {
 			return;
@@ -40,10 +38,10 @@ public class RuleRenderController {
 			ruleBuilder.appendDynamicElement(renderTrigger(trigger, triggerRenderer));
 		}
 		for (SharedCondition condition : rule.getConditions()) {
-			ruleBuilder.appendDynamicElement(renderCondition(condition));
+			ruleBuilder.appendDynamicElement(renderCondition(condition, conditionRenderer));
 		}
 		for (SharedAction action : rule.getActions()) {
-			ruleBuilder.appendDynamicElement(renderAction(action));
+			ruleBuilder.appendDynamicElement(renderAction(action, actionRenderer));
 		}
 	}
 
@@ -59,34 +57,25 @@ public class RuleRenderController {
 		return elem;
 	}
 
+	private DynamicElement renderAction(SharedAction action, ActionRenderer<Component> actionRenderer) {
 		ActionElement elem = new ActionElement(ruleBuilder);
 		elem.setActionTypeContainer(action.getActionTypeContainer());
 
 		String label = action.getLabel();
 		String description = action.getDescription();
 		elem.setToolTipText(String.format("%s: %s", label, description));
-
-		switch (action.getActionTypeContainer().getActionType()) {
-		default:
-			LOG.error("Unsupported Action type {}.", action.getActionTypeContainer().getActionType());
-		}
+		elem.setStrategyElements(actionRenderer.renderAction(action));
 		return elem;
 	}
 
-	private ConditionElement renderCondition(SharedCondition condition) {
+	private ConditionElement renderCondition(SharedCondition condition, ConditionRenderer<Component> conditionRenderer) {
 		ConditionElement elem = new ConditionElement(ruleBuilder);
 		elem.setConditionTypeContainer(condition.getConditionTypeContainer());
 
 		String label = condition.getLabel();
 		String description = condition.getDescription();
 		elem.setToolTipText(String.format("%s: %s", label, description));
-
-		switch (condition.getConditionTypeContainer().getConditionType()) {
-		case ItemState:
-			break;
-		default:
-			LOG.error("Unsupported condition type {}.", condition.getConditionTypeContainer().getConditionType());
-		}
+		elem.setStrategyElements(conditionRenderer.renderCondition(condition));
 		return elem;
 	}
 
