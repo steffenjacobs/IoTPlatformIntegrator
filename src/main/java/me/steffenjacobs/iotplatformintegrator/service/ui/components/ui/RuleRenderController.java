@@ -170,8 +170,10 @@ public class RuleRenderController {
 		DefaultComboBoxModel<Operation> itemModel = new DefaultComboBoxModel<>();
 		JComboBox<Operation> chooseItem = new JComboBox<>(itemModel);
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.name() : ""));
-		itemModel.addElement(operation);
-		// TODO: add alternative operations or use operationtype instead
+		for (Operation op : Operation.getKnownSubstitutes(operation)) {
+			itemModel.addElement(op);
+			// TODO: add alternative operations allowed in this item context
+		}
 		chooseItem.setSelectedItem(operation);
 		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.OPERATOR, operation.name(), operation.name()));
 		return chooseItem;
@@ -181,8 +183,10 @@ public class RuleRenderController {
 		DefaultComboBoxModel<Command> itemModel = new DefaultComboBoxModel<>();
 		JComboBox<Command> chooseItem = new JComboBox<>(itemModel);
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.name() : ""));
-		itemModel.addElement(command);
-		// TODO: add alternative commands or use commandtype instead
+		for (Command cmd : Command.getKnownSubstitutes(command)) {
+			itemModel.addElement(cmd);
+			// TODO: add alternative commands allowed by item
+		}
 		chooseItem.setSelectedItem(command);
 		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.COMMAND, command.name(), command.name()));
 		return chooseItem;

@@ -83,6 +83,33 @@ public enum ItemType {
 			return new Command[] { Up, Down, StopMove, Percent };
 		}
 
+		public static Command[] getKnownSubstitutes(Command command) {
+			switch (command) {
+			case On:
+			case Off:
+				return getSwitchCommands();
+			case Open:
+			case Closed:
+				return getContactCommands();
+			case Play:
+			case Pause:
+			case Next:
+			case Previous:
+			case Rewind:
+			case Fastforward:
+				return getPlayerCommands();
+			case Up:
+			case Down:
+			case StopMove:
+			case Percent:
+				return getRollershutterCommands();
+			default:
+				return new Command[] { command };
+			}
+
+			// TODO: improve this to cover allowed commands for items/channels
+		}
+
 		public static Command parse(String command) {
 			switch (command.toLowerCase()) {
 			case "on":
@@ -204,6 +231,25 @@ public enum ItemType {
 				return AND;
 			default:
 				return UNKNOWN;
+			}
+		}
+
+		public static Operation[] getKnownSubstitutes(Operation operation) {
+			switch (operation) {
+			case EQUAL:
+			case NOT_EQUAL:
+				return new Operation[] { Operation.EQUAL, Operation.NOT_EQUAL };
+			case BIGGER:
+			case SMALLER:
+				return new Operation[] { Operation.BIGGER, Operation.SMALLER, Operation.EQUAL, Operation.NOT_EQUAL };
+			case BIGGER_EQUAL:
+			case SMALLER_EQUAL:
+				return new Operation[] { Operation.BIGGER_EQUAL, Operation.SMALLER_EQUAL, Operation.BIGGER, Operation.SMALLER, Operation.EQUAL, Operation.NOT_EQUAL };
+			case AND:
+			case OR:
+				return new Operation[] { Operation.AND, Operation.OR };
+			default:
+				return new Operation[] { operation };
 			}
 		}
 	}
