@@ -40,9 +40,9 @@ public class TriggerRenderer<T> {
 				strategyElements.add(renderingStrategy.textComponent("Item", "Item '%s' changed from %s to %s"));
 				strategyElements.add(renderingStrategy.itemComponent(itemRetriever.apply(item)));
 				strategyElements.add(renderingStrategy.textComponent("changed", "Item '%s' changed from %s to %s"));
-				strategyElements.add(renderingStrategy.valueComponent(previousState));
+				strategyElements.addAll(renderingStrategy.valueComponent(previousState));
 				strategyElements.add(renderingStrategy.textComponent("from", "Item '%s' changed from %s to %s"));
-				strategyElements.add(renderingStrategy.valueComponent(state));
+				strategyElements.addAll(renderingStrategy.valueComponent(state));
 				strategyElements.add(renderingStrategy.textComponent("to", "Item '%s' changed from %s to %s"));
 				return strategyElements;
 			}
@@ -50,7 +50,7 @@ public class TriggerRenderer<T> {
 			strategyElements.add(renderingStrategy.itemComponent(itemRetriever.apply(item)));
 			strategyElements.add(renderingStrategy.textComponent("changed", "Item '%s' changed to %s"));
 			strategyElements.add(renderingStrategy.textComponent("to", "Item '%s' changed to %s"));
-			strategyElements.add(renderingStrategy.valueComponent(state));
+			strategyElements.addAll(renderingStrategy.valueComponent(state));
 			return strategyElements;
 		case CommandReceived:
 			Command command = (Command) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Command);
@@ -72,7 +72,7 @@ public class TriggerRenderer<T> {
 			strategyElements3.add(renderingStrategy.itemComponent(itemRetriever.apply(item3)));
 			strategyElements3.add(renderingStrategy.textComponent("updated", "Item '%s' updated to %s"));
 			strategyElements3.add(renderingStrategy.textComponent("to", "Item '%s' updated to %s"));
-			strategyElements3.add(renderingStrategy.valueComponent(state2));
+			strategyElements3.addAll(renderingStrategy.valueComponent(state2));
 			return strategyElements3;
 		case Timed:
 			String time = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Time);
@@ -80,7 +80,7 @@ public class TriggerRenderer<T> {
 
 			strategyElements4.add(renderingStrategy.textComponent("Time", "Time == %s"));
 			strategyElements4.add(renderingStrategy.operationComponent(Operation.EQUAL));
-			strategyElements4.add(renderingStrategy.valueComponent(time));
+			strategyElements4.addAll(renderingStrategy.valueComponent(time));
 			return strategyElements4;
 		case TriggerChannelFired:
 			Object triggerChannel = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Channel);
@@ -91,17 +91,17 @@ public class TriggerRenderer<T> {
 
 			strategyElements5.add(renderingStrategy.textComponent("Channel", "Channel '%s' received event '%s'"));
 			if (triggerChannel instanceof String) {
-				strategyElements5.add(renderingStrategy.valueComponent("" + triggerChannel));
+				strategyElements5.addAll(renderingStrategy.valueComponent("" + triggerChannel));
 			}
 			if (triggerChannel instanceof SharedItem) {
 				strategyElements5.add(renderingStrategy.itemComponent((SharedItem) triggerChannel));
 			}
 			strategyElements5.add(renderingStrategy.textComponent("received", "Channel '%s' received event '%s'"));
 			strategyElements5.add(renderingStrategy.textComponent("event", "Channel '%s' received event '%s'"));
-			strategyElements5.add(renderingStrategy.valueComponent(event));
+			strategyElements5.addAll(renderingStrategy.valueComponent(event));
 			if (eventData != null && !eventData.isEmpty() && !"null".equals(eventData)) {
 				strategyElements5.add(renderingStrategy.textComponent("{", "{'%s'}"));
-				strategyElements5.add(renderingStrategy.valueComponent(eventData));
+				strategyElements5.addAll(renderingStrategy.valueComponent(eventData));
 				strategyElements5.add(renderingStrategy.textComponent("}", "{'%s'}"));
 			}
 			return strategyElements5;

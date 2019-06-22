@@ -1,6 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
 import java.awt.Component;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -43,11 +45,11 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	}
 
 	@Override
-	public Component valueComponent(String value) {
+	public List<Component> valueComponent(String value) {
 		// TODO: datatypes
 		JTextField txt = new JTextField();
 		txt.setText(value);
-		return txt;
+		return Arrays.asList(txt);
 	}
 
 	@Override

@@ -2,6 +2,9 @@ package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
+
+import java.util.List;
+
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 
@@ -12,7 +15,7 @@ public interface RenderingStrategy<ComponentType> {
 
 	ComponentType commandComponent(Command command);
 
-	ComponentType valueComponent(String value);
+	List<ComponentType> valueComponent(String value);
 
 	ComponentType textComponent(String text, String description);
 
