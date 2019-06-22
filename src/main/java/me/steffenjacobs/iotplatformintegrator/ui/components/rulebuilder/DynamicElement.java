@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -12,6 +13,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementAddedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
 
 /** @author Steffen Jacobs */
 
@@ -41,7 +46,7 @@ public abstract class DynamicElement extends JPanel {
 
 	private final JPanel header;
 
-	public DynamicElement(ElementType type) {
+	public DynamicElement(ElementType type, UUID uuid) {
 		elementType = new JLabel(type.getDisplayString());
 		subType = new JLabel();
 		addButton = new JButton("+");
@@ -73,6 +78,9 @@ public abstract class DynamicElement extends JPanel {
 
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setBackground(RuleColors.CONDITION_COLOR);
+
+		addButton.addActionListener(e -> EventBus.getInstance().fireEvent(new RuleElementAddedEvent(type, uuid)));
+		removeButton.addActionListener(e -> EventBus.getInstance().fireEvent(new RuleElementRemovedEvent(type, uuid)));
 	}
 
 	protected void setColors(Color strategyPanelColor, Color headerColor, Color backgroundColor, Color borderColor) {

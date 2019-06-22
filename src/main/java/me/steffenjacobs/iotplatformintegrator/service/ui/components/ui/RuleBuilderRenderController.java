@@ -1,12 +1,19 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
 import java.awt.Component;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementAddedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
@@ -27,14 +34,44 @@ public class RuleBuilderRenderController {
 
 	private final RuleBuilder ruleBuilder;
 
+	private final Map<UUID, DynamicElement> renderedRuleElements = new HashMap<>();
+	private final Map<UUID, SharedRuleElement> ruleElements = new HashMap<>();
+	private SharedRule rule = null;
+
 	public RuleBuilderRenderController(RuleBuilder ruleBuilder) {
 		this.ruleBuilder = ruleBuilder;
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedSourceRuleChanged, e -> renderRule(((SelectedSourceRuleChangeEvent) e).getSelectedRule()));
+
+		EventBus.getInstance().addEventHandler(EventType.RuleElementAdded, e -> addRuleElement(((RuleElementAddedEvent) e).getSourceId()));
+		EventBus.getInstance().addEventHandler(EventType.RuleElementRemoved, e -> removeRuleElement(((RuleElementRemovedEvent) e).getSourceId()));
+	}
+
+	private void addRuleElement(UUID sourceId) {
+	}
+
+	private void removeRuleElement(UUID sourceId) {
+		if (rule != null) {
+			SharedRuleElement elem = ruleElements.remove(sourceId);
+			if (elem instanceof SharedTrigger) {
+				SharedTrigger trigger = (SharedTrigger) elem;
+				rule.getTriggers().remove(trigger);
+			} else if (elem instanceof SharedCondition) {
+				SharedCondition condition = (SharedCondition) elem;
+				rule.getConditions().remove(condition);
+			} else if (elem instanceof SharedAction) {
+				SharedAction action = (SharedAction) elem;
+				rule.getActions().remove(action);
+			}
+			renderRule(rule);
+		}
 	}
 
 	public void renderRule(SharedRule rule) {
+		this.rule = rule;
+		renderedRuleElements.clear();
 		ruleBuilder.clear();
+		ruleElements.clear();
 		if (rule == null) {
 			return;
 		}
@@ -52,7 +89,8 @@ public class RuleBuilderRenderController {
 	}
 
 	private DynamicElement renderTrigger(SharedTrigger trigger, TriggerRenderer<Component> triggerRenderer) {
-		TriggerElement elem = new TriggerElement(ruleBuilder);
+		UUID uuid = UUID.randomUUID();
+		TriggerElement elem = new TriggerElement(uuid);
 		elem.setTriggerTypeContainer(trigger.getTriggerTypeContainer());
 
 		String label = trigger.getLabel();
@@ -60,28 +98,36 @@ public class RuleBuilderRenderController {
 		elem.setToolTipText(String.format("%s: %s", label, description));
 
 		elem.setStrategyElements(triggerRenderer.renderTrigger(trigger));
+		ruleElements.put(uuid, trigger);
+		renderedRuleElements.put(uuid, elem);
 		return elem;
 	}
 
 	private DynamicElement renderAction(SharedAction action, ActionRenderer<Component> actionRenderer) {
-		ActionElement elem = new ActionElement(ruleBuilder);
+		UUID uuid = UUID.randomUUID();
+		ActionElement elem = new ActionElement(uuid);
 		elem.setActionTypeContainer(action.getActionTypeContainer());
 
 		String label = action.getLabel();
 		String description = action.getDescription();
 		elem.setToolTipText(String.format("%s: %s", label, description));
 		elem.setStrategyElements(actionRenderer.renderAction(action));
+		renderedRuleElements.put(uuid, elem);
+		ruleElements.put(uuid, action);
 		return elem;
 	}
 
 	private ConditionElement renderCondition(SharedCondition condition, ConditionRenderer<Component> conditionRenderer) {
-		ConditionElement elem = new ConditionElement(ruleBuilder);
+		UUID uuid = UUID.randomUUID();
+		ConditionElement elem = new ConditionElement(uuid);
 		elem.setConditionTypeContainer(condition.getConditionTypeContainer());
 
 		String label = condition.getLabel();
 		String description = condition.getDescription();
 		elem.setToolTipText(String.format("%s: %s", label, description));
 		elem.setStrategyElements(conditionRenderer.renderCondition(condition));
+		ruleElements.put(uuid, condition);
+		renderedRuleElements.put(uuid, elem);
 		return elem;
 	}
 
