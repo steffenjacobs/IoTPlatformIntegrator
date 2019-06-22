@@ -2,8 +2,10 @@ package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition;
 
 import java.util.Map;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
+
 /** @author Steffen Jacobs */
-public class SharedCondition {
+public class SharedCondition implements SharedRuleElement{
 	private final String description;
 	private final String label;
 	private final ConditionTypeContainer conditionTypeContainer;

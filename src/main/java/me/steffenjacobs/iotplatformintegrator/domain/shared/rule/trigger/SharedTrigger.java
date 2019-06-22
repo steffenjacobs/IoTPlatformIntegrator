@@ -2,8 +2,10 @@ package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger;
 
 import java.util.Map;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
+
 /** @author Steffen Jacobs */
-public class SharedTrigger {
+public class SharedTrigger implements SharedRuleElement{
 
 	private final String description;
 	private final String label;
