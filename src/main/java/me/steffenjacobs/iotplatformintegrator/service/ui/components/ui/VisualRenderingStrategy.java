@@ -69,4 +69,9 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
 		return chooseItem;
 	}
+
+	@Override
+	public Component textComponent(String text, String description, TokenType type) {
+		return textComponent(text, description);
+	}
 }
