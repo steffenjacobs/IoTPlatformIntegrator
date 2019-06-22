@@ -1,9 +1,11 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagLayout;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -59,22 +61,23 @@ public class InstanceChooserPanel extends JPanel {
 	}
 
 	private JPanel createChooserPanelPanel(JComboBox<ServerConnection> chooseSourceServer, JComboBox<ServerConnection> chooseTargetServer) {
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
+		panel.setAlignmentY(Component.TOP_ALIGNMENT);
 		final JPanel form = new JPanel();
 		form.setLayout(new GridBagLayout());
 		FormUtility formUtility = new FormUtility();
 
 		// Add fields
-		formUtility.addLabel("Source Server Connection: ", form);
+		formUtility.addLastField(new JLabel("Choose the source and target server connections."), form);
+		formUtility.addLastField(Box.createVerticalStrut(10), form);
+
+		formUtility.addLastField(new JLabel("Source Server Connection: "), form);
 		formUtility.addLastField(chooseSourceServer, form);
 
-		formUtility.addLabel("Target Server Connection: ", form);
+		formUtility.addLastField(new JLabel("Target Server Connection: "), form);
 		formUtility.addLastField(chooseTargetServer, form);
 
-		panel.add(new JLabel("Choose the source and target server connections."));
-		panel.add(Box.createVerticalStrut(10));
 		panel.add(form);
-
 		return panel;
 	}
 }
