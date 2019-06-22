@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
@@ -28,22 +26,12 @@ public class PseudocodeGenerator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PseudocodeGenerator.class);
 
-	private SharedItem getItemOrPlaceholder(Object item) {
-		if (item instanceof SharedItem) {
-			return (SharedItem) item;
-		} else if (item instanceof String) {
-			return new SharedItem("<invalid item name '" + item + "'>", "<invalid item name '" + item + "'>", ItemType.Unknown);
-		} else {
-			return new SharedItem("<null item>", "<null item>", ItemType.Unknown);
-		}
-	}
-
 	public List<Token> generateCodeForRule(SharedRule sharedRule) {
 		if (sharedRule == null) {
 			return Arrays.asList(new Token("Please select a rule to generate pseudocode for.", Token.TokenType.UNCLASSIFIED, ""));
 		}
 
-		final TriggerRenderer<Token> triggerRenderer = new TriggerRenderer<>(new PseudoCodeRenderingStrategy(TokenType.TRIGGER_CONDITION), this::getItemOrPlaceholder);
+		final TriggerRenderer<Token> triggerRenderer = new TriggerRenderer<>(new PseudoCodeRenderingStrategy(TokenType.TRIGGER_CONDITION));
 		final ConditionRenderer<Token> conditionRenderer = new ConditionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.CONDITION));
 		final ActionRenderer<Token> actionRenderer = new ActionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.ACTION));
 

@@ -2,11 +2,11 @@ package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
@@ -19,11 +19,9 @@ public class TriggerRenderer<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(TriggerRenderer.class);
 
 	private final RenderingStrategy<T> renderingStrategy;
-	private final Function<Object, SharedItem> itemRetriever;
 
-	public TriggerRenderer(RenderingStrategy<T> renderingStrategy, Function<Object, SharedItem> itemRetriever) {
+	public TriggerRenderer(RenderingStrategy<T> renderingStrategy) {
 		this.renderingStrategy = renderingStrategy;
-		this.itemRetriever = itemRetriever;
 
 	}
 
@@ -38,7 +36,7 @@ public class TriggerRenderer<T> {
 
 			if (previousState != null && !previousState.equals("") && !previousState.equals("null")) {
 				strategyElements.add(renderingStrategy.textComponent("Item", "Item '%s' changed from %s to %s"));
-				strategyElements.add(renderingStrategy.itemComponent(itemRetriever.apply(item)));
+				strategyElements.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item)));
 				strategyElements.add(renderingStrategy.textComponent("changed", "Item '%s' changed from %s to %s"));
 				strategyElements.addAll(renderingStrategy.valueComponent(previousState));
 				strategyElements.add(renderingStrategy.textComponent("from", "Item '%s' changed from %s to %s"));
@@ -47,7 +45,7 @@ public class TriggerRenderer<T> {
 				return strategyElements;
 			}
 			strategyElements.add(renderingStrategy.textComponent("Item", "Item '%s' changed to %s"));
-			strategyElements.add(renderingStrategy.itemComponent(itemRetriever.apply(item)));
+			strategyElements.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item)));
 			strategyElements.add(renderingStrategy.textComponent("changed", "Item '%s' changed to %s"));
 			strategyElements.add(renderingStrategy.textComponent("to", "Item '%s' changed to %s"));
 			strategyElements.addAll(renderingStrategy.valueComponent(state));
@@ -57,7 +55,7 @@ public class TriggerRenderer<T> {
 			SharedItem item2 = (SharedItem) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
 			Collection<T> strategyElements2 = new ArrayList<>();
 			strategyElements2.add(renderingStrategy.textComponent("Item", "Item '%s' received command '%s'"));
-			strategyElements2.add(renderingStrategy.itemComponent(itemRetriever.apply(item2)));
+			strategyElements2.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item2)));
 			strategyElements2.add(renderingStrategy.textComponent("received", "Item '%s' received command '%s'"));
 			strategyElements2.add(renderingStrategy.textComponent("command", "Item '%s' received command '%s'"));
 			strategyElements2.add(renderingStrategy.commandComponent(command));
@@ -69,7 +67,7 @@ public class TriggerRenderer<T> {
 			Collection<T> strategyElements3 = new ArrayList<>();
 
 			strategyElements3.add(renderingStrategy.textComponent("Item", "Item '%s' updated to %s"));
-			strategyElements3.add(renderingStrategy.itemComponent(itemRetriever.apply(item3)));
+			strategyElements3.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item3)));
 			strategyElements3.add(renderingStrategy.textComponent("updated", "Item '%s' updated to %s"));
 			strategyElements3.add(renderingStrategy.textComponent("to", "Item '%s' updated to %s"));
 			strategyElements3.addAll(renderingStrategy.valueComponent(state2));
@@ -108,6 +106,16 @@ public class TriggerRenderer<T> {
 		default:
 			LOG.error("Unsupported trigger type {}.", trigger.getTriggerTypeContainer().getTriggerType());
 			return new ArrayList<T>();
+		}
+	}
+
+	private SharedItem getItemOrPlaceholder(Object item) {
+		if (item instanceof SharedItem) {
+			return (SharedItem) item;
+		} else if (item instanceof String) {
+			return new SharedItem("<invalid item name '" + item + "'>", "<invalid item name '" + item + "'>", ItemType.Unknown);
+		} else {
+			return new SharedItem("<null item>", "<null item>", ItemType.Unknown);
 		}
 	}
 }

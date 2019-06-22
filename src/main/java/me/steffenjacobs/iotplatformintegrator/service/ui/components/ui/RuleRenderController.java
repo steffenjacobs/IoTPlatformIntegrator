@@ -3,9 +3,6 @@ package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 import java.awt.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
@@ -32,7 +29,7 @@ public class RuleRenderController {
 	}
 
 	public void renderRule(SharedRule rule) {
-		final TriggerRenderer<Component> triggerRenderer = new TriggerRenderer<>(new VisualRenderingStrategy(), this::getItemOrPlaceholder);
+		final TriggerRenderer<Component> triggerRenderer = new TriggerRenderer<>(new VisualRenderingStrategy());
 		ruleBuilder.clear();
 		if (rule == null) {
 			return;
@@ -62,17 +59,6 @@ public class RuleRenderController {
 		return elem;
 	}
 
-	private SharedItem getItemOrPlaceholder(Object item) {
-		if (item instanceof SharedItem) {
-			return (SharedItem) item;
-		} else if (item instanceof String) {
-			return new SharedItem("<invalid item name '" + item + "'>", "<invalid item name '" + item + "'>", ItemType.Unknown);
-		} else {
-			return new SharedItem("<null item>", "<null item>", ItemType.Unknown);
-		}
-	}
-
-	private DynamicElement renderAction(SharedAction action) {
 		ActionElement elem = new ActionElement(ruleBuilder);
 		elem.setActionTypeContainer(action.getActionTypeContainer());
 
