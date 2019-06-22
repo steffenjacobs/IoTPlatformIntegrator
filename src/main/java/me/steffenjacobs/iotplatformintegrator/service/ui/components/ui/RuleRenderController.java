@@ -68,11 +68,11 @@ public class RuleRenderController {
 		String description = trigger.getDescription();
 		elem.setToolTipText(String.format("%s: %s", label, description));
 
-		elem.setStrategyElements(setupStrategy(trigger));
+		elem.setStrategyElements(setupTriggerStrategy(trigger));
 		return elem;
 	}
 
-	private Collection<Component> setupStrategy(SharedTrigger trigger) {
+	private Collection<Component> setupTriggerStrategy(SharedTrigger trigger) {
 		switch (trigger.getTriggerTypeContainer().getTriggerType()) {
 		case ItemStateChanged:
 			Object item = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
