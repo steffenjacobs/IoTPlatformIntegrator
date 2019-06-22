@@ -1,16 +1,19 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
-import javax.swing.JPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ConditionElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
 
 /** @author Steffen Jacobs */
 public class RuleRenderController {
+	private static final Logger LOG = LoggerFactory.getLogger(RuleRenderController.class);
 
 	private final RuleBuilder ruleBuilder;
 
@@ -33,12 +36,18 @@ public class RuleRenderController {
 	}
 
 	private ConditionElement renderCondition(SharedCondition condition) {
-		return new ConditionElement();
-	}
+		String label = condition.getLabel();
+		String description = condition.getDescription();
+		ConditionElement elem = new ConditionElement(ruleBuilder);
 
-	public static class ConditionElement extends JPanel {
-		private static final long serialVersionUID = 262937647608306926L;
-
+		switch (condition.getConditionTypeContainer().getConditionType()) {
+		case ItemState:
+			elem.setConditionTypeContainer(condition.getConditionTypeContainer());
+			break;
+		default:
+			LOG.error("Unsupported condition type {}.", condition.getConditionTypeContainer().getConditionType());
+		}
+		return elem;
 	}
 
 }
