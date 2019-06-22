@@ -21,8 +21,8 @@ public class RuleBuilder extends JPanel {
 		new RuleRenderController(this);
 	}
 
-	public void appendConditionElement(ConditionElement conditionElement) {
-		rulePanel.add(conditionElement);
+	public void appendDynamicElement(DynamicElement dynamicElement) {
+		rulePanel.add(dynamicElement);
 		super.revalidate();
 		super.repaint();
 	}
@@ -40,4 +40,5 @@ public class RuleBuilder extends JPanel {
 		// TODO: beautify
 		rulePanel.add(headerPanel);
 	}
+
 }
