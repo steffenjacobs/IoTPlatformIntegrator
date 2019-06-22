@@ -36,14 +36,16 @@ public abstract class DynamicElement extends JPanel {
 	protected final JLabel elementType;
 	protected final JLabel subType;
 	protected final JButton addButton;
+	protected final JButton removeButton;
 	protected final JPanel strategyPanel;
 
 	private final JPanel header;
 
-	public DynamicElement() {
-		elementType = new JLabel();
+	public DynamicElement(ElementType type) {
+		elementType = new JLabel(type.getDisplayString());
 		subType = new JLabel();
 		addButton = new JButton("+");
+		removeButton = new JButton("-");
 		strategyPanel = new JPanel();
 		strategyPanel.setMinimumSize(new Dimension(50, 200));
 
@@ -59,6 +61,7 @@ public abstract class DynamicElement extends JPanel {
 		rightFooter.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		footer.add(rightFooter);
 
+		rightFooter.add(removeButton, BorderLayout.SOUTH);
 		rightFooter.add(addButton, BorderLayout.SOUTH);
 
 		footer.setBackground(ColorPalette.TRANSPARENT);

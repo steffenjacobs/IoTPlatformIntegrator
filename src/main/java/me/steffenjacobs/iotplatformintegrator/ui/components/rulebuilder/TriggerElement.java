@@ -7,9 +7,7 @@ public class TriggerElement extends DynamicElement {
 	private static final long serialVersionUID = 16080274137145616L;
 
 	public TriggerElement(RuleBuilder rb) {
-		super();
-		super.elementType.setText(ElementType.Trigger.getDisplayString());
-		super.addButton.addActionListener(e -> rb.appendDynamicElement(new TriggerElement(rb)));
+		super(ElementType.Trigger);
 
 		super.setColors(RuleColors.TRIGGER_STRATEGY_PANEL_COLOR, RuleColors.TRIGGER_HEADER_COLOR, RuleColors.TRIGGER_COLOR, RuleColors.TRIGGER_BORDER_COLOR);
 	}
