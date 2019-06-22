@@ -60,13 +60,31 @@ public class AdoptionPerspective extends Perspective {
 		SingleCDockable instanceChooserWindow = DockableUtil.createDockable("InstanceChooser-Window", "Instance Chooser", GlobalComponentHolder.getInstance().getInstanceChooser());
 		control.addDockable(instanceChooserWindow);
 
+		// create source item table window
+		SingleCDockable sourceItemWindow = DockableUtil.createDockable("SourceItemTable-Window", "Source Items", GlobalComponentHolder.getInstance().getItemSourceTable());
+		control.addDockable(sourceItemWindow);
+
+		// create target item table window
+		SingleCDockable targetItemWindow = DockableUtil.createDockable("TargetItemTable-Window", "Target Items", GlobalComponentHolder.getInstance().getItemTargetTable());
+		control.addDockable(targetItemWindow);
+
+		// create rule builder window
+		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new JPanel());
+		control.addDockable(ruleBuilderWindow);
+
 		// configure grid
 		CGrid grid = new CGrid(control);
 
-		grid.add(0, 0, .4, .8, connectionExplorerWindow);
-		grid.add(0, .8, .4, .2, instanceChooserWindow);
-		grid.add(0, 1, .5, 1, ruleTableSourceWindow);
-		grid.add(.5, 1, 1, 1, ruleTableTargetWindow);
+		grid.add(0, 0, .15, .4, connectionExplorerWindow);
+		grid.add(0, .4, .15, .3, instanceChooserWindow);
+		grid.add(0, .7, .3, .3, ruleTableSourceWindow);
+		grid.add(.3, .7, .3, .3, ruleTableTargetWindow);
+		
+		grid.add(.15, 0, .65, .7, ruleBuilderWindow);
+		
+		grid.add(.8, 0, .2, .5, sourceItemWindow);
+		grid.add(.8, .5, .2, .5, targetItemWindow);
+		
 		control.getContentArea().deploy(grid);
 	}
 }
