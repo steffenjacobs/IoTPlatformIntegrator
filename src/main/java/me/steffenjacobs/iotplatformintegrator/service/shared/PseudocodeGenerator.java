@@ -16,11 +16,11 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.ReferenceToken;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ConditionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.PseudoCodeRenderingStrategy;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.TriggerRenderer;
 
@@ -45,6 +45,7 @@ public class PseudocodeGenerator {
 		}
 
 		final TriggerRenderer<Token> triggerRenderer = new TriggerRenderer<>(new PseudoCodeRenderingStrategy(TokenType.TRIGGER_CONDITION), this::getItemOrPlaceholder);
+		final ConditionRenderer<Token> conditionRenderer = new ConditionRenderer<>(new PseudoCodeRenderingStrategy(TokenType.CONDITION));
 
 		List<Token> tokens = new ArrayList<>();
 
@@ -67,7 +68,7 @@ public class PseudocodeGenerator {
 			addToken(tokens, keywordToken("IF"));
 			count = 0;
 			for (SharedCondition condition : sharedRule.getConditions()) {
-				for (Token t : generateCodeForCondition(condition)) {
+				for (Token t : conditionRenderer.renderCondition(condition)) {
 					addToken(tokens, t);
 				}
 				if (count < sharedRule.getConditions().size() - 1) {
@@ -115,10 +116,6 @@ public class PseudocodeGenerator {
 		return new Token(operation.getText(), TokenType.OPERATOR, String.format("Type: %s, Operator: %s (%s)", TokenType.OPERATOR, operation.getText(), operation.name()));
 	}
 
-	private Token conditionToken(String text, String description) {
-		return new Token(text, TokenType.CONDITION, description);
-	}
-
 	private Token actionToken(String text, String description) {
 		return new Token(text, TokenType.ACTION, description);
 	}
@@ -149,55 +146,6 @@ public class PseudocodeGenerator {
 
 	private Token unknownToken(String message) {
 		return new Token(message, TokenType.UNKNOWN, message);
-	}
-
-	public List<Token> generateCodeForCondition(SharedCondition condition) {
-		switch (condition.getConditionTypeContainer().getConditionType()) {
-		case ScriptEvaluatesTrue:
-			List<Token> tokens = new ArrayList<>();
-			String script = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Script);
-			String type = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Type);
-			tokens.add(conditionToken("Script", "Script %s {%s} evaluates to true"));
-			tokens.addAll(valueToken(type));
-			tokens.add(unknownToken("{"));
-			tokens.addAll(valueToken(script));
-			tokens.add(unknownToken("}"));
-			tokens.add(conditionToken("evaluates", "Script %s {%s} evaluates to true"));
-			tokens.add(conditionToken("to", "Script %s {%s} evaluates to true"));
-			tokens.add(conditionToken("true", "Script %s {%s} evaluates to true"));
-			return tokens;
-		case ItemState:
-			SharedItem item = (SharedItem) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName);
-			String state = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.State);
-			Operation operator = (Operation) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Operator);
-			List<Token> tokens2 = new ArrayList<>();
-			tokens2.add(conditionToken("value", "value of item '%s' %s %s"));
-			tokens2.add(conditionToken("of", "value of item '%s' %s %s"));
-			tokens2.add(conditionToken("item", "value of item '%s' %s %s"));
-			if (item != null) {
-				tokens2.add(itemToken(item));
-			} else {
-				tokens2.add(unknownToken("<null item>"));
-			}
-			tokens2.add(operatorToken(operator));
-			tokens2.addAll(valueToken(state));
-			return tokens2;
-		case DayOfWeek:
-			return Arrays.asList(unknownToken("<Day of Week is not implemented with openHAB 2.4.0>"));
-		case TimeOfDay:
-			String startTime = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.StartTime);
-			String endTime = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.EndTime);
-			List<Token> tokens3 = new ArrayList<>();
-			tokens3.add(conditionToken("time", "time between %s and %s"));
-			tokens3.add(conditionToken("between", "time between %s and %s"));
-			tokens3.addAll(valueToken(startTime));
-			tokens3.add(conditionToken("and", "time between %s and %s"));
-			tokens3.addAll(valueToken(endTime));
-			return tokens3;
-		default:
-			LOG.error("Invalid condition type: {}", condition.getConditionTypeContainer().getConditionType());
-			return Arrays.asList(unknownToken("<An error occured during parsing of the condition.>"));
-		}
 	}
 
 	public List<Token> generateCodeForAction(SharedAction action) {
