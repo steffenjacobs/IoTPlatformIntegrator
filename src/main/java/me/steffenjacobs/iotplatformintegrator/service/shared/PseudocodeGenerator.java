@@ -13,13 +13,13 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
+import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
+import me.steffenjacobs.iotplatformintegrator.service.manage.render.PseudoCodeRenderingStrategy;
+import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.ReferenceToken;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ActionRenderer;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ConditionRenderer;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.PseudoCodeRenderingStrategy;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.TriggerRenderer;
 
 /** @author Steffen Jacobs */
 public class PseudocodeGenerator {

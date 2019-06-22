@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
+package me.steffenjacobs.iotplatformintegrator.service.manage.render;
 
 import java.awt.Component;
 import java.util.Arrays;

@@ -1,8 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 
-import java.awt.Component;
-import java.util.Collection;
-
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerTypeContainer;
 
 /** @author Steffen Jacobs */

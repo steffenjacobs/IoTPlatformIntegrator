@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
+package me.steffenjacobs.iotplatformintegrator.service.manage.render;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 
