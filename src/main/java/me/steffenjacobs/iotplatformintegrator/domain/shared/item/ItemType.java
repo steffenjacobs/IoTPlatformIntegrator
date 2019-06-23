@@ -9,19 +9,27 @@ import org.apache.commons.lang3.ArrayUtils;
  * operations.
  */
 public enum ItemType {
-	Switch(new DataType[] { DataType.Discrete }, Command.getSwitchCommands()), Contact(new DataType[] { DataType.Discrete }, Command.getContactCommands()), //
-	String(new DataType[] { DataType.Discrete }, new Command[] { Command.String }), Number(new DataType[] { DataType.Numerical }, new Command[] { Command.Decimal }), //
-	Dimmer(new DataType[] { DataType.Numerical }, Command.getDimmerCommands()), DateTime(new DataType[] { DataType.Numerical }, new Command[0]), //
-	Color(new DataType[] { DataType.Numerical }, Command.getColorCommands()), Image(new DataType[] { DataType.Discrete }, new Command[0]), //
-	Player(new DataType[] { DataType.Discrete }, Command.getPlayerCommands()), Location(new DataType[] { DataType.Discrete }, new Command[] { Command.Point }), //
-	Rollershutter(new DataType[] { DataType.Numerical }, Command.getRollershutterCommands()), //
-	Group(new DataType[] { DataType.Discrete }, new Command[0]), Unknown(new DataType[] { DataType.Unknown }, new Command[0]), //
-	AUTOMATION_RULE(new DataType[] { DataType.Unknown }, new Command[0]);
+	Switch(new DataType[] { DataType.Discrete }, Command.getSwitchCommands(), new StateType[] { StateType.Command }), //
+	Contact(new DataType[] { DataType.Discrete }, Command.getContactCommands(), new StateType[] { StateType.Command }), //
+	String(new DataType[] { DataType.Discrete }, new Command[] { Command.String }, new StateType[] { StateType.String }), //
+	Number(new DataType[] { DataType.Numerical }, new Command[] { Command.Decimal }, new StateType[] { StateType.Decimal }), //
+	Dimmer(new DataType[] { DataType.Numerical }, Command.getDimmerCommands(), new StateType[] { StateType.Decimal }), //
+	DateTime(new DataType[] { DataType.Numerical }, new Command[0], new StateType[] { StateType.Integer }), //
+	Color(new DataType[] { DataType.Numerical }, Command.getColorCommands(), new StateType[] { StateType.Object }), //
+	Image(new DataType[] { DataType.Discrete }, new Command[0], new StateType[] { StateType.Object }), //
+	Player(new DataType[] { DataType.Discrete }, Command.getPlayerCommands(), new StateType[] { StateType.Object }), //
+	Location(new DataType[] { DataType.Discrete }, new Command[] { Command.Point }, new StateType[] { StateType.Object }), //
+	Rollershutter(new DataType[] { DataType.Numerical }, Command.getRollershutterCommands(), new StateType[] { StateType.Decimal }), //
+	Group(new DataType[] { DataType.Discrete }, new Command[0], new StateType[] { StateType.Object }), //
+	Unknown(new DataType[] { DataType.Unknown }, new Command[0], new StateType[] { StateType.Unknown }), //
+	AUTOMATION_RULE(new DataType[] { DataType.Unknown }, new Command[0], new StateType[] { StateType.Unknown });
 
 	private final DataType datatype;
 	private final Command[] commands;
+	private final StateType[] states;
 
-	private ItemType(DataType[] datatypes, Command[] commands) {
+	private ItemType(DataType[] datatypes, Command[] commands, StateType[] states) {
+		this.states = states;
 		this.datatype = datatypes[0];
 		this.commands = commands;
 	}
@@ -32,6 +40,14 @@ public enum ItemType {
 
 	public DataType getDatatype() {
 		return datatype;
+	}
+
+	public StateType[] getAllowedStates() {
+		return states;
+	}
+
+	public enum StateType {
+		Boolean, String, Decimal, Integer, Command, Object, Unknown
 	}
 
 	/**
