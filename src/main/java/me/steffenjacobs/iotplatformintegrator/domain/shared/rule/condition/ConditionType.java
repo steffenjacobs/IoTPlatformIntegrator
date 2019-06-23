@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
+
 /** @author Steffen Jacobs */
 public enum ConditionType {
 	ScriptEvaluatesTrue(new ConditionTypeSpecificKey[] { ConditionTypeSpecificKey.Script, ConditionTypeSpecificKey.Type }), //
@@ -17,8 +19,9 @@ public enum ConditionType {
 	public ConditionTypeSpecificKey[] getTypeSpecificKeys() {
 		return typeSpecificKeys;
 	}
+	
 
-	public static enum ConditionTypeSpecificKey {
+	public static enum ConditionTypeSpecificKey implements SharedTypeSpecificKey{
 		Script("script", "Script"), Type("type", "Type"), ItemName("itemName", "Item Name"), State("state", "State"), Operator("operator", "Operator"), StartTime("startTime",
 				"Start Time"), EndTime("endTime", "End Time");
 

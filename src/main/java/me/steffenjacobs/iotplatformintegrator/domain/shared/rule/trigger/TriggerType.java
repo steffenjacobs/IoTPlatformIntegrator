@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
+
 /** @author Steffen Jacobs */
 public enum TriggerType {
 
@@ -21,7 +23,7 @@ public enum TriggerType {
 		return typeSpecificKeys;
 	}
 
-	public static enum TriggerTypeSpecificKey {
+	public static enum TriggerTypeSpecificKey implements SharedTypeSpecificKey{
 		Command("command", "Command"), PreviousState("previous_state", "Previous State"), State("state", "State"), Channel("channel", "Channel"), Event("event",
 				"Event"), EventData("event_data", "Event Data"), ItemName("itemName", "Item Name"), Time("time", "Time");
 

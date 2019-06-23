@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
+
 /** @author Steffen Jacobs */
 public enum ActionType {
 
@@ -21,7 +23,7 @@ public enum ActionType {
 		return typeSpecificKeys;
 	}
 
-	public static enum ActionTypeSpecificKey {
+	public static enum ActionTypeSpecificKey implements SharedTypeSpecificKey{
 		Enable("enable", "Enable"), RuleUUIDs("ruleUIDs", "Rule UUIDs"), Type("type", "Type"), Script("script", "Script"), Sink("sink", "Sink"), Sound("sound",
 				"Sound"), ConsiderConditions("considerConditions", "Consider conditions"), Text("text", "Text"), ItemName("itemName", "Item Name"), Command("command", "Command");
 
