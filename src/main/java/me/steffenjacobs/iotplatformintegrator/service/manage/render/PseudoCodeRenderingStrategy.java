@@ -46,7 +46,7 @@ public class PseudoCodeRenderingStrategy implements RenderingStrategy<Token> {
 
 	@Override
 	public Token itemComponent(SharedItem item, SharedTypeSpecificKey key) {
-		return new Token(item.getName(), TokenType.ITEM, String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
+		return new Token(item.getName(), TokenType.ITEM, String.format("Type: %s, Name: %s (%s)", item.getType().name(), item.getName(), item.getLabel()));
 	}
 
 	public Token unknownToken(String message) {
