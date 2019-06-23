@@ -335,7 +335,10 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			}
 			if (item.isPresent() && cCommand.isPresent()) {
 				for (Command command : item.get().getType().getAllowedCommands()) {
-					((JComboBox<Command>) cCommand.get()).addItem(command);
+					JComboBox<Command> box = (JComboBox<Command>) cCommand.get();
+					if (!containsItem(box, command)) {
+						box.addItem(command);
+					}
 				}
 			}
 			if (cState.isPresent()) {
@@ -343,10 +346,22 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			}
 			if (item.isPresent() && cOperator.isPresent()) {
 				for (Operation op : item.get().getType().getDatatype().getOperations()) {
-					((JComboBox<Operation>) cOperator.get()).addItem(op);
+					JComboBox<Operation> box = (JComboBox<Operation>) cOperator.get();
+					if (!containsItem(box, op)) {
+						box.addItem(op);
+					}
 				}
 			}
 		}
+	}
+
+	private <T> boolean containsItem(JComboBox<T> box, T t) {
+		for (int i = 0; i < box.getItemCount(); i++) {
+			if (box.getItemAt(i) == t) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Optional<Component> getType(Collection<Component> components, String keyString) {
