@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JLabel;
+import javax.swing.text.JTextComponent;
 
 /**
  * Simple utility class for creating forms that have a column of labels and a
@@ -23,7 +24,14 @@ public class FormUtility {
 	private GridBagConstraints middleConstraints = null;
 	private GridBagConstraints labelConstraints = null;
 
+	private boolean editable = false;
+
 	public FormUtility() {
+		this(false);
+	}
+
+	public FormUtility(boolean editable) {
+		this.editable = editable;
 		// Set up the constraints for the "last" field in each
 		// row first, then copy and modify those constraints.
 
@@ -70,6 +78,9 @@ public class FormUtility {
 	public void addLastField(Component c, Container parent) {
 		GridBagLayout gbl = (GridBagLayout) parent.getLayout();
 		gbl.setConstraints(c, lastConstraints);
+		if (c instanceof JTextComponent) {
+			((JTextComponent) c).setEditable(editable);
+		}
 		parent.add(c);
 	}
 
@@ -81,6 +92,9 @@ public class FormUtility {
 	public void addLabel(Component c, Container parent) {
 		GridBagLayout gbl = (GridBagLayout) parent.getLayout();
 		gbl.setConstraints(c, labelConstraints);
+		if (c instanceof JTextComponent) {
+			((JTextComponent) c).setEditable(editable);
+		}
 		parent.add(c);
 	}
 
@@ -101,6 +115,9 @@ public class FormUtility {
 	public void addMiddleField(Component c, Container parent) {
 		GridBagLayout gbl = (GridBagLayout) parent.getLayout();
 		gbl.setConstraints(c, middleConstraints);
+		if (c instanceof JTextComponent) {
+			((JTextComponent) c).setEditable(editable);
+		}
 		parent.add(c);
 	}
 
