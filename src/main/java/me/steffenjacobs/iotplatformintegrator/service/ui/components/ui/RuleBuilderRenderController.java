@@ -148,9 +148,13 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 					properties.put(annotation.getRuleElementSpecificKey().getKeyString(), text.getText());
 				}
 				break;
-			case "value":
 			case "enable":
+			case "considerConditions":
+				JTextField textB = (JTextField) strategyElement;
+				properties.put(annotation.getRuleElementSpecificKey().getKeyString(), Boolean.parseBoolean(textB.getText()));
+				break;
 			case "ruleUIDs":
+			case "value":
 			case "type":
 			case "script":
 			case "sink":
@@ -159,7 +163,6 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			case "startTime":
 			case "endTime":
 			case "time":
-			case "considerConditions":
 			case "previous_state":
 			case "channel":
 			case "event":
