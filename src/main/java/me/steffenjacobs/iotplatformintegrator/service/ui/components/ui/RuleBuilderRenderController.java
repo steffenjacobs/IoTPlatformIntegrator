@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.swing.JComboBox;
@@ -24,9 +25,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
@@ -59,13 +58,16 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 
 	private final RuleElementRecommender recommender = new RuleElementRecommender(this);
 
+	public Optional<SharedRule> getDisplayedRule() {
+		return rule == null ? Optional.empty() : Optional.of(rule);
+	}
+
 	public RuleBuilderRenderController(RuleBuilder ruleBuilder) {
+		new RuleMutator(this);
 		this.ruleBuilder = ruleBuilder;
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedSourceRuleChanged, e -> renderRule(((SelectedSourceRuleChangeEvent) e).getSelectedRule()));
 
-		EventBus.getInstance().addEventHandler(EventType.RuleElementAdded, e -> addRuleElement(((RuleElementAddedEvent) e).getSourceId()));
-		EventBus.getInstance().addEventHandler(EventType.RuleElementRemoved, e -> removeRuleElement(((RuleElementRemovedEvent) e).getSourceId()));
 		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
 			RuleChangeEvent event = (RuleChangeEvent) e;
 			if (event.getSelectedRule() == rule) {
@@ -186,54 +188,16 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 	public void clearComponents() {
 		annotatedComponents.clear();
 	}
-
-	private void addRuleElement(UUID sourceId) {
-		if (rule != null) {
-			SharedRuleElement elem = ruleElements.get(sourceId);
-			if (elem instanceof SharedTrigger) {
-				rule.getTriggers().add(copy((SharedTrigger) elem));
-			} else if (elem instanceof SharedCondition) {
-				rule.getConditions().add(copy((SharedCondition) elem));
-			} else if (elem instanceof SharedAction) {
-				rule.getActions().add(copy((SharedAction) elem));
-			}
-			EventBus.getInstance().fireEvent(new RuleChangeEvent(rule));
-		}
+	
+	
+	@Override
+	public SharedRuleElement getRuleElementById(UUID uuid){
+		return ruleElements.get(uuid);
 	}
-
-	private SharedTrigger copy(SharedTrigger trigger) {
-		Map<String, Object> properties = new HashMap<>();
-		trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties, trigger.getDescription(), trigger.getLabel() + " - Copy");
-	}
-
-	private SharedCondition copy(SharedCondition condition) {
-		Map<String, Object> properties = new HashMap<>();
-		condition.getConditionTypeContainer().getConditionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedCondition(condition.getConditionTypeContainer().getConditionType(), properties, condition.getDescription(), condition.getLabel() + " - Copy");
-	}
-
-	private SharedAction copy(SharedAction action) {
-		Map<String, Object> properties = new HashMap<>();
-		action.getActionTypeContainer().getActionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedAction(action.getActionTypeContainer().getActionType(), properties, action.getDescription(), action.getLabel() + " - Copy");
-	}
-
-	private void removeRuleElement(UUID sourceId) {
-		if (rule != null) {
-			SharedRuleElement elem = ruleElements.remove(sourceId);
-			if (elem instanceof SharedTrigger) {
-				SharedTrigger trigger = (SharedTrigger) elem;
-				rule.getTriggers().remove(trigger);
-			} else if (elem instanceof SharedCondition) {
-				SharedCondition condition = (SharedCondition) elem;
-				rule.getConditions().remove(condition);
-			} else if (elem instanceof SharedAction) {
-				SharedAction action = (SharedAction) elem;
-				rule.getActions().remove(action);
-			}
-			EventBus.getInstance().fireEvent(new RuleChangeEvent(rule));
-		}
+	
+	@Override
+	public SharedRuleElement removeRuleElementById(UUID uuid) {
+		return ruleElements.remove(uuid);
 	}
 
 	public void renderRule(SharedRule rule) {
