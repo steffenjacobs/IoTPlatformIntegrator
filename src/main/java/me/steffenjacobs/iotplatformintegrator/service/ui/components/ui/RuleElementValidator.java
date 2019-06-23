@@ -52,6 +52,15 @@ public class RuleElementValidator {
 		Optional<Component> cItem = getType(strategyElements, "itemName");
 		Optional<Component> cState = getType(strategyElements, "state");
 		Optional<Component> cCommand = getType(strategyElements, "command");
+		Optional<Component> cEnable = getType(strategyElements, "enable");
+		Optional<Component> cConsiderConditions = getType(strategyElements, "considerConditions");
+
+		if (cEnable.isPresent()) {
+			booleanTextFieldValidation(cEnable);
+		}
+		if (cConsiderConditions.isPresent()) {
+			booleanTextFieldValidation(cConsiderConditions);
+		}
 
 		if (cState.isPresent() && cItem.isPresent()) {
 			final Optional<SharedItem> item;
@@ -219,6 +228,23 @@ public class RuleElementValidator {
 			}
 		}
 
+	}
+
+	private void booleanTextFieldValidation(Optional<Component> booleanTextField) {
+		JTextField txt = (JTextField) booleanTextField.get();
+		txt.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if ("true".equals(txt.getText().toLowerCase()) || "false".equals(txt.getText().toLowerCase()) || "t".equals(txt.getText().toLowerCase())
+						|| "f".equals(txt.getText().toLowerCase()) || "1".equals(txt.getText().toLowerCase()) || "0".equals(txt.getText().toLowerCase())) {
+					txt.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
+					txt.setToolTipText("Validation successful");
+				} else {
+					txt.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+					txt.setToolTipText("Value needs to be an Boolean.");
+				}
+			}
+		});
 	}
 
 	private <T> boolean containsItem(JComboBox<T> box, T t) {
