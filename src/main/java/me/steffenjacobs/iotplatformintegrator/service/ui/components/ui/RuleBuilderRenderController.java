@@ -10,7 +10,6 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleEleme
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerTypeContainer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
@@ -26,7 +25,6 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.Conditio
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.TriggerElement;
-import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement.ElementType;
 
 /** @author Steffen Jacobs */
 public class RuleBuilderRenderController {
