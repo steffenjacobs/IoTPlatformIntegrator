@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.RuleRelatedAnnotation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
@@ -163,14 +164,21 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			case "channel":
 			case "event":
 			case "event_data":
-				JTextField text = (JTextField) strategyElement;
-				properties.put(annotation.getRuleElementSpecificKey().getKeyString(), text.getText());
+				if (strategyElement instanceof JTextField) {
+					JTextField text = (JTextField) strategyElement;
+					properties.put(annotation.getRuleElementSpecificKey().getKeyString(), text.getText());
+				} else if (strategyElement instanceof JComboBox<?>) {
+					JComboBox<?> box = (JComboBox<?>) strategyElement;
+					properties.put(annotation.getRuleElementSpecificKey().getKeyString(), ((Command) box.getSelectedItem()).name());
+				} else {
+					LOG.error("Not implemented component type found during parsing the properties from the view: {}", strategyElement.getClass().getName());
+				}
 				break;
 			case "text":
 				// ignore text changes since they should not occur
 				break;
 			default:
-				LOG.info("Invalid rule element specific key for parsing from view: {}", annotation.getRuleElementSpecificKey());
+				LOG.error("Invalid rule element specific key for parsing from view: {}", annotation.getRuleElementSpecificKey());
 			}
 		}
 		return properties;
@@ -327,19 +335,26 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			case "previous_state":
 			case "state":
 				// TODO: validation, if this is an item or a command
-				JTextField text = (JTextField) strategyElement;
-				text.addKeyListener(new KeyAdapter() {
-					public void keyReleased(java.awt.event.KeyEvent e) {
-						if (e.getKeyCode() == KeyEvent.VK_ENTER)
-							EventBus.getInstance().fireEvent(new RuleElementChangeEvent(elementType, uuid, rule));
-					};
-				});
+				if (strategyElement instanceof JTextField) {
+					JTextField text = (JTextField) strategyElement;
+					text.addKeyListener(new KeyAdapter() {
+						public void keyReleased(java.awt.event.KeyEvent e) {
+							if (e.getKeyCode() == KeyEvent.VK_ENTER)
+								EventBus.getInstance().fireEvent(new RuleElementChangeEvent(elementType, uuid, rule));
+						};
+					});
+				} else if (strategyElement instanceof JComboBox<?>) {
+					JComboBox<?> box = (JComboBox<?>) strategyElement;
+					box.addActionListener(e -> EventBus.getInstance().fireEvent(new RuleElementChangeEvent(elementType, uuid, rule)));
+				} else {
+					LOG.error("Not implemented component type found during addition of listeners: {}", strategyElement.getClass().getName());
+				}
 				break;
 			case "text":
 				// ignore text changes since they should not occur
 				break;
 			default:
-				LOG.info("Invalid rule element specific key: {}", annotation.getRuleElementSpecificKey());
+				LOG.error("Invalid rule element specific key: {}", annotation.getRuleElementSpecificKey());
 			}
 
 			counter++;

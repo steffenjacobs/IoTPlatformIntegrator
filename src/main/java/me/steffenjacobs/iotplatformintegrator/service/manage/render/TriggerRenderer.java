@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.StateType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
@@ -29,6 +30,7 @@ public class TriggerRenderer<T> implements ItemPlaceholderFactory {
 		switch (trigger.getTriggerTypeContainer().getTriggerType()) {
 		case ItemStateChanged:
 			Object item = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+			SharedItem itemOrPlaceholder = getItemOrPlaceholder(item);
 			String previousState = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.PreviousState);
 			String state = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
 
@@ -36,19 +38,27 @@ public class TriggerRenderer<T> implements ItemPlaceholderFactory {
 
 			if (previousState != null && !previousState.equals("") && !previousState.equals("null")) {
 				strategyElements.add(renderingStrategy.textComponent("Item", "Item '%s' changed from %s to %s"));
-				strategyElements.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item), TriggerTypeSpecificKey.ItemName));
+				strategyElements.add(renderingStrategy.itemComponent(itemOrPlaceholder, TriggerTypeSpecificKey.ItemName));
 				strategyElements.add(renderingStrategy.textComponent("changed", "Item '%s' changed from %s to %s"));
-				strategyElements.addAll(renderingStrategy.valueComponent(previousState, TriggerTypeSpecificKey.PreviousState));
 				strategyElements.add(renderingStrategy.textComponent("from", "Item '%s' changed from %s to %s"));
-				strategyElements.addAll(renderingStrategy.valueComponent(state, TriggerTypeSpecificKey.State));
+				strategyElements.addAll(renderingStrategy.valueComponent(previousState, TriggerTypeSpecificKey.PreviousState));
 				strategyElements.add(renderingStrategy.textComponent("to", "Item '%s' changed from %s to %s"));
+				if (itemOrPlaceholder.getType().getAllowedStates().length == 1 && itemOrPlaceholder.getType().getAllowedStates()[0] == StateType.Command) {
+					strategyElements.add(renderingStrategy.commandComponent(Command.parse(state), TriggerTypeSpecificKey.State));
+				} else {
+					strategyElements.addAll(renderingStrategy.valueComponent(state, TriggerTypeSpecificKey.State));
+				}
 				return strategyElements;
 			}
 			strategyElements.add(renderingStrategy.textComponent("Item", "Item '%s' changed to %s"));
-			strategyElements.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item), TriggerTypeSpecificKey.ItemName));
+			strategyElements.add(renderingStrategy.itemComponent(itemOrPlaceholder, TriggerTypeSpecificKey.ItemName));
 			strategyElements.add(renderingStrategy.textComponent("changed", "Item '%s' changed to %s"));
 			strategyElements.add(renderingStrategy.textComponent("to", "Item '%s' changed to %s"));
-			strategyElements.addAll(renderingStrategy.valueComponent(state, TriggerTypeSpecificKey.State));
+			if (itemOrPlaceholder.getType().getAllowedStates().length == 1 && itemOrPlaceholder.getType().getAllowedStates()[0] == StateType.Command) {
+				strategyElements.add(renderingStrategy.commandComponent(Command.parse(state), TriggerTypeSpecificKey.State));
+			} else {
+				strategyElements.addAll(renderingStrategy.valueComponent(state, TriggerTypeSpecificKey.State));
+			}
 			return strategyElements;
 		case CommandReceived:
 			Command command = (Command) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Command);
@@ -62,15 +72,20 @@ public class TriggerRenderer<T> implements ItemPlaceholderFactory {
 			return strategyElements2;
 		case ItemStateUpdated:
 			Object item3 = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+			SharedItem itemOrPlaceholder3 = getItemOrPlaceholder(item3);
 			String state2 = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State);
 
 			Collection<T> strategyElements3 = new ArrayList<>();
 
 			strategyElements3.add(renderingStrategy.textComponent("Item", "Item '%s' updated to %s"));
-			strategyElements3.add(renderingStrategy.itemComponent(getItemOrPlaceholder(item3), TriggerTypeSpecificKey.ItemName));
+			strategyElements3.add(renderingStrategy.itemComponent(itemOrPlaceholder3, TriggerTypeSpecificKey.ItemName));
 			strategyElements3.add(renderingStrategy.textComponent("updated", "Item '%s' updated to %s"));
 			strategyElements3.add(renderingStrategy.textComponent("to", "Item '%s' updated to %s"));
-			strategyElements3.addAll(renderingStrategy.valueComponent(state2, TriggerTypeSpecificKey.State));
+			if (itemOrPlaceholder3.getType().getAllowedStates().length == 1 && itemOrPlaceholder3.getType().getAllowedStates()[0] == StateType.Command) {
+				strategyElements3.add(renderingStrategy.commandComponent(Command.parse(state2), TriggerTypeSpecificKey.State));
+			} else {
+				strategyElements3.addAll(renderingStrategy.valueComponent(state2, TriggerTypeSpecificKey.State));
+			}
 			return strategyElements3;
 		case Timed:
 			String time = "" + trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.Time);
