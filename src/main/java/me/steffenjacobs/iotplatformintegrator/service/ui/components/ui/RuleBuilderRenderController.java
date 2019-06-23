@@ -57,6 +57,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 	private SharedRule rule = null;
 
 	private final RuleElementRecommender recommender = new RuleElementRecommender(this);
+	private final RuleElementValidator validator = new RuleElementValidator(this);
 
 	public Optional<SharedRule> getDisplayedRule() {
 		return rule == null ? Optional.empty() : Optional.of(rule);
@@ -233,6 +234,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		Collection<Component> strategyElements = triggerRenderer.renderTrigger(trigger);
 		addComponentListeners(uuid, strategyElements, ElementType.Condition);
 		recommender.addRecommendations(strategyElements);
+		validator.addValidation(strategyElements);
 		elem.setStrategyElements(strategyElements);
 		ruleElements.put(uuid, trigger);
 		renderedRuleElements.put(uuid, elem);
@@ -250,6 +252,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		Collection<Component> strategyElements = actionRenderer.renderAction(action);
 		addComponentListeners(uuid, strategyElements, ElementType.Action);
 		recommender.addRecommendations(strategyElements);
+		validator.addValidation(strategyElements);
 		elem.setStrategyElements(strategyElements);
 		renderedRuleElements.put(uuid, elem);
 		ruleElements.put(uuid, action);
@@ -268,6 +271,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 
 		addComponentListeners(uuid, strategyElements, ElementType.Condition);
 		recommender.addRecommendations(strategyElements);
+		validator.addValidation(strategyElements);
 
 		elem.setStrategyElements(strategyElements);
 		ruleElements.put(uuid, condition);
