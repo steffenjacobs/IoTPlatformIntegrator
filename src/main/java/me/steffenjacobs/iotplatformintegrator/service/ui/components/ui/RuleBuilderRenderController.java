@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.swing.JComboBox;
@@ -15,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.RuleRelatedAnnotation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
@@ -127,18 +131,17 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		for (Component strategyElement : elem.getStrategyElements()) {
 			RuleRelatedAnnotation annotation = annotatedComponents.get(strategyElement);
 
-			if(annotation == null || annotation.getRuleElementSpecificKey() == null) {
+			if (annotation == null || annotation.getRuleElementSpecificKey() == null) {
 				continue;
 			}
 			switch (annotation.getRuleElementSpecificKey().getKeyString()) {
 			case "operator":
 			case "command":
 			case "itemName":
-				if(strategyElement instanceof JComboBox<?>) {
+				if (strategyElement instanceof JComboBox<?>) {
 					JComboBox<?> combo = (JComboBox<?>) strategyElement;
 					properties.put(annotation.getRuleElementSpecificKey().getKeyString(), combo.getSelectedItem());
-				}
-				else {
+				} else {
 					JTextField text = (JTextField) strategyElement;
 					properties.put(annotation.getRuleElementSpecificKey().getKeyString(), text.getText());
 				}
@@ -268,6 +271,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 
 		Collection<Component> strategyElements = triggerRenderer.renderTrigger(trigger);
 		addComponentListeners(uuid, strategyElements, ElementType.Condition);
+		addRecommendations(strategyElements);
 		elem.setStrategyElements(strategyElements);
 		ruleElements.put(uuid, trigger);
 		renderedRuleElements.put(uuid, elem);
@@ -284,6 +288,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		elem.setToolTipText(String.format("%s: %s", label, description));
 		Collection<Component> strategyElements = actionRenderer.renderAction(action);
 		addComponentListeners(uuid, strategyElements, ElementType.Action);
+		addRecommendations(strategyElements);
 		elem.setStrategyElements(strategyElements);
 		renderedRuleElements.put(uuid, elem);
 		ruleElements.put(uuid, action);
@@ -301,11 +306,58 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		Collection<Component> strategyElements = conditionRenderer.renderCondition(condition);
 
 		addComponentListeners(uuid, strategyElements, ElementType.Condition);
+		addRecommendations(strategyElements);
 
 		elem.setStrategyElements(strategyElements);
 		ruleElements.put(uuid, condition);
 		renderedRuleElements.put(uuid, elem);
 		return elem;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addRecommendations(Collection<Component> strategyElements) {
+		Optional<Component> cOperator = getType(strategyElements, "operator");
+		Optional<Component> cItem = getType(strategyElements, "itemName");
+		Optional<Component> cState = getType(strategyElements, "state");
+		Optional<Component> cCommand = getType(strategyElements, "command");
+
+		if (cItem.isPresent()) {
+			final Optional<SharedItem> item;
+			if (cItem.get() instanceof JComboBox<?>) {
+				SharedItem si = (SharedItem) ((JComboBox<?>) cItem.get()).getSelectedItem();
+				if (si != null) {
+					item = Optional.of(si);
+				} else {
+					item = Optional.empty();
+				}
+			} else {
+				item = Optional.empty();
+			}
+			if (item.isPresent() && cCommand.isPresent()) {
+				for (Command command : item.get().getType().getAllowedCommands()) {
+					((JComboBox<Command>) cCommand.get()).addItem(command);
+				}
+			}
+			if (cState.isPresent()) {
+				// TODO: validation if state is a command or item
+			}
+			if (item.isPresent() && cOperator.isPresent()) {
+				for (Operation op : item.get().getType().getDatatype().getOperations()) {
+					((JComboBox<Operation>) cOperator.get()).addItem(op);
+				}
+			}
+		}
+	}
+
+	private Optional<Component> getType(Collection<Component> components, String keyString) {
+		for (Component comp : components) {
+			RuleRelatedAnnotation annotationFromComponent = getAnnotationFromComponent(comp);
+			if (annotationFromComponent != null && annotationFromComponent.getRuleElementSpecificKey() != null
+					&& keyString.equals(annotationFromComponent.getRuleElementSpecificKey().getKeyString())) {
+				return Optional.of(comp);
+			}
+		}
+		return Optional.empty();
 	}
 
 	private void addComponentListeners(UUID uuid, Collection<Component> strategyElements, ElementType elementType) {
@@ -316,7 +368,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			// update annotation
 			addAnnotatedComponent(strategyElement, annotation.getRuleElementSpecificKey(), counter);
 
-			if(annotation.getRuleElementSpecificKey()==null) {
+			if (annotation.getRuleElementSpecificKey() == null) {
 				continue;
 			}
 			// add listener
@@ -324,11 +376,10 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			case "operator":
 			case "command":
 			case "itemName":
-				if(strategyElement instanceof JComboBox<?>) {
+				if (strategyElement instanceof JComboBox<?>) {
 					JComboBox<?> combo = (JComboBox<?>) strategyElement;
 					combo.addActionListener(l -> EventBus.getInstance().fireEvent(new RuleElementChangeEvent(elementType, uuid, rule)));
-				}
-				else {
+				} else {
 					JTextField text = (JTextField) strategyElement;
 					text.addKeyListener(new KeyAdapter() {
 						public void keyReleased(java.awt.event.KeyEvent e) {
@@ -338,22 +389,25 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 					});
 				}
 				break;
-			case "value":
 			case "enable":
+			case "considerConditions":
+				// TODO: validation for boolean
+			case "startTime":
+			case "endTime":
+			case "time":
+				// TODO: validation for time
+			case "channel":
+			case "event":
+			case "event_data":
+			case "value":
 			case "ruleUIDs":
 			case "type":
 			case "script":
 			case "sink":
 			case "sound":
-			case "state":
-			case "startTime":
-			case "endTime":
-			case "time":
-			case "considerConditions":
 			case "previous_state":
-			case "channel":
-			case "event":
-			case "event_data":
+			case "state":
+				// TODO: validation, if this is an item or a command
 				JTextField text = (JTextField) strategyElement;
 				text.addKeyListener(new KeyAdapter() {
 					public void keyReleased(java.awt.event.KeyEvent e) {

@@ -38,7 +38,7 @@ public enum ItemType {
 	 * Defines the data type of an item as either discrete or numerical. Each data
 	 * type implies its own allowed operations.
 	 */
-	enum DataType {
+	public enum DataType {
 		Discrete(Operation.EQUAL, Operation.NOT_EQUAL), Numerical(Operation.EQUAL, Operation.SMALLER_EQUAL, Operation.SMALLER, Operation.BIGGER_EQUAL, Operation.BIGGER,
 				Operation.NOT_EQUAL), Unknown;
 
