@@ -143,4 +143,8 @@ public abstract class DynamicElement extends JPanel {
 		revalidate();
 		repaint();
 	}
+	
+	public Component[] getStrategyElements(){
+		return strategyPanel.getComponents();
+	}
 }

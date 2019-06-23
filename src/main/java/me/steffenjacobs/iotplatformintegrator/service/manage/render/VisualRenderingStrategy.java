@@ -14,9 +14,18 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Comman
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleComponentRegistry;
 
 /** @author Steffen Jacobs */
 public class VisualRenderingStrategy implements RenderingStrategy<Component> {
+
+	private final RuleComponentRegistry registry;
+
+	public VisualRenderingStrategy(RuleComponentRegistry registry) {
+		this.registry = registry;
+
+	}
+
 	@Override
 	public Component operationComponent(Operation operation, SharedTypeSpecificKey key) {
 		DefaultComboBoxModel<Operation> itemModel = new DefaultComboBoxModel<>();
@@ -28,6 +37,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		}
 		chooseItem.setSelectedItem(operation);
 		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.OPERATOR, operation.name(), operation.name()));
+		registry.addAnnotatedComponent(chooseItem, key, -1);
 		return chooseItem;
 	}
 
@@ -42,6 +52,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		}
 		chooseItem.setSelectedItem(command);
 		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.COMMAND, command.name(), command.name()));
+		registry.addAnnotatedComponent(chooseItem, key, -1);
 		return chooseItem;
 	}
 
@@ -50,6 +61,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		// TODO: datatypes
 		JTextField txt = new JTextField();
 		txt.setText(value);
+		registry.addAnnotatedComponent(txt, key, -1);
 		return Arrays.asList(txt);
 	}
 
@@ -57,6 +69,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	public Component textComponent(String text, String description) {
 		JLabel label = new JLabel(text);
 		label.setToolTipText(description);
+		registry.addAnnotatedComponent(label, null, -1);
 		return label;
 	}
 
@@ -68,6 +81,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		itemModel.addElement(item);
 		chooseItem.setSelectedItem(item);
 		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
+		registry.addAnnotatedComponent(chooseItem, key, -1);
 		return chooseItem;
 	}
 
