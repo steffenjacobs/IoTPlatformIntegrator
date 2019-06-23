@@ -14,11 +14,13 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementAddedEvent;
@@ -137,6 +139,10 @@ public abstract class DynamicElement extends JPanel {
 
 	public void setStrategyElements(Iterable<Component> components) {
 		for (Component c : components) {
+			if (c instanceof JTextField || c instanceof JComboBox<?>) {
+				c.setMinimumSize(new Dimension(150, 25));
+				c.setPreferredSize(new Dimension(150, 25));
+			}
 			strategyPanel.add(c);
 		}
 
