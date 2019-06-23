@@ -78,42 +78,61 @@ public class RuleElementValidator {
 								case Boolean:
 									if ("true".equals(txt.getText().toLowerCase()) || "false".equals(txt.getText().toLowerCase()) || "t".equals(txt.getText().toLowerCase())
 											|| "f".equals(txt.getText().toLowerCase()) || "1".equals(txt.getText().toLowerCase()) || "0".equals(txt.getText().toLowerCase())) {
-										txt.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+										txt.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
+										txt.setToolTipText("Validation successful");
 									} else {
 										txt.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+										txt.setToolTipText("Value needs to be an Boolean.");
 									}
 									break;
 								case Integer: {
 									try {
 										Integer.parseInt(txt.getText());
-										txt.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+										txt.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
+										txt.setToolTipText("Validation successful");
 									} catch (NumberFormatException ex) {
 										txt.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+										txt.setToolTipText("Value needs to be an Integer.");
 									}
 									break;
 								}
 								case Decimal:
 									try {
 										Double.parseDouble(txt.getText());
-										txt.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+										txt.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
+										txt.setToolTipText("Validation successful");
 									} catch (NullPointerException | NumberFormatException ex) {
 										txt.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+										txt.setToolTipText("Value needs to be a decimal number.");
 									}
 									break;
 								case Command:
 									Command parsedCommand = Command.parse(txt.getText());
 									if (parsedCommand == Command.Unknown) {
 										txt.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+										txt.setToolTipText(String.format("Unknown command: %s", txt.getText()));
 										break;
 									}
+									boolean found = false;
 									for (Command command : item.get().getType().getAllowedCommands()) {
 										if (command == parsedCommand) {
-											txt.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+											txt.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
+											txt.setToolTipText("Validation successful");
+											found = true;
 											break;
 
 										}
 									}
+									if (found) {
+										break;
+									}
 									txt.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+									Collection<String> commandStrings = new ArrayList<String>();
+									for (Command c : item.get().getType().getAllowedCommands()) {
+										commandStrings.add(c.name());
+									}
+									txt.setToolTipText(String.format("Invalid command %s for item of type %s, allowed commands: %s", parsedCommand.name(),
+											item.get().getType().name(), commandStrings));
 									break;
 								case String:
 								case Object:
