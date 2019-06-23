@@ -3,6 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +13,12 @@ import java.util.UUID;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.RuleRelatedAnnotation;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
@@ -32,10 +35,12 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementA
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.TargetConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.VisualRenderingStrategy;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ActionElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ConditionElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement;
@@ -61,9 +66,17 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 
 	private SharedRule rule = null;
 
+	private ItemDirectory targetItemDirectory = null;
+
 	public RuleBuilderRenderController(RuleBuilder ruleBuilder) {
 		this.ruleBuilder = ruleBuilder;
 
+		EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
+			ServerConnection c = ((TargetConnectionChangeEvent) e).getServerConnection();
+			if (c != null) {
+				targetItemDirectory = c.getItemDirectory();
+			}
+		});
 		EventBus.getInstance().addEventHandler(EventType.SelectedSourceRuleChanged, e -> renderRule(((SelectedSourceRuleChangeEvent) e).getSelectedRule()));
 
 		EventBus.getInstance().addEventHandler(EventType.RuleElementAdded, e -> addRuleElement(((RuleElementAddedEvent) e).getSourceId()));
@@ -333,6 +346,8 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			} else {
 				item = Optional.empty();
 			}
+
+			// add recommendations for commands based on current item
 			if (item.isPresent() && cCommand.isPresent()) {
 				for (Command command : item.get().getType().getAllowedCommands()) {
 					JComboBox<Command> box = (JComboBox<Command>) cCommand.get();
@@ -344,6 +359,8 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 			if (cState.isPresent()) {
 				// TODO: validation if state is a command or item
 			}
+
+			// add recommendations for operator based on current item
 			if (item.isPresent() && cOperator.isPresent()) {
 				for (Operation op : item.get().getType().getDatatype().getOperations()) {
 					JComboBox<Operation> box = (JComboBox<Operation>) cOperator.get();
@@ -352,7 +369,40 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 					}
 				}
 			}
+			// add recommendations for item based on operator and/or command
+			if (targetItemDirectory != null && cItem.get() instanceof JComboBox<?>) {
+				Collection<SharedItem> items = new ArrayList<>();
+				if (cOperator.isPresent() && cCommand.isPresent()) {
+					for (SharedItem si : targetItemDirectory.getAllItems()) {
+						if (ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())
+								&& ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
+							items.add(si);
+						}
+					}
+				} else if (cOperator.isPresent()) {
+					for (SharedItem si : targetItemDirectory.getAllItems()) {
+						if (ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
+							items.add(si);
+						}
+					}
+				} else if (cCommand.isPresent()) {
+					for (SharedItem si : targetItemDirectory.getAllItems()) {
+						if (ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())) {
+							items.add(si);
+						}
+					}
+				}
+
+				// add alternative items to combobox
+				for (SharedItem si : items) {
+					JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
+					if (!containsItem(box, si)) {
+						box.addItem(si);
+					}
+				}
+			}
 		}
+
 	}
 
 	private <T> boolean containsItem(JComboBox<T> box, T t) {
