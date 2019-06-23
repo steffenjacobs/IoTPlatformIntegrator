@@ -10,6 +10,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleEleme
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerTypeContainer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
@@ -25,6 +26,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.Conditio
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.TriggerElement;
+import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement.ElementType;
 
 /** @author Steffen Jacobs */
 public class RuleBuilderRenderController {
@@ -55,6 +57,35 @@ public class RuleBuilderRenderController {
 	}
 
 	private void addRuleElement(UUID sourceId) {
+		if (rule != null) {
+			SharedRuleElement elem = ruleElements.get(sourceId);
+			if (elem instanceof SharedTrigger) {
+				rule.getTriggers().add(copy((SharedTrigger) elem));
+			} else if (elem instanceof SharedCondition) {
+				rule.getConditions().add(copy((SharedCondition) elem));
+			} else if (elem instanceof SharedAction) {
+				rule.getActions().add(copy((SharedAction) elem));
+			}
+			EventBus.getInstance().fireEvent(new RuleChangeEvent(rule));
+		}
+	}
+
+	private SharedTrigger copy(SharedTrigger trigger) {
+		Map<String, Object> properties = new HashMap<>();
+		trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
+		return new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties, trigger.getDescription(), trigger.getLabel() + " - Copy");
+	}
+
+	private SharedCondition copy(SharedCondition condition) {
+		Map<String, Object> properties = new HashMap<>();
+		condition.getConditionTypeContainer().getConditionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
+		return new SharedCondition(condition.getConditionTypeContainer().getConditionType(), properties, condition.getDescription(), condition.getLabel() + " - Copy");
+	}
+
+	private SharedAction copy(SharedAction action) {
+		Map<String, Object> properties = new HashMap<>();
+		action.getActionTypeContainer().getActionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
+		return new SharedAction(action.getActionTypeContainer().getActionType(), properties, action.getDescription(), action.getLabel() + " - Copy");
 	}
 
 	private void removeRuleElement(UUID sourceId) {
