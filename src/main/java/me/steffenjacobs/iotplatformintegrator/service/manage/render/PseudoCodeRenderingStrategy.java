@@ -7,6 +7,7 @@ import java.util.List;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
 
@@ -21,17 +22,17 @@ public class PseudoCodeRenderingStrategy implements RenderingStrategy<Token> {
 	}
 
 	@Override
-	public Token operationComponent(Operation operation) {
+	public Token operationComponent(Operation operation, SharedTypeSpecificKey key) {
 		return new Token(operation.getText(), TokenType.OPERATOR, String.format("Type: %s, Operator: %s (%s)", TokenType.OPERATOR, operation.getText(), operation.name()));
 	}
 
 	@Override
-	public Token commandComponent(Command command) {
+	public Token commandComponent(Command command, SharedTypeSpecificKey key) {
 		return new Token(command.name(), TokenType.COMMAND, String.format("Type: %s, Command: %s", TokenType.COMMAND, command.name()));
 	}
 
 	@Override
-	public List<Token> valueComponent(String value) {
+	public List<Token> valueComponent(String value, SharedTypeSpecificKey key) {
 		if (value.contains(" ")) {
 			return multivalueComponent(value);
 		}
@@ -44,7 +45,7 @@ public class PseudoCodeRenderingStrategy implements RenderingStrategy<Token> {
 	}
 
 	@Override
-	public Token itemComponent(SharedItem item) {
+	public Token itemComponent(SharedItem item, SharedTypeSpecificKey key) {
 		return new Token(item.getName(), TokenType.ITEM, String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
 	}
 

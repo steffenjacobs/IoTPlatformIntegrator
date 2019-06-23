@@ -14,7 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionTy
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 
 /** @author Steffen Jacobs */
-public class ActionRenderer<T> {
+public class ActionRenderer<T> implements ItemPlaceholderFactory{
 
 	private static final Logger LOG = LoggerFactory.getLogger(ActionRenderer.class);
 
@@ -34,9 +34,9 @@ public class ActionRenderer<T> {
 			tokens.add(renderingStrategy.textComponent("rule.enabled", "Set rule.enabled for rules %s to %s"));
 			tokens.add(renderingStrategy.textComponent("for", "Set rule.enabled for rules %s to %s"));
 			tokens.add(renderingStrategy.textComponent("rules", "Set rule.enabled for rules %s to %s"));
-			tokens.addAll(renderingStrategy.valueComponent(rules));
+			tokens.addAll(renderingStrategy.valueComponent(rules, ActionTypeSpecificKey.RuleUUIDs));
 			tokens.add(renderingStrategy.textComponent("to", "Set rule.enabled for rules %s to %s"));
-			tokens.addAll(renderingStrategy.valueComponent(Boolean.toString(enable)));
+			tokens.addAll(renderingStrategy.valueComponent(Boolean.toString(enable), ActionTypeSpecificKey.Enable));
 			return tokens;
 		case ExecuteScript:
 			String type = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Type);
@@ -44,9 +44,9 @@ public class ActionRenderer<T> {
 			List<T> tokens2 = new ArrayList<>();
 			tokens2.add(renderingStrategy.textComponent("Execute", "Execute script %s {%s}"));
 			tokens2.add(renderingStrategy.textComponent("script", "Execute script %s {%s}"));
-			tokens2.addAll(renderingStrategy.valueComponent(type));
+			tokens2.addAll(renderingStrategy.valueComponent(type, ActionTypeSpecificKey.Type));
 			tokens2.add(renderingStrategy.textComponent("{", "Execute script %s {%s}"));
-			tokens2.addAll(renderingStrategy.valueComponent(script));
+			tokens2.addAll(renderingStrategy.valueComponent(script, ActionTypeSpecificKey.Script));
 			tokens2.add(renderingStrategy.textComponent("}", "Execute script %s {%s}"));
 			return tokens2;
 		case PlaySound:
@@ -55,9 +55,9 @@ public class ActionRenderer<T> {
 			List<T> tokens3 = new ArrayList<>();
 			tokens3.add(renderingStrategy.textComponent("Play", "Play sound %s to %s"));
 			tokens3.add(renderingStrategy.textComponent("sound", "Play sound %s to %s"));
-			tokens3.addAll(renderingStrategy.valueComponent(sound));
+			tokens3.addAll(renderingStrategy.valueComponent(sound, ActionTypeSpecificKey.Sound));
 			tokens3.add(renderingStrategy.textComponent("to", "Play sound %s to %s"));
-			tokens3.addAll(renderingStrategy.valueComponent(sink));
+			tokens3.addAll(renderingStrategy.valueComponent(sink, ActionTypeSpecificKey.Sink));
 			return tokens3;
 		case RunRules:
 			String rules2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.RuleUUIDs);
@@ -65,34 +65,33 @@ public class ActionRenderer<T> {
 			List<T> tokens4 = new ArrayList<>();
 			tokens4.add(renderingStrategy.textComponent("Run", "Run rules %s Check condition: %s"));
 			tokens4.add(renderingStrategy.textComponent("rules", "Run rules %s Check condition: %s"));
-			tokens4.addAll(renderingStrategy.valueComponent(rules2));
+			tokens4.addAll(renderingStrategy.valueComponent(rules2, ActionTypeSpecificKey.RuleUUIDs));
 			tokens4.add(renderingStrategy.textComponent("Check", "Run rules %s Check condition: %s"));
 			tokens4.add(renderingStrategy.textComponent("condition:", "Run rules %s Check condition: %s"));
-			tokens4.addAll(renderingStrategy.valueComponent(Boolean.toString(considerConditions)));
+			tokens4.addAll(renderingStrategy.valueComponent(Boolean.toString(considerConditions), ActionTypeSpecificKey.ConsiderConditions));
 			return tokens4;
 		case SaySomething:
 			String sink2 = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink);
 			String text = "" + action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Text);
 			List<T> tokens5 = new ArrayList<>();
 			tokens5.add(renderingStrategy.textComponent("Say", "Say %s to %s"));
-			tokens5.addAll(renderingStrategy.valueComponent(text));
+			tokens5.addAll(renderingStrategy.valueComponent(text, ActionTypeSpecificKey.Text));
 			tokens5.add(renderingStrategy.textComponent("to", "Say %s to %s"));
-			tokens5.addAll(renderingStrategy.valueComponent(sink2));
+			tokens5.addAll(renderingStrategy.valueComponent(sink2, ActionTypeSpecificKey.Sink));
 			return tokens5;
 		case ItemCommand:
-			SharedItem item = (SharedItem) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName);
+			SharedItem item = getItemOrPlaceholder(action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName));
 			Command command = (Command) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Command);
 			List<T> tokens6 = new ArrayList<>();
 			tokens6.add(renderingStrategy.textComponent("Send", "Send command %s to %s"));
 			tokens6.add(renderingStrategy.textComponent("command", "Send command %s to %s"));
-			tokens6.add(renderingStrategy.commandComponent(command));
+			tokens6.add(renderingStrategy.commandComponent(command, ActionTypeSpecificKey.Command));
 			tokens6.add(renderingStrategy.textComponent("to", "Send command %s to %s"));
-			tokens6.add(renderingStrategy.itemComponent(item));
+			tokens6.add(renderingStrategy.itemComponent(item, ActionTypeSpecificKey.ItemName));
 			return tokens6;
 		default:
 			LOG.error("Invalid action type: {}", action.getActionTypeContainer().getActionType());
 			return Arrays.asList(renderingStrategy.textComponent("<An error occured during parsing of the action.>", "<An error occured during parsing of the action.>"));
 		}
 	}
-
 }

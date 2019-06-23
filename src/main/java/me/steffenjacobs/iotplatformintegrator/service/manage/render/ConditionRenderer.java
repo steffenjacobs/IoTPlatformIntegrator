@@ -14,7 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 
 /** @author Steffen Jacobs */
-public class ConditionRenderer<T> {
+public class ConditionRenderer<T> implements ItemPlaceholderFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ConditionRenderer.class);
 
@@ -31,16 +31,16 @@ public class ConditionRenderer<T> {
 			String script = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Script);
 			String type = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Type);
 			tokens.add(renderingStrategy.textComponent("Script", "Script %s {%s} evaluates to true"));
-			tokens.addAll(renderingStrategy.valueComponent(type));
+			tokens.addAll(renderingStrategy.valueComponent(type, ConditionTypeSpecificKey.Type));
 			tokens.add(renderingStrategy.textComponent("{", "{"));
-			tokens.addAll(renderingStrategy.valueComponent(script));
+			tokens.addAll(renderingStrategy.valueComponent(script, ConditionTypeSpecificKey.Script));
 			tokens.add(renderingStrategy.textComponent("}", "}"));
 			tokens.add(renderingStrategy.textComponent("evaluates", "Script %s {%s} evaluates to true"));
 			tokens.add(renderingStrategy.textComponent("to", "Script %s {%s} evaluates to true"));
 			tokens.add(renderingStrategy.textComponent("true", "Script %s {%s} evaluates to true"));
 			return tokens;
 		case ItemState:
-			SharedItem item = (SharedItem) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName);
+			SharedItem item = getItemOrPlaceholder(condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName));
 			String state = "" + condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.State);
 			Operation operator = (Operation) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Operator);
 			List<T> tokens2 = new ArrayList<>();
@@ -48,12 +48,12 @@ public class ConditionRenderer<T> {
 			tokens2.add(renderingStrategy.textComponent("of", "value of item '%s' %s %s"));
 			tokens2.add(renderingStrategy.textComponent("item", "value of item '%s' %s %s"));
 			if (item != null) {
-				tokens2.add(renderingStrategy.itemComponent(item));
+				tokens2.add(renderingStrategy.itemComponent(item, ConditionTypeSpecificKey.ItemName));
 			} else {
 				tokens2.add(renderingStrategy.textComponent("<null item>", "<null item>"));
 			}
-			tokens2.add(renderingStrategy.operationComponent(operator));
-			tokens2.addAll(renderingStrategy.valueComponent(state));
+			tokens2.add(renderingStrategy.operationComponent(operator, ConditionTypeSpecificKey.Operator));
+			tokens2.addAll(renderingStrategy.valueComponent(state, ConditionTypeSpecificKey.State));
 			return tokens2;
 		case DayOfWeek:
 			return Arrays.asList(renderingStrategy.textComponent("<Day of Week is not implemented with openHAB 2.4.0>", "<Day of Week is not implemented with openHAB 2.4.0>"));
@@ -63,14 +63,13 @@ public class ConditionRenderer<T> {
 			List<T> tokens3 = new ArrayList<>();
 			tokens3.add(renderingStrategy.textComponent("time", "time between %s and %s"));
 			tokens3.add(renderingStrategy.textComponent("between", "time between %s and %s"));
-			tokens3.addAll(renderingStrategy.valueComponent(startTime));
+			tokens3.addAll(renderingStrategy.valueComponent(startTime, ConditionTypeSpecificKey.StartTime));
 			tokens3.add(renderingStrategy.textComponent("and", "time between %s and %s"));
-			tokens3.addAll(renderingStrategy.valueComponent(endTime));
+			tokens3.addAll(renderingStrategy.valueComponent(endTime, ConditionTypeSpecificKey.EndTime));
 			return tokens3;
 		default:
 			LOG.error("Invalid condition type: {}", condition.getConditionTypeContainer().getConditionType());
 			return Arrays.asList(renderingStrategy.textComponent("<An error occured during parsing of the condition.>", "<An error occured during parsing of the condition.>"));
 		}
 	}
-
 }

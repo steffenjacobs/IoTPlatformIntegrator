@@ -1,6 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.service.manage.render;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 
 import java.util.List;
 
@@ -11,16 +12,16 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorCo
 /** @author Steffen Jacobs */
 public interface RenderingStrategy<ComponentType> {
 
-	ComponentType operationComponent(Operation operation);
+	ComponentType operationComponent(Operation operation, SharedTypeSpecificKey key);
 
-	ComponentType commandComponent(Command command);
+	ComponentType commandComponent(Command command, SharedTypeSpecificKey key);
 
-	List<ComponentType> valueComponent(String value);
+	List<ComponentType> valueComponent(String value, SharedTypeSpecificKey key);
 
 	ComponentType textComponent(String text, String description, TokenType type);
 
 	ComponentType textComponent(String text, String description);
 
-	ComponentType itemComponent(SharedItem item);
+	ComponentType itemComponent(SharedItem item, SharedTypeSpecificKey key);
 
 }

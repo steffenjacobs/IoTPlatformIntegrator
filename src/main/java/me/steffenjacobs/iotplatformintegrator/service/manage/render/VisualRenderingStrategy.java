@@ -12,12 +12,13 @@ import javax.swing.JTextField;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
 
 /** @author Steffen Jacobs */
 public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	@Override
-	public Component operationComponent(Operation operation) {
+	public Component operationComponent(Operation operation, SharedTypeSpecificKey key) {
 		DefaultComboBoxModel<Operation> itemModel = new DefaultComboBoxModel<>();
 		JComboBox<Operation> chooseItem = new JComboBox<>(itemModel);
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.name() : ""));
@@ -31,7 +32,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	}
 
 	@Override
-	public Component commandComponent(Command command) {
+	public Component commandComponent(Command command, SharedTypeSpecificKey key) {
 		DefaultComboBoxModel<Command> itemModel = new DefaultComboBoxModel<>();
 		JComboBox<Command> chooseItem = new JComboBox<>(itemModel);
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.name() : ""));
@@ -45,7 +46,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	}
 
 	@Override
-	public List<Component> valueComponent(String value) {
+	public List<Component> valueComponent(String value, SharedTypeSpecificKey key) {
 		// TODO: datatypes
 		JTextField txt = new JTextField();
 		txt.setText(value);
@@ -60,7 +61,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	}
 
 	@Override
-	public Component itemComponent(SharedItem item) {
+	public Component itemComponent(SharedItem item, SharedTypeSpecificKey key) {
 		DefaultComboBoxModel<SharedItem> itemModel = new DefaultComboBoxModel<>();
 		JComboBox<SharedItem> chooseItem = new JComboBox<>(itemModel);
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.getName() : ""));
