@@ -80,12 +80,12 @@ public class AdoptionPerspective extends Perspective {
 		grid.add(0, .4, .15, .3, instanceChooserWindow);
 		grid.add(0, .7, .3, .3, ruleTableSourceWindow);
 		grid.add(.3, .7, .3, .3, ruleTableTargetWindow);
-		
+
 		grid.add(.15, 0, .65, .7, ruleBuilderWindow);
-		
+
 		grid.add(.8, 0, .2, .5, sourceItemWindow);
 		grid.add(.8, .5, .2, .5, targetItemWindow);
-		
+
 		control.getContentArea().deploy(grid);
 	}
 }

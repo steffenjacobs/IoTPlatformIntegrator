@@ -13,12 +13,12 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorCo
 
 /** @author Steffen Jacobs */
 public class PseudoCodeRenderingStrategy implements RenderingStrategy<Token> {
-	
+
 	private final TokenType defaultTextType;
 
 	public PseudoCodeRenderingStrategy(TokenType defaultTextType) {
 		this.defaultTextType = defaultTextType;
-		
+
 	}
 
 	@Override

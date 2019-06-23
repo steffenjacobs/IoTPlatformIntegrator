@@ -188,13 +188,12 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 	public void clearComponents() {
 		annotatedComponents.clear();
 	}
-	
-	
+
 	@Override
-	public SharedRuleElement getRuleElementById(UUID uuid){
+	public SharedRuleElement getRuleElementById(UUID uuid) {
 		return ruleElements.get(uuid);
 	}
-	
+
 	@Override
 	public SharedRuleElement removeRuleElementById(UUID uuid) {
 		return ruleElements.remove(uuid);

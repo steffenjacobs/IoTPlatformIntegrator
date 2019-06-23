@@ -7,7 +7,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement.ElementType;
 
 /** @author Steffen Jacobs */
-public class RuleElementChangeEvent extends WithRuleElementAndRuleEvent{
+public class RuleElementChangeEvent extends WithRuleElementAndRuleEvent {
 
 	public RuleElementChangeEvent(ElementType elementType, UUID elementUUID, SharedRule sharedRule) {
 		super(EventType.RuleElementChangeEvent, elementType, elementUUID, sharedRule);

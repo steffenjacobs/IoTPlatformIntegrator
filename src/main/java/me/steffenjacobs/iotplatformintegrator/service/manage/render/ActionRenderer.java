@@ -14,7 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionTy
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 
 /** @author Steffen Jacobs */
-public class ActionRenderer<T> implements ItemPlaceholderFactory{
+public class ActionRenderer<T> implements ItemPlaceholderFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ActionRenderer.class);
 

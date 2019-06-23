@@ -56,17 +56,17 @@ public abstract class DynamicElement extends JPanel {
 		elementType = new JLabel(type.getDisplayString());
 		elementType.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		JPopupMenu popupElement = new JPopupMenu();
-		for(ElementType t : ElementType.values()) {
+		for (ElementType t : ElementType.values()) {
 			JMenuItem elementTypeTrigger = new JMenuItem(t.getDisplayString());
 			popupElement.add(elementTypeTrigger);
 		}
 		this.add(popupElement);
 		setHeaderStyle(elementType, popupElement);
-		
+
 		subType = new JLabel();
 		subType.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		JPopupMenu popupSubType = new JPopupMenu();
-		if(type == ElementType.Trigger) {
+		if (type == ElementType.Trigger) {
 		}
 		this.add(popupSubType);
 		setHeaderStyle(subType, popupSubType);
@@ -119,7 +119,7 @@ public abstract class DynamicElement extends JPanel {
 				super.mouseExited(e);
 				component.setForeground(ColorPalette.FONT_COLOR);
 			}
-			
+
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				super.mouseReleased(e);
@@ -143,8 +143,8 @@ public abstract class DynamicElement extends JPanel {
 		revalidate();
 		repaint();
 	}
-	
-	public Component[] getStrategyElements(){
+
+	public Component[] getStrategyElements() {
 		return strategyPanel.getComponents();
 	}
 }
