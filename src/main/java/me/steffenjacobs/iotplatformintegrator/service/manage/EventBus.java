@@ -20,7 +20,7 @@ public class EventBus {
 	public static enum EventType {
 		Test, //
 		SelectedServerConnectionChanged, ServerDisconnected, ServerConnected, SelectedRuleChanged, SourceConnectionChanged, TargetConnectionChanged, //
-		SelectedSourceRuleChanged, SelectedTargetRuleChanged, RuleElementAdded, RuleElementRemoved, RuleChangeEvent;
+		SelectedSourceRuleChanged, SelectedTargetRuleChanged, RuleElementAdded, RuleElementRemoved, RuleChangeEvent, RuleElementChangeEvent;
 	}
 
 	private EventBus() {
