@@ -15,10 +15,6 @@ public class RuleChangeEvent extends WithSharedRuleEvent {
 	private final ChangeOperation operation;
 	private final SharedRuleElement oldElement;
 
-	public RuleChangeEvent(SharedRule sharedRule, SharedRuleElement changedElement, ChangeOperation operation) {
-		this(sharedRule, changedElement, changedElement, operation);
-	}
-
 	public RuleChangeEvent(SharedRule sharedRule, SharedRuleElement newElement, SharedRuleElement oldElement, ChangeOperation operation) {
 		super(EventType.RuleChangeEvent, sharedRule);
 		this.changedElement = newElement;

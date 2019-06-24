@@ -35,13 +35,13 @@ public class RuleMutator {
 			SharedRuleElement elem = ruleBuilderController.getRuleElementById(sourceId);
 			if (elem instanceof SharedTrigger) {
 				rule.getTriggers().add(copy((SharedTrigger) elem));
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, ChangeOperation.ADD));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null, ChangeOperation.ADD));
 			} else if (elem instanceof SharedCondition) {
 				rule.getConditions().add(copy((SharedCondition) elem));
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, ChangeOperation.ADD));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null, ChangeOperation.ADD));
 			} else if (elem instanceof SharedAction) {
 				rule.getActions().add(copy((SharedAction) elem));
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, ChangeOperation.ADD));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null, ChangeOperation.ADD));
 			}
 		}
 	}
@@ -54,15 +54,15 @@ public class RuleMutator {
 			if (elem instanceof SharedTrigger) {
 				SharedTrigger trigger = (SharedTrigger) elem;
 				rule.getTriggers().remove(trigger);
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, ChangeOperation.REMOVE));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem, ChangeOperation.REMOVE));
 			} else if (elem instanceof SharedCondition) {
 				SharedCondition condition = (SharedCondition) elem;
 				rule.getConditions().remove(condition);
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, ChangeOperation.REMOVE));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem, ChangeOperation.REMOVE));
 			} else if (elem instanceof SharedAction) {
 				SharedAction action = (SharedAction) elem;
 				rule.getActions().remove(action);
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, ChangeOperation.REMOVE));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem, ChangeOperation.REMOVE));
 			}
 		}
 	}
