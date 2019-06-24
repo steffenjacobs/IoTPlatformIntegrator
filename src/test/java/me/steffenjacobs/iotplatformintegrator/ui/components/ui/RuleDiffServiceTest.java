@@ -39,6 +39,7 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
 	@Test
@@ -59,6 +60,7 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
 	@Test
@@ -82,6 +84,7 @@ public class RuleDiffServiceTest {
 		Assert.assertEquals(Command.Off, diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
 	@Test
@@ -104,6 +107,7 @@ public class RuleDiffServiceTest {
 		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesRemoved().size());
 		Assert.assertEquals(Command.Off, diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
 	@Test
@@ -128,10 +132,11 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesUpdated().size());
 		Assert.assertEquals(item2, diffSharedRuleElement.getPropertiesUpdated().get(TriggerTypeSpecificKey.ItemName.getKeyString()));
+		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
 	@Test
-	public void testRemovedElementDiff() {
+	public void testAddedElementDiff() {
 		RuleDiffService diffService = new RuleDiffService();
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
@@ -152,10 +157,11 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.State.getKeyString()).equals(Command.On));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
 	@Test
-	public void testRemovedAddedDiff() {
+	public void testRemovedElementDiff() {
 		RuleDiffService diffService = new RuleDiffService();
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
@@ -176,6 +182,7 @@ public class RuleDiffServiceTest {
 				.equals(new SharedItem("testSwitch", "testLabel", ItemType.Switch)));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.State.getKeyString()).equals(Command.On));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+		Assert.assertTrue(diffSharedRuleElement.isNegative());
 	}
 
 	private Map<String, Object> createPropertiesForItemStateUpdatedExample(TriggerType type) {
