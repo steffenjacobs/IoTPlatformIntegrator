@@ -26,6 +26,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent.ChangeOperation;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
@@ -85,22 +86,24 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 					SharedTrigger trigger = parseTriggerFromView(event.getSourceId());
 					ruleElements.put(event.getSourceId(), trigger);
 					rule.getTriggers().add(trigger);
+					EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, trigger, elem, ChangeOperation.UPDATE));
 
 				} else if (elem instanceof SharedCondition) {
 					rule.getConditions().remove(elem);
 					SharedCondition condition = parseConditionFromView(event.getSourceId());
 					ruleElements.put(event.getSourceId(), condition);
 					rule.getConditions().add(condition);
+					EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, condition, elem, ChangeOperation.UPDATE));
 
 				} else if (elem instanceof SharedAction) {
 					rule.getActions().remove(elem);
 					SharedAction action = parseActionFromView(event.getSourceId());
 					ruleElements.put(event.getSourceId(), action);
 					rule.getActions().add(action);
+					EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, action, elem, ChangeOperation.UPDATE));
 				} else {
 					LOG.error("Invalid element type: " + elem);
 				}
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule));
 			}
 		});
 	}
