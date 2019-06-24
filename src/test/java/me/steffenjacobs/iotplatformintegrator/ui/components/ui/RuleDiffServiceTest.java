@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.DiffResult;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -127,6 +128,30 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesUpdated().size());
 		Assert.assertEquals(item2, diffSharedRuleElement.getPropertiesUpdated().get(TriggerTypeSpecificKey.ItemName.getKeyString()));
+	}
+
+	@Test
+	public void testRemovedElementDiff() {
+		RuleDiffService diffService = new RuleDiffService();
+
+		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
+
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label");
+
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(null, sharedTrigger);
+
+		Assert.assertNotNull(diffSharedRuleElement.getLabel());
+		Assert.assertEquals("Some Label", diffSharedRuleElement.getLabel());
+		Assert.assertNotNull(diffSharedRuleElement.getDescription());
+		Assert.assertEquals("Hello World", diffSharedRuleElement.getDescription());
+		Assert.assertNotNull(diffSharedRuleElement.getElementType());
+		Assert.assertEquals(TriggerType.ItemStateUpdated, diffSharedRuleElement.getElementType());
+		Assert.assertEquals(2, diffSharedRuleElement.getPropertiesAdded().size());
+		Assert.assertTrue(
+				diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.ItemName.getKeyString()).equals(new SharedItem("testSwitch", "testLabel", ItemType.Switch)));
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.State.getKeyString()).equals(Command.On));
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
 	}
 
 	private Map<String, Object> createPropertiesForItemStateUpdatedExample(TriggerType type) {
