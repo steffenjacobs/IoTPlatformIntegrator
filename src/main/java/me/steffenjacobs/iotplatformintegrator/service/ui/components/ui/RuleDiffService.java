@@ -15,7 +15,44 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.Trigger
 
 /** @author Steffen Jacobs */
 public class RuleDiffService {
+
+	private SharedRuleElementDiff getFullDiff(SharedRuleElement element, boolean add) {
+		final Map<String, Object> properties = new HashMap<>();
+		final SharedElementType elementType;
+		if (element instanceof SharedTrigger) {
+			SharedTrigger trigger = (SharedTrigger) element;
+			for (TriggerTypeSpecificKey key : trigger.getTriggerTypeContainer().getTriggerType().getTypeSpecificKeys()) {
+				properties.put(key.getKeyString(), trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key));
+			}
+			elementType = trigger.getTriggerTypeContainer().getTriggerType();
+		} else if (element instanceof SharedCondition) {
+			SharedCondition condition = (SharedCondition) element;
+			for (ConditionTypeSpecificKey key : condition.getConditionTypeContainer().getConditionType().getTypeSpecificKeys()) {
+				properties.put(key.getKeyString(), condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key));
+			}
+			elementType = condition.getConditionTypeContainer().getConditionType();
+		} else /* if (element instanceof SharedAction) */ {
+			SharedAction action = (SharedAction) element;
+			for (ActionTypeSpecificKey key : action.getActionTypeContainer().getActionType().getTypeSpecificKeys()) {
+				properties.put(key.getKeyString(), action.getActionTypeContainer().getActionTypeSpecificValues().get(key));
+			}
+			elementType = action.getActionTypeContainer().getActionType();
+		}
+		return new SharedRuleElementDiff(element.getDescription(), element.getLabel(), elementType, add ? properties : new HashMap<>(), !add ? properties : new HashMap<>(),
+				new HashMap<>());
+	}
+
 	public SharedRuleElementDiff getDiffSharedRuleElement(SharedRuleElement oldElement, SharedRuleElement newElement) {
+
+		if(oldElement == null && newElement != null) {
+			return getFullDiff(newElement, true);
+		}
+		else if (newElement == null && oldElement!=null) {
+			return getFullDiff(oldElement, false);
+		}
+		else if (newElement == null && oldElement == null) {
+			return new SharedRuleElementDiff();
+		}
 		final SharedRuleElementDiff diffElement = null;
 		final String description;
 		if (!oldElement.getDescription().equals(newElement.getDescription())) {
