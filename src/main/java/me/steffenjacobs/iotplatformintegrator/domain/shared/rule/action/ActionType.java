@@ -1,9 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 
 /** @author Steffen Jacobs */
-public enum ActionType {
+public enum ActionType implements SharedElementType{
 
 	EnableDisableRule(new ActionTypeSpecificKey[] { ActionTypeSpecificKey.Enable, ActionTypeSpecificKey.RuleUUIDs }), //
 	ExecuteScript(new ActionTypeSpecificKey[] { ActionTypeSpecificKey.Type, ActionTypeSpecificKey.Script }), //

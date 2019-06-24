@@ -1,9 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 
 /** @author Steffen Jacobs */
-public enum ConditionType {
+public enum ConditionType implements SharedElementType {
 	ScriptEvaluatesTrue(new ConditionTypeSpecificKey[] { ConditionTypeSpecificKey.Script, ConditionTypeSpecificKey.Type }), //
 	ItemState(new ConditionTypeSpecificKey[] { ConditionTypeSpecificKey.ItemName, ConditionTypeSpecificKey.State, ConditionTypeSpecificKey.Operator }), //
 	DayOfWeek(new ConditionTypeSpecificKey[] {}), //
@@ -19,9 +20,8 @@ public enum ConditionType {
 	public ConditionTypeSpecificKey[] getTypeSpecificKeys() {
 		return typeSpecificKeys;
 	}
-	
 
-	public static enum ConditionTypeSpecificKey implements SharedTypeSpecificKey{
+	public static enum ConditionTypeSpecificKey implements SharedTypeSpecificKey {
 		Script("script", "Script"), Type("type", "Type"), ItemName("itemName", "Item Name"), State("state", "State"), Operator("operator", "Operator"), StartTime("startTime",
 				"Start Time"), EndTime("endTime", "End Time");
 
