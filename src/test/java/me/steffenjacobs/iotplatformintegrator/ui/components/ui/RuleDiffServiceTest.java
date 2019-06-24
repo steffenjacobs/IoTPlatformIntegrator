@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.DiffResult;
 import org.junit.Assert;
 import org.junit.Test;
 
