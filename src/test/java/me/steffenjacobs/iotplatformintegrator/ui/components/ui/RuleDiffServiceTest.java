@@ -77,9 +77,31 @@ public class RuleDiffServiceTest {
 		Assert.assertNotNull(diffSharedRuleElement.getElementType());
 		Assert.assertEquals(TriggerType.ItemStateChanged, diffSharedRuleElement.getElementType());
 		Assert.assertFalse(diffSharedRuleElement.getPropertiesAdded().isEmpty());
-		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().size() == 1);
+		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesAdded().size());
 		Assert.assertEquals(Command.Off, diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+	}
+
+	@Test
+	public void testRemove() {
+		RuleDiffService diffService = new RuleDiffService();
+
+		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
+		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateChanged);
+
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateChanged, properties2, "Hello World", "Some Label");
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label");
+
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
+
+		Assert.assertNull(diffSharedRuleElement.getLabel());
+		Assert.assertNull(diffSharedRuleElement.getDescription());
+		Assert.assertNotNull(diffSharedRuleElement.getElementType());
+		Assert.assertEquals(TriggerType.ItemStateUpdated, diffSharedRuleElement.getElementType());
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
+		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesRemoved().size());
+		Assert.assertEquals(Command.Off, diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
 	}
 
