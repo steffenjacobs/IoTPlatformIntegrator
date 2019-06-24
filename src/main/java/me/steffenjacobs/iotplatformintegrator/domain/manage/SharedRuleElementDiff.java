@@ -26,6 +26,13 @@ public class SharedRuleElementDiff {
 		this.propertiesUpdated.putAll(propertiesUpdated);
 	}
 
+	/** Constructor to create an empty diff element. */
+	public SharedRuleElementDiff() {
+		this.description = null;
+		this.label = null;
+		this.elementType = null;
+	}
+
 	public String getDescription() {
 		return description;
 	}
