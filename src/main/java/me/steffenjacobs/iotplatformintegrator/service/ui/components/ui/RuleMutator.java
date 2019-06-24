@@ -13,7 +13,6 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent.ChangeOperation;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
 
@@ -35,13 +34,13 @@ public class RuleMutator {
 			SharedRuleElement elem = ruleBuilderController.getRuleElementById(sourceId);
 			if (elem instanceof SharedTrigger) {
 				rule.getTriggers().add(copy((SharedTrigger) elem));
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null, ChangeOperation.ADD));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null));
 			} else if (elem instanceof SharedCondition) {
 				rule.getConditions().add(copy((SharedCondition) elem));
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null, ChangeOperation.ADD));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null));
 			} else if (elem instanceof SharedAction) {
 				rule.getActions().add(copy((SharedAction) elem));
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null, ChangeOperation.ADD));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null));
 			}
 		}
 	}
@@ -54,15 +53,15 @@ public class RuleMutator {
 			if (elem instanceof SharedTrigger) {
 				SharedTrigger trigger = (SharedTrigger) elem;
 				rule.getTriggers().remove(trigger);
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem, ChangeOperation.REMOVE));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem));
 			} else if (elem instanceof SharedCondition) {
 				SharedCondition condition = (SharedCondition) elem;
 				rule.getConditions().remove(condition);
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem, ChangeOperation.REMOVE));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem));
 			} else if (elem instanceof SharedAction) {
 				SharedAction action = (SharedAction) elem;
 				rule.getActions().remove(action);
-				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem, ChangeOperation.REMOVE));
+				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, null, elem));
 			}
 		}
 	}

@@ -7,31 +7,21 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 /** @author Steffen Jacobs */
 public class RuleChangeEvent extends WithSharedRuleEvent {
 
-	public static enum ChangeOperation {
-		ADD, REMOVE, UPDATE;
-	}
-
-	private final SharedRuleElement changedElement;
-	private final ChangeOperation operation;
+	private final SharedRuleElement newElement;
 	private final SharedRuleElement oldElement;
 
-	public RuleChangeEvent(SharedRule sharedRule, SharedRuleElement newElement, SharedRuleElement oldElement, ChangeOperation operation) {
+	public RuleChangeEvent(SharedRule sharedRule, SharedRuleElement newElement, SharedRuleElement oldElement) {
 		super(EventType.RuleChangeEvent, sharedRule);
-		this.changedElement = newElement;
+		this.newElement = newElement;
 		this.oldElement = oldElement;
-		this.operation = operation;
 	}
 
-	public SharedRuleElement getChangedElement() {
-		return changedElement;
+	public SharedRuleElement getNewElement() {
+		return newElement;
 	}
 
 	public SharedRuleElement getOldElement() {
 		return oldElement;
-	}
-
-	public ChangeOperation getOperation() {
-		return operation;
 	}
 
 }
