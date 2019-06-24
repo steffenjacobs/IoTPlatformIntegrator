@@ -24,17 +24,7 @@ public class RuleDiffServiceTest {
 	public void testDescriptionChange() {
 		RuleDiffService diffService = new RuleDiffService();
 
-		for (TriggerTypeSpecificKey key : TriggerType.ItemStateUpdated.getTypeSpecificKeys()) {
-			if (key != TriggerTypeSpecificKey.ItemName && key != TriggerTypeSpecificKey.State) {
-				fail("Unexpected TriggerTypeSpecific key: " + key.name());
-			}
-		}
-
-		final Map<String, Object> properties = new HashMap<>();
-
-		SharedItem testSwitch = new SharedItem("testSwitch", "testLabel", ItemType.Switch);
-		properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), testSwitch);
-		properties.put(TriggerTypeSpecificKey.State.getKeyString(), Command.On);
+		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample();
 
 		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label");
 		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, new HashMap<>(properties), "Hello World2", "Some Label");
@@ -48,6 +38,41 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+	}
+
+	@Test
+	public void testLabelChange() {
+		RuleDiffService diffService = new RuleDiffService();
+
+		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample();
+
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label");
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, new HashMap<>(properties), "Hello World", "Some Label2");
+
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
+
+		Assert.assertNotNull(diffSharedRuleElement.getLabel());
+		Assert.assertEquals("Some Label2", diffSharedRuleElement.getLabel());
+		Assert.assertNull(diffSharedRuleElement.getDescription());
+		Assert.assertNull(diffSharedRuleElement.getElementType());
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
+	}
+
+	private Map<String, Object> createPropertiesForItemStateUpdatedExample() {
+		for (TriggerTypeSpecificKey key : TriggerType.ItemStateUpdated.getTypeSpecificKeys()) {
+			if (key != TriggerTypeSpecificKey.ItemName && key != TriggerTypeSpecificKey.State) {
+				fail("Unexpected TriggerTypeSpecific key: " + key.name());
+			}
+		}
+
+		final Map<String, Object> properties = new HashMap<>();
+
+		SharedItem testSwitch = new SharedItem("testSwitch", "testLabel", ItemType.Switch);
+		properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), testSwitch);
+		properties.put(TriggerTypeSpecificKey.State.getKeyString(), Command.On);
+		return properties;
 	}
 
 }
