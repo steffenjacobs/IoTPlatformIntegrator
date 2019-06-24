@@ -14,9 +14,10 @@ public class SharedRuleElementDiff {
 	private final Map<String, Object> propertiesAdded = new HashMap<>();
 	private final Map<String, Object> propertiesRemoved = new HashMap<>();
 	private final Map<String, Object> propertiesUpdated = new HashMap<>();
+	private final boolean negative;
 
 	public SharedRuleElementDiff(String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
-			Map<String, Object> propertiesUpdated) {
+			Map<String, Object> propertiesUpdated, boolean isNegative) {
 		super();
 		this.description = description;
 		this.label = label;
@@ -24,13 +25,15 @@ public class SharedRuleElementDiff {
 		this.propertiesAdded.putAll(propertiesAdded);
 		this.propertiesRemoved.putAll(propertiesRemoved);
 		this.propertiesUpdated.putAll(propertiesUpdated);
+		this.negative = isNegative;
 	}
 
 	/** Constructor to create an empty diff element. */
-	public SharedRuleElementDiff() {
+	public SharedRuleElementDiff(boolean isNegative) {
 		this.description = null;
 		this.label = null;
 		this.elementType = null;
+		this.negative = isNegative;
 	}
 
 	public String getDescription() {
@@ -59,6 +62,10 @@ public class SharedRuleElementDiff {
 
 	public boolean isEmpty() {
 		return description == null && label == null && elementType == null && propertiesAdded.isEmpty() && propertiesRemoved.isEmpty() && propertiesUpdated.isEmpty();
+	}
+
+	public boolean isNegative() {
+		return negative;
 	}
 
 }

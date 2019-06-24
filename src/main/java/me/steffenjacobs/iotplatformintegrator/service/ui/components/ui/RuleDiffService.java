@@ -39,19 +39,17 @@ public class RuleDiffService {
 			elementType = action.getActionTypeContainer().getActionType();
 		}
 		return new SharedRuleElementDiff(element.getDescription(), element.getLabel(), elementType, add ? properties : new HashMap<>(), !add ? properties : new HashMap<>(),
-				new HashMap<>());
+				new HashMap<>(), !add);
 	}
 
 	public SharedRuleElementDiff getDiffSharedRuleElement(SharedRuleElement oldElement, SharedRuleElement newElement) {
 
-		if(oldElement == null && newElement != null) {
+		if (oldElement == null && newElement != null) {
 			return getFullDiff(newElement, true);
-		}
-		else if (newElement == null && oldElement!=null) {
+		} else if (newElement == null && oldElement != null) {
 			return getFullDiff(oldElement, false);
-		}
-		else if (newElement == null && oldElement == null) {
-			return new SharedRuleElementDiff();
+		} else if (newElement == null && oldElement == null) {
+			return new SharedRuleElementDiff(false);
 		}
 		final SharedRuleElementDiff diffElement = null;
 		final String description;
@@ -101,7 +99,7 @@ public class RuleDiffService {
 				}
 			}
 
-			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated);
+			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, false);
 		} else if (oldElement instanceof SharedCondition) {
 			SharedCondition oldCondition = (SharedCondition) oldElement;
 			SharedCondition newCondition = (SharedCondition) newElement;
@@ -135,7 +133,7 @@ public class RuleDiffService {
 				}
 			}
 
-			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated);
+			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, false);
 		} else if (oldElement instanceof SharedAction) {
 			SharedAction oldAction = (SharedAction) oldElement;
 			SharedAction newAction = (SharedAction) newElement;
@@ -169,7 +167,7 @@ public class RuleDiffService {
 				}
 			}
 
-			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated);
+			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, false);
 		}
 		return diffElement;
 	}
