@@ -37,29 +37,35 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 	}
 
 	@Override
-	public SharedRule transformRule(ExperimentalRule rule, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
+	public SharedRule transformRule(ExperimentalRule rule, ItemDirectory itemDirectory,
+			OpenHabCommandParser commandParser) {
 		String ruleName = rule.getName();
 		String ruleUid = rule.getUid();
 		String description = rule.getDescription();
 		String status = getReadeableStatus(rule);
 		String visible = rule.getVisibility();
+
 		Set<SharedCondition> conditions = new HashSet<>();
+		int conditionCount = 0;
 		for (Condition condition : rule.getConditions()) {
-			conditions.add(transformCondition(condition, itemDirectory));
+			conditions.add(transformCondition(condition, itemDirectory, conditionCount++));
 		}
 		Set<SharedTrigger> triggers = new HashSet<>();
+		int triggerCount = 0;
 		for (Trigger trigger : rule.getTriggers()) {
-			triggers.add(transformTrigger(trigger, itemDirectory, commandParser));
+			triggers.add(transformTrigger(trigger, itemDirectory, commandParser, triggerCount++));
 		}
 		Set<SharedAction> actions = new HashSet<>();
+		int actionCount = 0;
 		for (Action action : rule.getActions()) {
-			actions.add(transformAction(action, itemDirectory, commandParser));
+			actions.add(transformAction(action, itemDirectory, commandParser, actionCount++));
 		}
 		LOG.info("Transformed rule {}.", rule.getUid());
 		return new SharedRule(ruleName, ruleUid, description, visible, status, triggers, conditions, actions);
 	}
 
-	private SharedCondition transformCondition(Condition condition, ItemDirectory itemDirectory) {
+	private SharedCondition transformCondition(Condition condition, ItemDirectory itemDirectory,
+			int relativeElementId) {
 		if (condition.getConfiguration() == null || condition.getConfiguration().getAdditionalProperties() == null) {
 			LOG.info("Could not parse condition {}", condition.getId());
 			return null;
@@ -68,13 +74,16 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		String description = condition.getDescription();
 		String type = condition.getType();
 		String label = condition.getLabel();
-		SharedCondition sc = new SharedCondition(getConditionType(type), properties, description, label);
+		SharedCondition sc = new SharedCondition(getConditionType(type), properties, description, label,
+				relativeElementId);
 		conditionTransformer.convertConditionTypeContainer(sc.getConditionTypeContainer(), itemDirectory);
 		return sc;
 	}
 
-	private SharedTrigger transformTrigger(Trigger t, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
-		if (t.getConfiguration() == null || t.getConfiguration().getAdditionalProperties() == null || t.getConfiguration().getAdditionalProperties().isEmpty()) {
+	private SharedTrigger transformTrigger(Trigger t, ItemDirectory itemDirectory, OpenHabCommandParser commandParser,
+			int relativeElementId) {
+		if (t.getConfiguration() == null || t.getConfiguration().getAdditionalProperties() == null
+				|| t.getConfiguration().getAdditionalProperties().isEmpty()) {
 			LOG.info("Could not parse trigger {}", t.getId());
 			return null;
 		}
@@ -84,7 +93,7 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		String type = t.getType();
 		String label = t.getLabel();
 
-		SharedTrigger st = new SharedTrigger(getTriggerType(type), properties, description, label);
+		SharedTrigger st = new SharedTrigger(getTriggerType(type), properties, description, label, relativeElementId);
 		triggerTransformer.convertTriggerTypeContainer(st.getTriggerTypeContainer(), itemDirectory, commandParser);
 		return st;
 	}
@@ -120,8 +129,10 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		return TriggerType.Unknown;
 	}
 
-	private SharedAction transformAction(Action a, ItemDirectory itemDirectory, OpenHabCommandParser commandParser) {
-		if (a.getConfiguration() == null || a.getConfiguration().getAdditionalProperties() == null || a.getConfiguration().getAdditionalProperties().isEmpty()) {
+	private SharedAction transformAction(Action a, ItemDirectory itemDirectory, OpenHabCommandParser commandParser,
+			int relativeElementId) {
+		if (a.getConfiguration() == null || a.getConfiguration().getAdditionalProperties() == null
+				|| a.getConfiguration().getAdditionalProperties().isEmpty()) {
 			LOG.info("Could not parse action {}", a.getId());
 			return null;
 		}
@@ -129,7 +140,7 @@ public class OpenHabRuleTransformationAdapter implements PlatformRuleTransformat
 		String description = a.getDescription();
 		String type = a.getType();
 		String label = a.getLabel();
-		SharedAction sa = new SharedAction(getActionType(type), properties, description, label);
+		SharedAction sa = new SharedAction(getActionType(type), properties, description, label, relativeElementId);
 		actionTransformer.convertActionTypeContainer(sa.getActionTypeContainer(), itemDirectory, commandParser);
 		return sa;
 	}

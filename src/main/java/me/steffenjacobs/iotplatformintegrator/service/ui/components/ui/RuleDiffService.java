@@ -15,31 +15,40 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.Trigger
 
 /** @author Steffen Jacobs */
 public class RuleDiffService {
+	
+	public void apply(SharedRuleElement rule, SharedRuleElementDiff diff) {
+		
+	}
 
 	private SharedRuleElementDiff getFullDiff(SharedRuleElement element, boolean add) {
 		final Map<String, Object> properties = new HashMap<>();
 		final SharedElementType elementType;
 		if (element instanceof SharedTrigger) {
 			SharedTrigger trigger = (SharedTrigger) element;
-			for (TriggerTypeSpecificKey key : trigger.getTriggerTypeContainer().getTriggerType().getTypeSpecificKeys()) {
-				properties.put(key.getKeyString(), trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key));
+			for (TriggerTypeSpecificKey key : trigger.getTriggerTypeContainer().getTriggerType()
+					.getTypeSpecificKeys()) {
+				properties.put(key.getKeyString(),
+						trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key));
 			}
 			elementType = trigger.getTriggerTypeContainer().getTriggerType();
 		} else if (element instanceof SharedCondition) {
 			SharedCondition condition = (SharedCondition) element;
-			for (ConditionTypeSpecificKey key : condition.getConditionTypeContainer().getConditionType().getTypeSpecificKeys()) {
-				properties.put(key.getKeyString(), condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key));
+			for (ConditionTypeSpecificKey key : condition.getConditionTypeContainer().getConditionType()
+					.getTypeSpecificKeys()) {
+				properties.put(key.getKeyString(),
+						condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key));
 			}
 			elementType = condition.getConditionTypeContainer().getConditionType();
 		} else /* if (element instanceof SharedAction) */ {
 			SharedAction action = (SharedAction) element;
 			for (ActionTypeSpecificKey key : action.getActionTypeContainer().getActionType().getTypeSpecificKeys()) {
-				properties.put(key.getKeyString(), action.getActionTypeContainer().getActionTypeSpecificValues().get(key));
+				properties.put(key.getKeyString(),
+						action.getActionTypeContainer().getActionTypeSpecificValues().get(key));
 			}
 			elementType = action.getActionTypeContainer().getActionType();
 		}
-		return new SharedRuleElementDiff(element.getDescription(), element.getLabel(), elementType, add ? properties : new HashMap<>(), !add ? properties : new HashMap<>(),
-				new HashMap<>(), !add);
+		return new SharedRuleElementDiff(element.getDescription(), element.getLabel(), elementType,
+				add ? properties : new HashMap<>(), !add ? properties : new HashMap<>(), new HashMap<>(), !add, element.getRelativeElementId());
 	}
 
 	public SharedRuleElementDiff getDiffSharedRuleElement(SharedRuleElement oldElement, SharedRuleElement newElement) {
@@ -49,7 +58,7 @@ public class RuleDiffService {
 		} else if (newElement == null && oldElement != null) {
 			return getFullDiff(oldElement, false);
 		} else if (newElement == null && oldElement == null) {
-			return new SharedRuleElementDiff(false);
+			return new SharedRuleElementDiff(false, -1);
 		}
 		final SharedRuleElementDiff diffElement = null;
 		final String description;
@@ -71,7 +80,8 @@ public class RuleDiffService {
 			SharedTrigger newTrigger = (SharedTrigger) newElement;
 			final SharedElementType elementType;
 
-			if (oldTrigger.getTriggerTypeContainer().getTriggerType() != newTrigger.getTriggerTypeContainer().getTriggerType()) {
+			if (oldTrigger.getTriggerTypeContainer().getTriggerType() != newTrigger.getTriggerTypeContainer()
+					.getTriggerType()) {
 				elementType = newTrigger.getTriggerTypeContainer().getTriggerType();
 			} else {
 				elementType = null;
@@ -81,7 +91,8 @@ public class RuleDiffService {
 			Map<String, Object> propertiesAdded = new HashMap<>();
 			Map<String, Object> propertiesUpdated = new HashMap<>();
 
-			for (TriggerTypeSpecificKey key : newTrigger.getTriggerTypeContainer().getTriggerType().getTypeSpecificKeys()) {
+			for (TriggerTypeSpecificKey key : newTrigger.getTriggerTypeContainer().getTriggerType()
+					.getTypeSpecificKeys()) {
 				Object oldValue = oldTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key);
 				Object newValue = newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key);
 				if (oldValue == null) {
@@ -91,7 +102,8 @@ public class RuleDiffService {
 				}
 			}
 
-			for (TriggerTypeSpecificKey key : oldTrigger.getTriggerTypeContainer().getTriggerType().getTypeSpecificKeys()) {
+			for (TriggerTypeSpecificKey key : oldTrigger.getTriggerTypeContainer().getTriggerType()
+					.getTypeSpecificKeys()) {
 				Object oldValue = oldTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key);
 				Object newValue = newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key);
 				if (newValue == null) {
@@ -99,13 +111,15 @@ public class RuleDiffService {
 				}
 			}
 
-			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, false);
+			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved,
+					propertiesUpdated, false, newElement.getRelativeElementId());
 		} else if (oldElement instanceof SharedCondition) {
 			SharedCondition oldCondition = (SharedCondition) oldElement;
 			SharedCondition newCondition = (SharedCondition) newElement;
 			final SharedElementType elementType;
 
-			if (oldCondition.getConditionTypeContainer().getConditionType() != newCondition.getConditionTypeContainer().getConditionType()) {
+			if (oldCondition.getConditionTypeContainer().getConditionType() != newCondition.getConditionTypeContainer()
+					.getConditionType()) {
 				elementType = newCondition.getConditionTypeContainer().getConditionType();
 			} else {
 				elementType = null;
@@ -115,7 +129,8 @@ public class RuleDiffService {
 			Map<String, Object> propertiesAdded = new HashMap<>();
 			Map<String, Object> propertiesUpdated = new HashMap<>();
 
-			for (ConditionTypeSpecificKey key : newCondition.getConditionTypeContainer().getConditionType().getTypeSpecificKeys()) {
+			for (ConditionTypeSpecificKey key : newCondition.getConditionTypeContainer().getConditionType()
+					.getTypeSpecificKeys()) {
 				Object oldValue = oldCondition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key);
 				Object newValue = newCondition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key);
 				if (oldValue == null) {
@@ -125,7 +140,8 @@ public class RuleDiffService {
 				}
 			}
 
-			for (ConditionTypeSpecificKey key : oldCondition.getConditionTypeContainer().getConditionType().getTypeSpecificKeys()) {
+			for (ConditionTypeSpecificKey key : oldCondition.getConditionTypeContainer().getConditionType()
+					.getTypeSpecificKeys()) {
 				Object oldValue = oldCondition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key);
 				Object newValue = newCondition.getConditionTypeContainer().getConditionTypeSpecificValues().get(key);
 				if (newValue == null) {
@@ -133,13 +149,15 @@ public class RuleDiffService {
 				}
 			}
 
-			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, false);
+			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved,
+					propertiesUpdated, false, newElement.getRelativeElementId());
 		} else if (oldElement instanceof SharedAction) {
 			SharedAction oldAction = (SharedAction) oldElement;
 			SharedAction newAction = (SharedAction) newElement;
 			final SharedElementType elementType;
 
-			if (oldAction.getActionTypeContainer().getActionType() != newAction.getActionTypeContainer().getActionType()) {
+			if (oldAction.getActionTypeContainer().getActionType() != newAction.getActionTypeContainer()
+					.getActionType()) {
 				elementType = newAction.getActionTypeContainer().getActionType();
 			} else {
 				elementType = null;
@@ -167,7 +185,8 @@ public class RuleDiffService {
 				}
 			}
 
-			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, false);
+			return new SharedRuleElementDiff(description, label, elementType, propertiesAdded, propertiesRemoved,
+					propertiesUpdated, false, newElement.getRelativeElementId());
 		}
 		return diffElement;
 	}

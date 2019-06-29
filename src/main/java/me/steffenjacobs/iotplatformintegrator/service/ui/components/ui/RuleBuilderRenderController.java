@@ -110,7 +110,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 	private SharedTrigger parseTriggerFromView(UUID source) {
 		SharedTrigger oldTrigger = (SharedTrigger) ruleElements.get(source);
 		final Map<String, Object> properties = parsePropertiesFromView(renderedRuleElements.get(source));
-		SharedTrigger trigger = new SharedTrigger(oldTrigger.getTriggerTypeContainer().getTriggerType(), properties, oldTrigger.getDescription(), oldTrigger.getLabel());
+		SharedTrigger trigger = new SharedTrigger(oldTrigger.getTriggerTypeContainer().getTriggerType(), properties, oldTrigger.getDescription(), oldTrigger.getLabel(), oldTrigger.getRelativeElementId());
 		return trigger;
 	}
 
@@ -118,14 +118,14 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		SharedCondition oldCondition = (SharedCondition) ruleElements.get(source);
 		final Map<String, Object> properties = parsePropertiesFromView(renderedRuleElements.get(source));
 		SharedCondition condition = new SharedCondition(oldCondition.getConditionTypeContainer().getConditionType(), properties, oldCondition.getDescription(),
-				oldCondition.getLabel());
+				oldCondition.getLabel(), oldCondition.getRelativeElementId());
 		return condition;
 	}
 
 	private SharedAction parseActionFromView(UUID source) {
 		SharedAction oldAction = (SharedAction) ruleElements.get(source);
 		final Map<String, Object> properties = parsePropertiesFromView(renderedRuleElements.get(source));
-		SharedAction action = new SharedAction(oldAction.getActionTypeContainer().getActionType(), properties, oldAction.getDescription(), oldAction.getLabel());
+		SharedAction action = new SharedAction(oldAction.getActionTypeContainer().getActionType(), properties, oldAction.getDescription(), oldAction.getLabel(), oldAction.getRelativeElementId());
 		return action;
 	}
 

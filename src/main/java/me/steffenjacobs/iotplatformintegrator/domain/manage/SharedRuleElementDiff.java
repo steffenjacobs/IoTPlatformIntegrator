@@ -15,13 +15,16 @@ public class SharedRuleElementDiff {
 	private final Map<String, Object> propertiesRemoved = new HashMap<>();
 	private final Map<String, Object> propertiesUpdated = new HashMap<>();
 	private final boolean negative;
+	private final int relativeElementId;
 
-	public SharedRuleElementDiff(String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
-			Map<String, Object> propertiesUpdated, boolean isNegative) {
+	public SharedRuleElementDiff(String description, String label, SharedElementType elementType,
+			Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
+			Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId) {
 		super();
 		this.description = description;
 		this.label = label;
 		this.elementType = elementType;
+		this.relativeElementId = relativeElementId;
 		this.propertiesAdded.putAll(propertiesAdded);
 		this.propertiesRemoved.putAll(propertiesRemoved);
 		this.propertiesUpdated.putAll(propertiesUpdated);
@@ -29,11 +32,12 @@ public class SharedRuleElementDiff {
 	}
 
 	/** Constructor to create an empty diff element. */
-	public SharedRuleElementDiff(boolean isNegative) {
+	public SharedRuleElementDiff(boolean isNegative , int relativeElementId) {
 		this.description = null;
 		this.label = null;
 		this.elementType = null;
 		this.negative = isNegative;
+		this.relativeElementId = relativeElementId;
 	}
 
 	public String getDescription() {
@@ -61,11 +65,16 @@ public class SharedRuleElementDiff {
 	}
 
 	public boolean isEmpty() {
-		return description == null && label == null && elementType == null && propertiesAdded.isEmpty() && propertiesRemoved.isEmpty() && propertiesUpdated.isEmpty();
+		return description == null && label == null && elementType == null && propertiesAdded.isEmpty()
+				&& propertiesRemoved.isEmpty() && propertiesUpdated.isEmpty();
 	}
 
 	public boolean isNegative() {
 		return negative;
+	}
+	
+	public int getRelativeElementId() {
+		return relativeElementId;
 	}
 
 }

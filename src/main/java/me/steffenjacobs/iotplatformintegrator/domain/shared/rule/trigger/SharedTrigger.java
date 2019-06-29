@@ -5,16 +5,19 @@ import java.util.Map;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 
 /** @author Steffen Jacobs */
-public class SharedTrigger implements SharedRuleElement{
+public class SharedTrigger implements SharedRuleElement {
 
 	private final String description;
 	private final String label;
 	private final TriggerTypeContainer triggerTypeContainer;
+	private final int relativeElementId;
 
-	public SharedTrigger(TriggerType triggerType, Map<String, Object> properties, String description, String label) {
+	public SharedTrigger(TriggerType triggerType, Map<String, Object> properties, String description, String label,
+			int relativeElementId) {
 		super();
 		this.description = description;
 		this.label = label;
+		this.relativeElementId = relativeElementId;
 
 		this.triggerTypeContainer = new TriggerTypeContainer(triggerType, properties);
 	}
@@ -29,6 +32,11 @@ public class SharedTrigger implements SharedRuleElement{
 
 	public TriggerTypeContainer getTriggerTypeContainer() {
 		return triggerTypeContainer;
+	}
+
+	@Override
+	public int getRelativeElementId() {
+		return relativeElementId;
 	}
 
 }

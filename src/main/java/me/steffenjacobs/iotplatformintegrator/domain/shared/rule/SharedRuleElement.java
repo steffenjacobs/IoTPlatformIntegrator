@@ -6,5 +6,7 @@ public interface SharedRuleElement {
 	public String getLabel();
 
 	public String getDescription();
+	
+	public int getRelativeElementId();
 
 }

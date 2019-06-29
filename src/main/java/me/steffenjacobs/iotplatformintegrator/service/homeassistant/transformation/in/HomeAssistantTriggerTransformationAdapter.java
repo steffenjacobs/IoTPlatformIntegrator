@@ -25,7 +25,7 @@ import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 public class HomeAssistantTriggerTransformationAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantTriggerTransformationAdapter.class);
 
-	public Pair<SharedTrigger, Set<SharedCondition>> parseTrigger(Object o, ItemDirectory itemDirectory) {
+	public Pair<SharedTrigger, Set<SharedCondition>> parseTrigger(Object o, ItemDirectory itemDirectory, int relativeElementId) {
 		if (!(o instanceof Map)) {
 			System.out.println(o);
 			return null;
@@ -58,7 +58,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), below);
 					String description = itemName + " below " + below;
 					String label = ConditionType.ItemState + " below condition";
-					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 					conditions.add(sc);
 				}
 				if (StringUtil.isNonNull(above)) {
@@ -69,7 +69,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), above);
 					String description = itemName + " above " + above;
 					String label = ConditionType.ItemState + " above condition";
-					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 					conditions.add(sc);
 				}
 
@@ -152,7 +152,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 		}
 		String description = "";
 		String label = "";
-		SharedTrigger st = new SharedTrigger(triggerType, properties, description, label);
+		SharedTrigger st = new SharedTrigger(triggerType, properties, description, label, relativeElementId);
 
 		return Pair.of(st, conditions);
 	}

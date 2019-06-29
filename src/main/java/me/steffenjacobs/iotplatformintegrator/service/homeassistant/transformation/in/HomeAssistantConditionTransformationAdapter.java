@@ -22,7 +22,7 @@ public class HomeAssistantConditionTransformationAdapter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantConditionTransformationAdapter.class);
 
-	public List<SharedCondition> parseCondition(Object o, ItemDirectory itemDirectory) {
+	public List<SharedCondition> parseCondition(Object o, ItemDirectory itemDirectory, int relativeElementId) {
 		if (!(o instanceof Map)) {
 			System.out.println(o);
 			return null;
@@ -48,7 +48,7 @@ public class HomeAssistantConditionTransformationAdapter {
 					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), below);
 					String description = itemName + " below " + below;
 					String label = ConditionType.ItemState + " below condition";
-					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 					conditions.add(sc);
 				}
 				if (StringUtil.isNonNull(above)) {
@@ -59,7 +59,7 @@ public class HomeAssistantConditionTransformationAdapter {
 					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), above);
 					String description = itemName + " above " + above;
 					String label = ConditionType.ItemState + " above condition";
-					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 					conditions.add(sc);
 				}
 			} else if (map.get("condition").equals("state")) {
@@ -80,13 +80,13 @@ public class HomeAssistantConditionTransformationAdapter {
 				}
 
 				String label = ConditionType.ItemState + " equal condition";
-				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+				SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 				conditions.add(sc);
 			} else if (map.get("condition").equals("sun")) {
 				String before = "" + map.get("before");
 				String after = "" + map.get("after");
 				SharedItem item = itemDirectory.getItemByName("sun.sun");
-				handleAfterBefore(map, conditions, before, after, item);
+				handleAfterBefore(map, conditions, before, after, item, relativeElementId);
 			} else if (map.get("condition").equals("zone")) {
 
 				// TODO: fix handling of zones
@@ -100,7 +100,7 @@ public class HomeAssistantConditionTransformationAdapter {
 				String label = ConditionType.ItemState + " equal condition for zone";
 				String description = String.format("%s is in zone %s", item.getLabel(), zone);
 
-				conditions.add(new SharedCondition(ConditionType.ItemState, conditionProperties, description, label));
+				conditions.add(new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId));
 			} else {
 				LOG.error("invalid condition for condition type item state.");
 			}
@@ -115,7 +115,7 @@ public class HomeAssistantConditionTransformationAdapter {
 
 			String description = String.format("Time is between %s and %s", before, after);
 			String label = ConditionType.TimeOfDay + " condition";
-			SharedCondition sc = new SharedCondition(ConditionType.TimeOfDay, conditionProperties, description, label);
+			SharedCondition sc = new SharedCondition(ConditionType.TimeOfDay, conditionProperties, description, label, relativeElementId);
 			conditions.add(sc);
 			break;
 		default:
@@ -125,7 +125,7 @@ public class HomeAssistantConditionTransformationAdapter {
 		return conditions;
 	}
 
-	private void handleAfterBefore(Map<String, Object> map, final List<SharedCondition> conditions, String before, String after, SharedItem item) {
+	private void handleAfterBefore(Map<String, Object> map, final List<SharedCondition> conditions, String before, String after, SharedItem item, int relativeElementId) {
 		if (StringUtil.isNonNull(before)) {
 			// TODO: fix label + description
 			Map<String, Object> conditionProperties = new HashMap<>();
@@ -139,7 +139,7 @@ public class HomeAssistantConditionTransformationAdapter {
 
 			String description = item.getLabel() + " before " + before;
 			String label = ConditionType.ItemState + " before condition";
-			SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+			SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 			conditions.add(sc);
 		}
 		if (StringUtil.isNonNull(after)) {
@@ -154,7 +154,7 @@ public class HomeAssistantConditionTransformationAdapter {
 			}
 			String description = item.getLabel() + " after " + after;
 			String label = ConditionType.ItemState + " after condition";
-			SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label);
+			SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 			conditions.add(sc);
 		}
 	}

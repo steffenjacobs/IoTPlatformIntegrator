@@ -76,6 +76,8 @@ public class HomeAssistantManualRuleImporter {
 				}
 				@SuppressWarnings("unchecked")
 				Map<String, Object> map = (Map<String, Object>) o;
+				
+				int triggerCount = 0, conditionCount = 0, actionCount = 0;
 				for (Entry<String, Object> e : map.entrySet()) {
 					switch (e.getKey()) {
 					case "alias":
@@ -88,35 +90,38 @@ public class HomeAssistantManualRuleImporter {
 					case "trigger":
 						if (e.getValue() instanceof List) {
 							for (Object li : (Iterable<?>) e.getValue()) {
-								handleTriggerParsingAndResultExtraction(itemDirectory, triggers, conditions, li);
+								handleTriggerParsingAndResultExtraction(itemDirectory, triggers, conditions, li, triggerCount);
 							}
 						} else {
-							handleTriggerParsingAndResultExtraction(itemDirectory, triggers, conditions, e.getValue());
+							handleTriggerParsingAndResultExtraction(itemDirectory, triggers, conditions, e.getValue(), triggerCount);
 						}
+						triggerCount++;
 						break;
 					case "condition":
 						if (e.getValue() instanceof List) {
 							for (Object li : (Iterable<?>) e.getValue()) {
-								conditions.addAll(conditionTransformer.parseCondition(li, itemDirectory));
+								conditions.addAll(conditionTransformer.parseCondition(li, itemDirectory, conditionCount));
 							}
 						} else {
-							conditions.addAll(conditionTransformer.parseCondition(e.getValue(), itemDirectory));
+							conditions.addAll(conditionTransformer.parseCondition(e.getValue(), itemDirectory, conditionCount));
 						}
+						conditionCount++;
 						break;
 					case "action":
 						if (e.getValue() instanceof List) {
 							for (Object li : (Iterable<?>) e.getValue()) {
-								SharedAction action = actionTransformer.parseAction(li, itemDirectory);
+								SharedAction action = actionTransformer.parseAction(li, itemDirectory, actionCount);
 								if (action != null) {
 									actions.add(action);
 								}
 							}
 						} else {
-							SharedAction action = actionTransformer.parseAction(e.getValue(), itemDirectory);
+							SharedAction action = actionTransformer.parseAction(e.getValue(), itemDirectory, actionCount);
 							if (action != null) {
 								actions.add(action);
 							}
 						}
+						actionCount++;
 						break;
 					}
 					System.out.println(e);
@@ -132,8 +137,8 @@ public class HomeAssistantManualRuleImporter {
 		return rules;
 	}
 
-	private void handleTriggerParsingAndResultExtraction(ItemDirectory itemDirectory, Set<SharedTrigger> triggers, Set<SharedCondition> conditions, Object e) {
-		Pair<SharedTrigger, Set<SharedCondition>> triggerWithConditions = triggerTransformer.parseTrigger(e, itemDirectory);
+	private void handleTriggerParsingAndResultExtraction(ItemDirectory itemDirectory, Set<SharedTrigger> triggers, Set<SharedCondition> conditions, Object e, int relativeElementId) {
+		Pair<SharedTrigger, Set<SharedCondition>> triggerWithConditions = triggerTransformer.parseTrigger(e, itemDirectory, relativeElementId);
 		if (triggerWithConditions != null) {
 			triggers.add(triggerWithConditions.getLeft());
 			conditions.addAll(triggerWithConditions.getRight());

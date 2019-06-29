@@ -9,11 +9,13 @@ public class SharedCondition implements SharedRuleElement{
 	private final String description;
 	private final String label;
 	private final ConditionTypeContainer conditionTypeContainer;
+	private final int relativeElementId;
 
-	public SharedCondition(ConditionType conditionType, Map<String, Object> propertiesMap, String description, String label) {
+	public SharedCondition(ConditionType conditionType, Map<String, Object> propertiesMap, String description, String label, int relativeElementId) {
 		super();
 		this.description = description;
 		this.label = label;
+		this.relativeElementId = relativeElementId;
 
 		this.conditionTypeContainer = new ConditionTypeContainer(conditionType, propertiesMap);
 	}
@@ -28,5 +30,10 @@ public class SharedCondition implements SharedRuleElement{
 
 	public ConditionTypeContainer getConditionTypeContainer() {
 		return conditionTypeContainer;
+	}
+
+	@Override
+	public int getRelativeElementId() {
+		return relativeElementId;
 	}
 }

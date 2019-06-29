@@ -18,7 +18,7 @@ public class HomeAssistantActionTransformationAdapter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantActionTransformationAdapter.class);
 
-	public SharedAction parseAction(Object o, ItemDirectory itemDirectory) {
+	public SharedAction parseAction(Object o, ItemDirectory itemDirectory, int relativeElementId) {
 		if (!(o instanceof Map)) {
 			System.out.println(o);
 			return null;
@@ -40,7 +40,7 @@ public class HomeAssistantActionTransformationAdapter {
 			Map<String, Object> properties = new HashMap<>();
 			properties.put(ActionTypeSpecificKey.ItemName.getKeyString(), item);
 			properties.put(ActionTypeSpecificKey.Command.getKeyString(), cmd);
-			return new SharedAction(ActionType.ItemCommand, properties, description, label);
+			return new SharedAction(ActionType.ItemCommand, properties, description, label, relativeElementId);
 		} else {
 			// TODO: implement
 			LOG.error("Not implemented yet.");
