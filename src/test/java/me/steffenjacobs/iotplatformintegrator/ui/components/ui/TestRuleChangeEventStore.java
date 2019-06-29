@@ -49,8 +49,8 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals(2, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().size());
 		Assert.assertEquals(Command.On, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
 				.get(TriggerTypeSpecificKey.Command));
-		Assert.assertEquals(new SharedItem("TestSwitch", "TestLabel", ItemType.Switch), newTrigger
-				.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
+		Assert.assertEquals(createTestItem("TestSwitch"), newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
+				.get(TriggerTypeSpecificKey.ItemName));
 	}
 
 	@Test
@@ -82,8 +82,52 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals(2, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().size());
 		Assert.assertEquals(Command.Off, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
 				.get(TriggerTypeSpecificKey.Command));
-		Assert.assertEquals(new SharedItem("TestSwitch", "TestLabel", ItemType.Switch), newTrigger
-				.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
+		Assert.assertEquals(createTestItem("TestSwitch"), newTrigger.getTriggerTypeContainer()
+				.getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
+	}
+
+	private SharedItem createTestItem(String name) {
+		return new SharedItem(name, "TestLabel", ItemType.Switch);
+	}
+
+	@Test
+	public void testDiffApplicationForTriggerWithAddedRemovedAndChangedProperty() {
+		SharedRule rule = createSharedRule();
+
+		Map<String, Object> propertiesCreated = new HashMap<>();
+		propertiesCreated.put(TriggerTypeSpecificKey.State.getKeyString(), Command.Off);
+
+		Map<String, Object> propertiesRemoved = new HashMap<>();
+		propertiesRemoved.put(TriggerTypeSpecificKey.Command.getKeyString(), null);
+
+		Map<String, Object> propertiesUpdated = new HashMap<>();
+		propertiesUpdated.put(TriggerTypeSpecificKey.ItemName.getKeyString(), createTestItem("TestSwitch2"));
+
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.ItemStateUpdated,
+				propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1);
+		RuleChangeEventStore store = new RuleChangeEventStore();
+
+		store.applyDiff(rule, diff);
+
+		Assert.assertEquals("Test Description", rule.getDescription());
+		Assert.assertEquals("TestRule", rule.getName());
+		Assert.assertEquals("TestRule.id", rule.getId());
+		Assert.assertEquals("false", rule.getVisible());
+		Assert.assertEquals("ACTIVE", rule.getStatus());
+
+		Assert.assertTrue(rule.getActions().isEmpty());
+		Assert.assertTrue(rule.getConditions().isEmpty());
+		Assert.assertEquals(1, rule.getTriggers().size());
+		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
+		Assert.assertEquals("ItemStateChangedDescription", newTrigger.getDescription());
+		Assert.assertEquals("ItemStateChangedLabel", newTrigger.getLabel());
+		Assert.assertEquals(1, newTrigger.getRelativeElementId());
+		Assert.assertEquals(TriggerType.ItemStateUpdated, newTrigger.getTriggerTypeContainer().getTriggerType());
+		Assert.assertEquals(2, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().size());
+		Assert.assertEquals(Command.Off, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
+				.get(TriggerTypeSpecificKey.State));
+		Assert.assertEquals(createTestItem("TestSwitch2"), newTrigger.getTriggerTypeContainer()
+				.getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
 	}
 
 	private SharedRule createSharedRule() {
@@ -93,8 +137,7 @@ public class TestRuleChangeEventStore {
 
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(TriggerTypeSpecificKey.Command.getKeyString(), Command.On);
-		properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(),
-				new SharedItem("TestSwitch", "TestLabel", ItemType.Switch));
+		properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), createTestItem("TestSwitch"));
 
 		SharedTrigger triggerToTest = new SharedTrigger(TriggerType.CommandReceived, properties,
 				"ItemStateChangedDescription", "ItemStateChangedLabel", 1);
