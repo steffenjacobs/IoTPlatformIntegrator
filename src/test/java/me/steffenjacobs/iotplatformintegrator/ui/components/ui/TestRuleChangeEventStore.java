@@ -14,6 +14,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
@@ -41,7 +43,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("false", rule.getVisible());
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
-		Assert.assertTrue(rule.getActions().isEmpty());
+		Assert.assertEquals(1, rule.getActions().size());
 		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
@@ -74,7 +76,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("false", rule.getVisible());
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
-		Assert.assertTrue(rule.getActions().isEmpty());
+		Assert.assertEquals(1, rule.getActions().size());
 		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
@@ -118,7 +120,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("false", rule.getVisible());
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
-		Assert.assertTrue(rule.getActions().isEmpty());
+		Assert.assertEquals(1, rule.getActions().size());
 		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
@@ -159,7 +161,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("false", rule.getVisible());
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
-		Assert.assertTrue(rule.getActions().isEmpty());
+		Assert.assertEquals(1, rule.getActions().size());
 		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedCondition newCondition = rule.getConditions().iterator().next();
@@ -188,6 +190,10 @@ public class TestRuleChangeEventStore {
 		properties2.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.EQUAL);
 		properties2.put(ConditionTypeSpecificKey.State.getKeyString(), Command.Off);
 
+		Map<String, Object> properties3 = new HashMap<>();
+		properties3.put(ActionTypeSpecificKey.ItemName.getKeyString(), createTestItem("TestSwitch"));
+		properties2.put(ActionTypeSpecificKey.Command.getKeyString(), Command.Off);
+
 		SharedCondition conditionToTest = new SharedCondition(ConditionType.ItemState, properties2,
 				"ConditionItemStateDescription", "ConditionItemStateLabel", 1337);
 		conditions.add(conditionToTest);
@@ -195,6 +201,10 @@ public class TestRuleChangeEventStore {
 		SharedTrigger triggerToTest = new SharedTrigger(TriggerType.CommandReceived, properties,
 				"ItemStateChangedDescription", "ItemStateChangedLabel", 1);
 		triggers.add(triggerToTest);
+
+		SharedAction actionToTest = new SharedAction(ActionType.ItemCommand, properties3,
+				"ItemCommandActionDescription", "ItemCommandActionabel", 1);
+		actions.add(actionToTest);
 
 		SharedRule rule = new SharedRule("TestRule", "TestRule.id", "Test Description", "false", "ACTIVE", triggers,
 				conditions, actions);
