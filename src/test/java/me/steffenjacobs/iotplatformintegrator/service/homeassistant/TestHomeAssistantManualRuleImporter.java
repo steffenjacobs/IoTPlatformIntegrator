@@ -18,19 +18,19 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 /** @author Steffen Jacobs */
 public class TestHomeAssistantManualRuleImporter {
-
+	
 	@Test
 	public void testImportRules() throws ClientProtocolException, IOException {
-		HomeAssistantManualRuleImporter importer = new HomeAssistantManualRuleImporter();
+		SettingService settingService = new SettingService("./settings.config");
+		HomeAssistantManualRuleImporter importer = new HomeAssistantManualRuleImporter(settingService);
 		ItemDirectory itemDirectory = new ItemDirectory();
 		HomeAssistantApiService homeAssistantApiService = new HomeAssistantApiService();
 		HomeAssistantItemTransformationService haItemTransformationService = new HomeAssistantItemTransformationService();
-		SettingService settingService = new SettingService("./settings.config");
 
 		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService.transformItemsAndRules(
 				homeAssistantApiService.getAllState(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 		itemDirectory.addItems(itemsAndRules.getLeft());
-		List<SharedRule> rules = importer.importRules(new File("L:\\Dropbox\\Masterarbeit\\test.yaml"), itemDirectory);
+		List<SharedRule> rules = importer.importRules(new File(settingService.getSetting(SettingKey.HOMEASSISTANT_FILE_URI)), itemDirectory);
 		System.out.println(rules);
 	}
 }

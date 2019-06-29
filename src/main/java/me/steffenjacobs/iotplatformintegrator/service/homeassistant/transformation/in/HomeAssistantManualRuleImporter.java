@@ -23,6 +23,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAc
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantManualRuleImporter {
@@ -31,11 +33,21 @@ public class HomeAssistantManualRuleImporter {
 	private static final HomeAssistantTriggerTransformationAdapter triggerTransformer = new HomeAssistantTriggerTransformationAdapter();
 	private static final HomeAssistantConditionTransformationAdapter conditionTransformer = new HomeAssistantConditionTransformationAdapter();
 	private static final HomeAssistantActionTransformationAdapter actionTransformer = new HomeAssistantActionTransformationAdapter();
+	private final SettingService settingService;
 
+	public HomeAssistantManualRuleImporter(SettingService settingService) {
+		this.settingService = settingService;
+		
+	}
 	public List<SharedRule> importRules(ItemDirectory itemDirectory) {
 		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Empty rules detected. Do you want to import data for the missing rules?", "Warning",
 				JOptionPane.YES_NO_OPTION)) {
 
+		}
+		
+		File loadedFile = new File(settingService.getSetting(SettingKey.HOMEASSISTANT_FILE_URI));
+		if(loadedFile.exists()) {
+			return importRules(loadedFile, itemDirectory);			
 		}
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -47,6 +59,7 @@ public class HomeAssistantManualRuleImporter {
 						"Could not load HomeAssistant configuration from file.", JOptionPane.ERROR_MESSAGE);
 				return new ArrayList<SharedRule>();
 			}
+			settingService.setSetting(SettingKey.HOMEASSISTANT_FILE_URI, selectedFile.getAbsolutePath());
 			return importRules(selectedFile, itemDirectory);
 		}
 		return new ArrayList<SharedRule>();
