@@ -126,7 +126,7 @@ public class RuleChangeEventStore {
 			map.put(entr.getKey(), entr.getValue());
 		}
 		for (Entry<String, Object> entr : toUpdate.entrySet()) {
-			map.remove(entr.getKey());
+			map.put(entr.getKey(), entr.getValue());
 		}
 	}
 
