@@ -64,8 +64,8 @@ public class RuleChangeEventStore {
 			final Map<String, Object> properties = generalize(triggerTypeSpecificValues);
 			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated());
 
-			SharedTrigger newTrigger = new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties,
-					description, label, trigger.getRelativeElementId());
+			SharedTrigger newTrigger = new SharedTrigger((TriggerType) diff.getElementType(), properties, description,
+					label, trigger.getRelativeElementId());
 			rule.getTriggers().add(newTrigger);
 
 		} else if (diff.getElementType() instanceof ConditionType) {
@@ -83,8 +83,8 @@ public class RuleChangeEventStore {
 			final Map<String, Object> properties = generalize(conditionTypeSpecificValues);
 			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated());
 
-			SharedCondition newCondition = new SharedCondition(condition.getConditionTypeContainer().getConditionType(),
-					properties, description, label, condition.getRelativeElementId());
+			SharedCondition newCondition = new SharedCondition((ConditionType) diff.getElementType(), properties,
+					description, label, condition.getRelativeElementId());
 			rule.getConditions().add(newCondition);
 		} else if (diff.getElementType() instanceof ActionType) {
 			SharedAction action = getActionByRelativeId(rule, diff.getRelativeElementId());
@@ -100,8 +100,8 @@ public class RuleChangeEventStore {
 			final Map<String, Object> properties = generalize(actionTypeSpecificValues);
 			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated());
 
-			SharedAction newAction = new SharedAction(action.getActionTypeContainer().getActionType(), properties,
-					description, label, action.getRelativeElementId());
+			SharedAction newAction = new SharedAction((ActionType) diff.getElementType(), properties, description,
+					label, action.getRelativeElementId());
 			rule.getActions().add(newAction);
 		} else {
 			LOG.error("invalid element type {}", diff.getElementType().getClass().getName());
