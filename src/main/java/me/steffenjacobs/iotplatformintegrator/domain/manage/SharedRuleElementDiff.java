@@ -25,9 +25,15 @@ public class SharedRuleElementDiff {
 		this.label = label;
 		this.elementType = elementType;
 		this.relativeElementId = relativeElementId;
-		this.propertiesAdded.putAll(propertiesAdded);
-		this.propertiesRemoved.putAll(propertiesRemoved);
-		this.propertiesUpdated.putAll(propertiesUpdated);
+		if (propertiesAdded != null) {
+			this.propertiesAdded.putAll(propertiesAdded);
+		}
+		if (propertiesRemoved != null) {
+			this.propertiesRemoved.putAll(propertiesRemoved);
+		}
+		if (propertiesUpdated != null) {
+			this.propertiesUpdated.putAll(propertiesUpdated);
+		}
 		this.negative = isNegative;
 	}
 
