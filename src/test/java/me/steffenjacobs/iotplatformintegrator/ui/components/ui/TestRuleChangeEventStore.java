@@ -12,8 +12,11 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDif
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
@@ -39,7 +42,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
 		Assert.assertTrue(rule.getActions().isEmpty());
-		Assert.assertTrue(rule.getConditions().isEmpty());
+		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
 		Assert.assertEquals("NewItemStateChangedDescription", newTrigger.getDescription());
@@ -49,8 +52,8 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals(2, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().size());
 		Assert.assertEquals(Command.On, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
 				.get(TriggerTypeSpecificKey.Command));
-		Assert.assertEquals(createTestItem("TestSwitch"), newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
-				.get(TriggerTypeSpecificKey.ItemName));
+		Assert.assertEquals(createTestItem("TestSwitch"), newTrigger.getTriggerTypeContainer()
+				.getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
 	}
 
 	@Test
@@ -72,7 +75,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
 		Assert.assertTrue(rule.getActions().isEmpty());
-		Assert.assertTrue(rule.getConditions().isEmpty());
+		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
 		Assert.assertEquals("ItemStateChangedDescription", newTrigger.getDescription());
@@ -116,7 +119,7 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals("ACTIVE", rule.getStatus());
 
 		Assert.assertTrue(rule.getActions().isEmpty());
-		Assert.assertTrue(rule.getConditions().isEmpty());
+		Assert.assertEquals(1, rule.getConditions().size());
 		Assert.assertEquals(1, rule.getTriggers().size());
 		SharedTrigger newTrigger = rule.getTriggers().iterator().next();
 		Assert.assertEquals("ItemStateChangedDescription", newTrigger.getDescription());
@@ -124,10 +127,51 @@ public class TestRuleChangeEventStore {
 		Assert.assertEquals(1, newTrigger.getRelativeElementId());
 		Assert.assertEquals(TriggerType.ItemStateUpdated, newTrigger.getTriggerTypeContainer().getTriggerType());
 		Assert.assertEquals(2, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().size());
-		Assert.assertEquals(Command.Off, newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues()
-				.get(TriggerTypeSpecificKey.State));
+		Assert.assertEquals(Command.Off,
+				newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.State));
 		Assert.assertEquals(createTestItem("TestSwitch2"), newTrigger.getTriggerTypeContainer()
 				.getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName));
+	}
+
+	@Test
+	public void testDiffApplicationForConditionWithAddedRemovedAndChangedProperty() {
+		SharedRule rule = createSharedRule();
+
+		Map<String, Object> propertiesCreated = new HashMap<>();
+		propertiesCreated.put(ConditionTypeSpecificKey.StartTime.getKeyString(), "12:34:56");
+		propertiesCreated.put(ConditionTypeSpecificKey.EndTime.getKeyString(), "13:34:56");
+
+		Map<String, Object> propertiesRemoved = new HashMap<>();
+		propertiesCreated.put(ConditionTypeSpecificKey.Operator.getKeyString(), null);
+		propertiesCreated.put(ConditionTypeSpecificKey.ItemName.getKeyString(), null);
+
+		Map<String, Object> propertiesUpdated = new HashMap<>();
+
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ConditionType.TimeOfDay, propertiesCreated,
+				propertiesRemoved, propertiesUpdated, false, 1337);
+		RuleChangeEventStore store = new RuleChangeEventStore();
+
+		store.applyDiff(rule, diff);
+
+		Assert.assertEquals("Test Description", rule.getDescription());
+		Assert.assertEquals("TestRule", rule.getName());
+		Assert.assertEquals("TestRule.id", rule.getId());
+		Assert.assertEquals("false", rule.getVisible());
+		Assert.assertEquals("ACTIVE", rule.getStatus());
+
+		Assert.assertTrue(rule.getActions().isEmpty());
+		Assert.assertEquals(1, rule.getConditions().size());
+		Assert.assertEquals(1, rule.getTriggers().size());
+		SharedCondition newCondition = rule.getConditions().iterator().next();
+		Assert.assertEquals("ConditionItemStateDescription", newCondition.getDescription());
+		Assert.assertEquals("ConditionItemStateLabel", newCondition.getLabel());
+		Assert.assertEquals(1337, newCondition.getRelativeElementId());
+		Assert.assertEquals(ConditionType.TimeOfDay, newCondition.getConditionTypeContainer().getConditionType());
+		Assert.assertEquals(2, newCondition.getConditionTypeContainer().getConditionTypeSpecificValues().size());
+		Assert.assertEquals("12:34:56", newCondition.getConditionTypeContainer().getConditionTypeSpecificValues()
+				.get(ConditionTypeSpecificKey.StartTime));
+		Assert.assertEquals("13:34:56", newCondition.getConditionTypeContainer().getConditionTypeSpecificValues()
+				.get(ConditionTypeSpecificKey.EndTime));
 	}
 
 	private SharedRule createSharedRule() {
@@ -138,6 +182,15 @@ public class TestRuleChangeEventStore {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(TriggerTypeSpecificKey.Command.getKeyString(), Command.On);
 		properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), createTestItem("TestSwitch"));
+
+		Map<String, Object> properties2 = new HashMap<>();
+		properties2.put(ConditionTypeSpecificKey.ItemName.getKeyString(), createTestItem("TestSwitch"));
+		properties2.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.EQUAL);
+		properties2.put(ConditionTypeSpecificKey.State.getKeyString(), Command.Off);
+
+		SharedCondition conditionToTest = new SharedCondition(ConditionType.ItemState, properties2,
+				"ConditionItemStateDescription", "ConditionItemStateLabel", 1337);
+		conditions.add(conditionToTest);
 
 		SharedTrigger triggerToTest = new SharedTrigger(TriggerType.CommandReceived, properties,
 				"ItemStateChangedDescription", "ItemStateChangedLabel", 1);
