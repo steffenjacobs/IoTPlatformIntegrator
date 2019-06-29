@@ -13,11 +13,14 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDif
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
@@ -46,7 +49,7 @@ public class RuleChangeEventStore {
 	}
 
 	public void applyDiff(SharedRule rule, SharedRuleElementDiff diff) {
-		if (diff.getElementType() instanceof SharedTrigger) {
+		if (diff.getElementType() instanceof TriggerType) {
 			SharedTrigger trigger = getTriggerByRelativeId(rule, diff.getRelativeElementId());
 			rule.getTriggers().remove(trigger);
 			if (diff.isNegative()) {
@@ -65,7 +68,7 @@ public class RuleChangeEventStore {
 					description, label, trigger.getRelativeElementId());
 			rule.getTriggers().add(newTrigger);
 
-		} else if (diff.getElementType() instanceof SharedCondition) {
+		} else if (diff.getElementType() instanceof ConditionType) {
 			SharedCondition condition = getConditionByRelativeId(rule, diff.getRelativeElementId());
 			rule.getConditions().remove(condition);
 			if (diff.isNegative()) {
@@ -83,7 +86,7 @@ public class RuleChangeEventStore {
 			SharedCondition newCondition = new SharedCondition(condition.getConditionTypeContainer().getConditionType(),
 					properties, description, label, condition.getRelativeElementId());
 			rule.getConditions().add(newCondition);
-		} else if (diff.getElementType() instanceof SharedAction) {
+		} else if (diff.getElementType() instanceof ActionType) {
 			SharedAction action = getActionByRelativeId(rule, diff.getRelativeElementId());
 			rule.getActions().remove(action);
 			if (diff.isNegative()) {
