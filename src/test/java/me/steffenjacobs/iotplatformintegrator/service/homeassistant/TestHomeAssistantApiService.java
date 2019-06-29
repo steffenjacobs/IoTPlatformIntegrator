@@ -38,7 +38,6 @@ public class TestHomeAssistantApiService {
 	public void testGetVersionInfo() throws JsonParseException, JsonMappingException, UnsupportedOperationException, IOException {
 		HomeAssistantApiService service = new HomeAssistantApiService();
 		ApiStatusMessage versionInfo = service.getVersionInfo(settingService.getSetting(SettingKey.HOMEASSISTANT_URI));
-		Assert.assertEquals(settingService.getSetting(SettingKey.HOMEASSISTANT_URI), versionInfo.getBaseUrl());
 		Assert.assertEquals("Home", versionInfo.getLocationName());
 		Assert.assertTrue(versionInfo.getRequiresApiPassword());
 	}
