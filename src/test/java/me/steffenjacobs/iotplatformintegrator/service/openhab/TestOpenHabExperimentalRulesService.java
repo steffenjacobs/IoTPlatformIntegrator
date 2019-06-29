@@ -26,7 +26,7 @@ public class TestOpenHabExperimentalRulesService {
 
 		// get all rules -> should be zero
 		List<ExperimentalRule> list = new OpenHabExperimentalRulesService().requestAllRules(OH_URL_WITH_PORT);
-		Assert.assertEquals(0, list.size());
+		final int initialRuleCount = list.size();
 
 		ExperimentalRule rule = createTestRule();
 
@@ -35,16 +35,18 @@ public class TestOpenHabExperimentalRulesService {
 		Assert.assertTrue(create);
 
 		// retrieve created rule
-		ExperimentalRule ruleRetrieved = new OpenHabExperimentalRulesService().requestRuleByUid(OH_URL_WITH_PORT, rule.getUid());
+		ExperimentalRule ruleRetrieved = new OpenHabExperimentalRulesService().requestRuleByUid(OH_URL_WITH_PORT,
+				rule.getUid());
 		Assert.assertNotNull(ruleRetrieved);
 		Assert.assertEquals(rule.getName(), ruleRetrieved.getName());
 
 		// retrieve all rules again -> should be one
 		list = new OpenHabExperimentalRulesService().requestAllRules(OH_URL_WITH_PORT);
-		Assert.assertEquals(1, list.size());
+		Assert.assertEquals(initialRuleCount + 1, list.size());
 
 		// get actions
-		List<Action> actions = new OpenHabExperimentalRulesService().getActionsFromRuleById(OH_URL_WITH_PORT, rule.getUid());
+		List<Action> actions = new OpenHabExperimentalRulesService().getActionsFromRuleById(OH_URL_WITH_PORT,
+				rule.getUid());
 		Assert.assertEquals(1, actions.size());
 		Action action = actions.get(0);
 		Assert.assertEquals("2", action.getId());
@@ -52,16 +54,19 @@ public class TestOpenHabExperimentalRulesService {
 		Assert.assertEquals("Sends a command to a specified item.", action.getDescription());
 
 		// get conditions
-		List<Condition> conditions = new OpenHabExperimentalRulesService().getConditionsFromRuleById(OH_URL_WITH_PORT, rule.getUid());
+		List<Condition> conditions = new OpenHabExperimentalRulesService().getConditionsFromRuleById(OH_URL_WITH_PORT,
+				rule.getUid());
 		Assert.assertEquals(0, conditions.size());
 
 		// get config
-		Configuration config = new OpenHabExperimentalRulesService().getConfigFromRuleById(OH_URL_WITH_PORT, rule.getUid());
+		Configuration config = new OpenHabExperimentalRulesService().getConfigFromRuleById(OH_URL_WITH_PORT,
+				rule.getUid());
 		Assert.assertNotNull(config);
 		Assert.assertEquals("testvalue", config.getAdditionalProperties().get("test"));
 
 		// get triggers
-		List<Trigger> triggers = new OpenHabExperimentalRulesService().getTriggersFromRuleById(OH_URL_WITH_PORT, rule.getUid());
+		List<Trigger> triggers = new OpenHabExperimentalRulesService().getTriggersFromRuleById(OH_URL_WITH_PORT,
+				rule.getUid());
 		Assert.assertEquals(1, actions.size());
 		Trigger t = triggers.get(0);
 		Assert.assertEquals("1", t.getId());
@@ -73,13 +78,15 @@ public class TestOpenHabExperimentalRulesService {
 		Assert.assertTrue(run);
 
 		// enable rule
-		boolean enable = new OpenHabExperimentalRulesService().enableRuleById(OH_URL_WITH_PORT, rule.getUid(), "enable");
+		boolean enable = new OpenHabExperimentalRulesService().enableRuleById(OH_URL_WITH_PORT, rule.getUid(),
+				"enable");
 		Assert.assertTrue(enable);
 
 		// update configuration
 		Configuration configNew = new Configuration();
 		configNew.getAdditionalProperties().put("test2", "testvalue2");
-		boolean updateConfig = new OpenHabExperimentalRulesService().updateConfigurationOfRuleById(OH_URL_WITH_PORT, rule.getUid(), configNew);
+		boolean updateConfig = new OpenHabExperimentalRulesService().updateConfigurationOfRuleById(OH_URL_WITH_PORT,
+				rule.getUid(), configNew);
 		Assert.assertTrue(updateConfig);
 
 		// check updated config
@@ -91,10 +98,12 @@ public class TestOpenHabExperimentalRulesService {
 		ExperimentalRule rule2 = createTestRule();
 		rule2.setName("TestRule");
 
-		boolean update = new OpenHabExperimentalRulesService().updateRuleById(OH_URL_WITH_PORT, rule2, "9c2f6e40-4b21-490d-bb55-9d6f1e97d106");
+		boolean update = new OpenHabExperimentalRulesService().updateRuleById(OH_URL_WITH_PORT, rule2,
+				"9c2f6e40-4b21-490d-bb55-9d6f1e97d106");
 		Assert.assertTrue(update);
 
-		ExperimentalRule ruleRetrieved2 = new OpenHabExperimentalRulesService().requestRuleByUid(OH_URL_WITH_PORT, rule.getUid());
+		ExperimentalRule ruleRetrieved2 = new OpenHabExperimentalRulesService().requestRuleByUid(OH_URL_WITH_PORT,
+				rule.getUid());
 		Assert.assertNotNull(ruleRetrieved2);
 		Assert.assertEquals(rule2.getName(), ruleRetrieved2.getName());
 
@@ -104,7 +113,7 @@ public class TestOpenHabExperimentalRulesService {
 
 		// retrieve all rules again -> should be zero again
 		list = new OpenHabExperimentalRulesService().requestAllRules(OH_URL_WITH_PORT);
-		Assert.assertEquals(0, list.size());
+		Assert.assertEquals(initialRuleCount, list.size());
 	}
 
 	private ExperimentalRule createTestRule() {
