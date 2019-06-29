@@ -32,7 +32,7 @@ public class SharedRuleElementDiff {
 	}
 
 	/** Constructor to create an empty diff element. */
-	public SharedRuleElementDiff(boolean isNegative , int relativeElementId) {
+	public SharedRuleElementDiff(boolean isNegative, int relativeElementId) {
 		this.description = null;
 		this.label = null;
 		this.elementType = null;
@@ -69,10 +69,14 @@ public class SharedRuleElementDiff {
 				&& propertiesRemoved.isEmpty() && propertiesUpdated.isEmpty();
 	}
 
+	/**
+	 * @return true: if rule element should be deleted<br/>
+	 *         false: else
+	 */
 	public boolean isNegative() {
 		return negative;
 	}
-	
+
 	public int getRelativeElementId() {
 		return relativeElementId;
 	}
