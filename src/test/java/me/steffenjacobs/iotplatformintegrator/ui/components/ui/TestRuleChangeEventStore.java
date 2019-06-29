@@ -144,8 +144,8 @@ public class TestRuleChangeEventStore {
 		propertiesCreated.put(ConditionTypeSpecificKey.EndTime.getKeyString(), "13:34:56");
 
 		Map<String, Object> propertiesRemoved = new HashMap<>();
-		propertiesCreated.put(ConditionTypeSpecificKey.Operator.getKeyString(), null);
-		propertiesCreated.put(ConditionTypeSpecificKey.ItemName.getKeyString(), null);
+		propertiesRemoved.put(ConditionTypeSpecificKey.Operator.getKeyString(), null);
+		propertiesRemoved.put(ConditionTypeSpecificKey.ItemName.getKeyString(), null);
 
 		Map<String, Object> propertiesUpdated = new HashMap<>();
 
@@ -176,6 +176,47 @@ public class TestRuleChangeEventStore {
 				.get(ConditionTypeSpecificKey.EndTime));
 	}
 
+	@Test
+	public void testDiffApplicationForActionWithAddedRemovedAndChangedProperty() {
+		SharedRule rule = createSharedRule();
+
+		Map<String, Object> propertiesCreated = new HashMap<>();
+		propertiesCreated.put(ActionTypeSpecificKey.Text.getKeyString(), "Hello World");
+		propertiesCreated.put(ActionTypeSpecificKey.Sink.getKeyString(), "javasound");
+
+		Map<String, Object> propertiesRemoved = new HashMap<>();
+		propertiesRemoved.put(ActionTypeSpecificKey.ItemName.getKeyString(), null);
+		propertiesRemoved.put(ActionTypeSpecificKey.Command.getKeyString(), null);
+
+		Map<String, Object> propertiesUpdated = new HashMap<>();
+
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ActionType.SaySomething, propertiesCreated,
+				propertiesRemoved, propertiesUpdated, false, 1);
+		RuleChangeEventStore store = new RuleChangeEventStore();
+
+		store.applyDiff(rule, diff);
+
+		Assert.assertEquals("Test Description", rule.getDescription());
+		Assert.assertEquals("TestRule", rule.getName());
+		Assert.assertEquals("TestRule.id", rule.getId());
+		Assert.assertEquals("false", rule.getVisible());
+		Assert.assertEquals("ACTIVE", rule.getStatus());
+
+		Assert.assertEquals(1, rule.getActions().size());
+		Assert.assertEquals(1, rule.getConditions().size());
+		Assert.assertEquals(1, rule.getTriggers().size());
+		SharedAction newAction = rule.getActions().iterator().next();
+		Assert.assertEquals("ItemCommandActionDescription", newAction.getDescription());
+		Assert.assertEquals("ItemCommandActionLabel", newAction.getLabel());
+		Assert.assertEquals(1, newAction.getRelativeElementId());
+		Assert.assertEquals(ActionType.SaySomething, newAction.getActionTypeContainer().getActionType());
+		Assert.assertEquals(2, newAction.getActionTypeContainer().getActionTypeSpecificValues().size());
+		Assert.assertEquals("Hello World",
+				newAction.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Text));
+		Assert.assertEquals("javasound",
+				newAction.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.Sink));
+	}
+
 	private SharedRule createSharedRule() {
 		Set<SharedTrigger> triggers = new HashSet<>();
 		Set<SharedCondition> conditions = new HashSet<>();
@@ -203,7 +244,7 @@ public class TestRuleChangeEventStore {
 		triggers.add(triggerToTest);
 
 		SharedAction actionToTest = new SharedAction(ActionType.ItemCommand, properties3,
-				"ItemCommandActionDescription", "ItemCommandActionabel", 1);
+				"ItemCommandActionDescription", "ItemCommandActionLabel", 1);
 		actions.add(actionToTest);
 
 		SharedRule rule = new SharedRule("TestRule", "TestRule.id", "Test Description", "false", "ACTIVE", triggers,
