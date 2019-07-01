@@ -25,7 +25,7 @@ public class MongoDbRuleDiffStorageService {
 	}
 
 	public void store(SharedRuleElementDiff diff, SharedRule associatedRule) {
-		storageService.insert(documentTransformer.toDocument(diffTransformer.toJSON(diff, associatedRule.getName())));
+		storageService.insertDiff(documentTransformer.toDocument(diffTransformer.toJSON(diff, associatedRule.getName())));
 	}
 
 	public void findForRule(SharedRule rule, SimplifiedSubscriber<SharedRuleElementDiff> subscriber) {

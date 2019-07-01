@@ -90,12 +90,16 @@ public class MongoDbStorageService {
 		getRuleCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
 	}
 
-	public void insert(Document document) {
-		// Document doc = new Document("name", "MongoDB").append("type",
-		// "database").append("count", 1).append("info", new Document("x",
-		// 203).append("y", 102));
+	public void insertRule(Document document) {
+		insert(getRuleCollection(), document);
+	}
 
-		Publisher<Success> publisher = getDiffCollection().insertOne(document);
+	public void insertDiff(Document document) {
+		insert(getDiffCollection(), document);
+	}
+
+	private void insert(MongoCollection<Document> collection, Document document) {
+		Publisher<Success> publisher = collection.insertOne(document);
 		publisher.subscribe(new Subscriber<Success>() {
 			@Override
 			public void onSubscribe(final Subscription s) {

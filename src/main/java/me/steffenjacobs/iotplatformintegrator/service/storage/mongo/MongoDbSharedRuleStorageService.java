@@ -19,10 +19,14 @@ public class MongoDbSharedRuleStorageService {
 	}
 
 	public void store(SharedRule rule) {
-		storageService.insert(documentTransformer.toDocument(jsonTransformer.toJson(rule)));
+		storageService.insertDiff(documentTransformer.toDocument(jsonTransformer.toJson(rule)));
 	}
 
 	public void getRules(Subscriber<SharedRule> subscriber) {
 		storageService.getAllRules(subscriber, d -> jsonTransformer.fromJson(documentTransformer.toJSON(d)));
+	}
+
+	public void insertRule(SharedRule rule) {
+		storageService.insertRule(documentTransformer.toDocument(jsonTransformer.toJson(rule)));
 	}
 }
