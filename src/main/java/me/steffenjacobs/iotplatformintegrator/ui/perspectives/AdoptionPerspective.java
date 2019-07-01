@@ -65,6 +65,10 @@ public class AdoptionPerspective extends Perspective {
 		SingleCDockable sourceItemWindow = DockableUtil.createDockable("SourceItemTable-Window", "Source Items", GlobalComponentHolder.getInstance().getItemSourceTable());
 		control.addDockable(sourceItemWindow);
 
+		// create remote rules window
+		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", GlobalComponentHolder.getInstance().getRemoteRulesPanel());
+		control.addDockable(remoteRulesWindow);
+
 		// create target item table window
 		SingleCDockable targetItemWindow = DockableUtil.createDockable("TargetItemTable-Window", "Target Items", GlobalComponentHolder.getInstance().getItemTargetTable());
 		control.addDockable(targetItemWindow);
@@ -83,7 +87,8 @@ public class AdoptionPerspective extends Perspective {
 
 		grid.add(.15, 0, .65, .7, ruleBuilderWindow);
 
-		grid.add(.8, 0, .2, .5, sourceItemWindow);
+		grid.add(.8, 0, .2, .25, sourceItemWindow);
+		grid.add(.8, .25, .2, .25, remoteRulesWindow);
 		grid.add(.8, .5, .2, .5, targetItemWindow);
 
 		control.getContentArea().deploy(grid);
