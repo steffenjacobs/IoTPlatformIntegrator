@@ -2,9 +2,6 @@ package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import java.util.concurrent.CompletableFuture;
 
-import javax.security.auth.callback.Callback;
-
-import org.bson.BSON;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
