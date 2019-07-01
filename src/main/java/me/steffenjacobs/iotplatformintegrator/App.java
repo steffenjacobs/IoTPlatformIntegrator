@@ -13,13 +13,26 @@ public class App {
 
 	private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
+	private static MongoDbRuleDiffStorageService mongoDbRuleDiffStorageService;
+	private static MongoDbSharedRuleStorageService mongoDbSharedRuleStorageService;
+
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		new UiEntrypoint().createAndShowGUIAsync();
 		new RuleChangeEventStore();
 
 		final MongoDbStorageService storageService = new MongoDbStorageService();
-		new MongoDbRuleDiffStorageService(storageService);
-		new MongoDbSharedRuleStorageService(storageService);
+		mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
+		mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
+		LOG.info("Setup complete.");
 	}
+
+	public static MongoDbRuleDiffStorageService getMongoDbRuleDiffStorageService() {
+		return mongoDbRuleDiffStorageService;
+	}
+
+	public static MongoDbSharedRuleStorageService getMongoDbSharedRuleStorageService() {
+		return mongoDbSharedRuleStorageService;
+	}
+
 }
