@@ -41,4 +41,9 @@ public enum ConditionType implements SharedElementType {
 			return keyString;
 		}
 	}
+
+	@Override
+	public String getType() {
+		return CONDITION_TYPE;
+	}
 }

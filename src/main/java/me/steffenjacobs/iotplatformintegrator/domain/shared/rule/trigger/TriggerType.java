@@ -44,4 +44,9 @@ public enum TriggerType implements SharedElementType {
 			return keyString;
 		}
 	}
+
+	@Override
+	public String getType() {
+		return TRIGGER_TYPE;
+	}
 }

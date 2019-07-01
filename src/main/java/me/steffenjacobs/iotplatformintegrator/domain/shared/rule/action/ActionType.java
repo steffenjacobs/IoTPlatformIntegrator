@@ -44,4 +44,9 @@ public enum ActionType implements SharedElementType{
 			return keyString;
 		}
 	}
+
+	@Override
+	public String getType() {
+		return ACTION_TYPE;
+	}
 }
