@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -16,6 +17,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.RemoteRuleController;
 
 /** @author Steffen Jacobs */
@@ -27,6 +29,10 @@ public class RemoteRuleDiffPanel extends JPanel {
 	private final Map<DefaultMutableTreeNode, SharedRule> nodeTable = new HashMap<>();
 
 	private final RemoteRuleController controller;
+
+	private JButton uploadButton;
+	
+	private SharedRule selectedRule = null;
 
 	public RemoteRuleDiffPanel(RemoteRuleController controller) {
 		super();
@@ -65,18 +71,31 @@ public class RemoteRuleDiffPanel extends JPanel {
 
 		model.nodeStructureChanged((TreeNode) model.getRoot());
 
-		super.add(createButtonBar(), BorderLayout.NORTH);
+		super.add(createHeaderPanel(), BorderLayout.NORTH);
 		super.add(tree, BorderLayout.CENTER);
 
 		EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> addRule(((RemoteRuleAddedEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> onSelectedRuleChange(((WithSharedRuleEvent) e).getSelectedRule()));
 	}
 
-	private JPanel createButtonBar() {
-		JPanel fp = new JPanel();
-		JButton refreshButton = new JButton("Refresh");
+	private void onSelectedRuleChange(SharedRule selectedRule) {
+		uploadButton.setEnabled(selectedRule != null);
+		this.selectedRule = selectedRule;
+	}
+
+	private JPanel createHeaderPanel() {
+		JPanel headerPanel = new JPanel();
+		headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
+		JButton refreshButton = new JButton("Retrieve Rules");
 		refreshButton.addActionListener(e -> controller.getRules(rule -> addRule(rule)));
-		fp.add(refreshButton);
-		return fp;
+
+		uploadButton = new JButton("Upload selected rule");
+		uploadButton.setEnabled(false);
+		uploadButton.addActionListener(e -> controller.uploadRule(selectedRule));
+
+		headerPanel.add(refreshButton);
+		headerPanel.add(uploadButton);
+		return headerPanel;
 	}
 
 	private void addRule(SharedRule rule) {

@@ -37,4 +37,8 @@ public class RemoteRuleController {
 		});
 	}
 
+	public void uploadRule(SharedRule selectedRule) {
+		ruleStorage.insertRule(selectedRule);
+	}
+
 }
