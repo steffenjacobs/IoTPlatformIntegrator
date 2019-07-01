@@ -21,6 +21,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.Trigger
 public class SharedRuleElementDiffJsonTransformer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SharedRuleElementDiffJsonTransformer.class);
+	private static final JsonTransformerHelper jsonHelper = new JsonTransformerHelper();
 
 	private static final String KEY_ID = "_id";
 	private static final String KEY_LABEL = "label";
@@ -36,39 +37,19 @@ public class SharedRuleElementDiffJsonTransformer {
 
 	public JSONObject toJSON(SharedRuleElementDiff diff) {
 		final JSONObject json = new JSONObject();
-		putIfNotNull(json, KEY_ID, diff.getUid().toString());
-		putIfNotNull(json, KEY_LABEL, diff.getLabel());
-		putIfNotNull(json, KEY_DESCRIPTION, diff.getDescription());
-		putIfNotNull(json, KEY_ELEMENT_SUBTYPE, diff.getElementType().name());
-		putIfNotNull(json, KEY_ELEMENT_TYPE, diff.getElementType().getType());
+		jsonHelper.putIfNotNull(json, KEY_ID, diff.getUid().toString());
+		jsonHelper.putIfNotNull(json, KEY_LABEL, diff.getLabel());
+		jsonHelper.putIfNotNull(json, KEY_DESCRIPTION, diff.getDescription());
+		jsonHelper.putIfNotNull(json, KEY_ELEMENT_SUBTYPE, diff.getElementType().name());
+		jsonHelper.putIfNotNull(json, KEY_ELEMENT_TYPE, diff.getElementType().getType());
 		if (diff.isNegative()) {
-			putIfNotNull(json, KEY_NEGATIVE, diff.isNegative());
+			jsonHelper.putIfNotNull(json, KEY_NEGATIVE, diff.isNegative());
 		}
-		putIfNotNull(json, KEY_RELATIVE_ELEMENT_ID, diff.getRelativeElementId());
-		putMapIfNotNull(json, KEY_PROPERTIES_ADDED, diff.getPropertiesAdded());
-		putMapIfNotNull(json, KEY_PROPERTIES_REMOVED, diff.getPropertiesRemoved());
-		putMapIfNotNull(json, KEY_PROPERTIES_UPDATED, diff.getPropertiesUpdated());
+		jsonHelper.putIfNotNull(json, KEY_RELATIVE_ELEMENT_ID, diff.getRelativeElementId());
+		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_ADDED, diff.getPropertiesAdded());
+		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_REMOVED, diff.getPropertiesRemoved());
+		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_UPDATED, diff.getPropertiesUpdated());
 		return json;
-	}
-
-	private void putMapIfNotNull(JSONObject json, String key, Map<String, Object> map) {
-		if (!map.isEmpty()) {
-			final JSONArray jsonArr = new JSONArray();
-
-			for (Entry<String, Object> entr : map.entrySet()) {
-				final JSONObject entrJson = new JSONObject();
-				entrJson.put(entr.getKey(), entr.getValue());
-				jsonArr.put(entrJson);
-			}
-
-			json.put(key, jsonArr);
-		}
-	}
-
-	private void putIfNotNull(JSONObject json, String key, Object value) {
-		if (value != null) {
-			json.put(key, value);
-		}
 	}
 
 	private Map<String, Object> readMap(JSONObject jsonArr, String key) {
