@@ -22,10 +22,9 @@ public class TestOpenHabItemService {
 		itemCreationDTO.setLabel("TestLabel");
 		itemCreationDTO.setType("Switch");
 		int createItem = service.createItem("http://localhost:8080", itemCreationDTO);
-		System.out.println(createItem);
 		List<ItemDTO> requestItems2 = service.requestItems("http://localhost:8080");
 
-		Assert.assertEquals(createItem, 200);
+		Assert.assertEquals(200, createItem);
 		Assert.assertTrue(requestItems1.size() + 1 == requestItems2.size());
 
 		ItemCreationDTO itemCreationDTO1 = new ItemCreationDTO();
@@ -34,7 +33,6 @@ public class TestOpenHabItemService {
 		itemCreationDTO1.setType("Switch");
 
 		int createItem2 = service.createItemByName("http://localhost:8080", itemCreationDTO1, Optional.ofNullable("ka"));
-		System.out.println("createItem2: " + createItem2);
 		Assert.assertEquals(createItem2, 201);
 
 		List<ItemDTO> requestItems3 = service.requestItems("http://localhost:8080");
@@ -49,7 +47,6 @@ public class TestOpenHabItemService {
 		service.postItem("http://localhost:8080", "TestName1", "ON");
 
 		String itemState = service.getItemState("http://localhost:8080", "TestName1");
-		System.out.println(itemState);
 		Assert.assertTrue(itemState.equals("ON"));
 		service.updateItemState("http://localhost:8080", "TestName1", "OFF");
 
