@@ -28,6 +28,8 @@ public class SharedRuleJsonTransformer {
 	private static final String KEY_STATUS = "status";
 	private static final String KEY_VISIBLE = "visible";
 	private static final String KEY_TRIGGERS = "triggers";
+	private static final String KEY_CONDITIONS = "conditions";
+	private static final String KEY_ACTIONS = "actions";
 
 	private static final String KEY_RULE_ELEMENT_LABEL = "label";
 	private static final String KEY_RULE_ELEMENT_DESCRIPTION = "description";
@@ -44,11 +46,13 @@ public class SharedRuleJsonTransformer {
 		jsonHelper.putIfNotNull(json, KEY_STATUS, rule.getStatus());
 		jsonHelper.putIfNotNull(json, KEY_VISIBLE, rule.getVisible());
 
-		putTriggerSetIfNotNull(json, KEY_TRIGGERS, rule.getTriggers());
+		putElementSetIfNotNull(json, KEY_TRIGGERS, rule.getTriggers());
+		putElementSetIfNotNull(json, KEY_CONDITIONS, rule.getConditions());
+		putElementSetIfNotNull(json, KEY_ACTIONS, rule.getActions());
 		return json;
 	}
 
-	private void putTriggerSetIfNotNull(JSONObject json, String key, Set<? extends SharedRuleElement> set) {
+	private void putElementSetIfNotNull(JSONObject json, String key, Set<? extends SharedRuleElement> set) {
 		JSONArray jsonArr = new JSONArray();
 		for (SharedRuleElement e : set) {
 			JSONObject jsonElem = new JSONObject();
