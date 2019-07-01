@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
+import org.reactivestreams.Subscriber;
+
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleJsonTransformer;
 
@@ -18,5 +20,9 @@ public class MongoDbSharedRuleStorageService {
 
 	public void store(SharedRule rule) {
 		storageService.insert(documentTransformer.toDocument(jsonTransformer.toJson(rule)));
+	}
+
+	public void getRules(Subscriber<SharedRule> subscriber) {
+		storageService.getAllRules(subscriber, d -> jsonTransformer.fromJson(documentTransformer.toJSON(d)));
 	}
 }

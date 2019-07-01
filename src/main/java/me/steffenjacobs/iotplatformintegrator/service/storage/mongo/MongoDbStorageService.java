@@ -26,9 +26,11 @@ public class MongoDbStorageService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoDbStorageService.class);
 	private static final String COLLECTION_NAME_DIFF_STORE = "diffStore";
+	private static final String COLLECTION_NAME_RULE_STORE = "ruleStore";
 	private static final String DATABASE_NAME = "IotPlatformIntegrator";
 
-	private MongoCollection<Document> collection;
+	private MongoCollection<Document> ruleCollection;
+	private MongoCollection<Document> diffCollection;
 	private MongoDatabase database;
 	private MongoClient mongoClient;
 
@@ -42,33 +44,16 @@ public class MongoDbStorageService {
 			database = mongoClient.getDatabase("IotPlatformIntegrator");
 		}
 
-		if (collection == null) {
-			collection = database.getCollection(COLLECTION_NAME_DIFF_STORE);
-			if (collection == null) {
-				database.createCollection(COLLECTION_NAME_DIFF_STORE).subscribe(new Subscriber<Success>() {
-
-					@Override
-					public void onSubscribe(Subscription s) {
-						s.request(1);
-					}
-
-					@Override
-					public void onNext(Success t) {
-					}
-
-					@Override
-					public void onError(Throwable t) {
-						LOG.error("Unable to create collection '{}' in mongodb: {}", COLLECTION_NAME_DIFF_STORE, t.getMessage());
-						initialized.complete(false);
-					}
-
-					@Override
-					public void onComplete() {
-						LOG.info("Created collection '{}' successfully.", COLLECTION_NAME_DIFF_STORE);
-						initialized.complete(true);
-					}
-				});
-				;
+		if (diffCollection == null) {
+			diffCollection = database.getCollection(COLLECTION_NAME_DIFF_STORE);
+			if (diffCollection == null) {
+				database.createCollection(COLLECTION_NAME_DIFF_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_DIFF_STORE));
+			}
+		}
+		if (ruleCollection == null) {
+			ruleCollection = database.getCollection(COLLECTION_NAME_RULE_STORE);
+			if (diffCollection == null) {
+				database.createCollection(COLLECTION_NAME_RULE_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_RULE_STORE));
 			}
 		}
 	}
@@ -87,15 +72,22 @@ public class MongoDbStorageService {
 		return database;
 	}
 
-	private MongoCollection<Document> getCollection() {
-		if (collection == null) {
-			collection = getDatabase().getCollection(COLLECTION_NAME_DIFF_STORE);
+	private MongoCollection<Document> getDiffCollection() {
+		if (diffCollection == null) {
+			diffCollection = getDatabase().getCollection(COLLECTION_NAME_DIFF_STORE);
 		}
-		return collection;
+		return diffCollection;
+	}
+
+	private MongoCollection<Document> getRuleCollection() {
+		if (ruleCollection == null) {
+			ruleCollection = getDatabase().getCollection(COLLECTION_NAME_RULE_STORE);
+		}
+		return ruleCollection;
 	}
 
 	public void containsRule(String ruleName, SimplifiedSubscriber<Document> callback) {
-		getCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
+		getRuleCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
 	}
 
 	public void insert(Document document) {
@@ -103,7 +95,7 @@ public class MongoDbStorageService {
 		// "database").append("count", 1).append("info", new Document("x",
 		// 203).append("y", 102));
 
-		Publisher<Success> publisher = getCollection().insertOne(document);
+		Publisher<Success> publisher = getDiffCollection().insertOne(document);
 		publisher.subscribe(new Subscriber<Success>() {
 			@Override
 			public void onSubscribe(final Subscription s) {
@@ -112,17 +104,17 @@ public class MongoDbStorageService {
 
 			@Override
 			public void onNext(final Success success) {
-				LOG.info("Inserted document into collection: {}", document.toJson());
+				LOG.info("Inserted document into diffCollection: {}", document.toJson());
 			}
 
 			@Override
 			public void onError(final Throwable t) {
-				LOG.error("Could not insert document into collection: {} ", t.getMessage());
+				LOG.error("Could not insert document into diffCollection: {} ", t.getMessage());
 			}
 
 			@Override
 			public void onComplete() {
-				LOG.info("Inserted document into collection: {} complete", document.toJson());
+				LOG.info("Inserted document into diffCollection: {} complete", document.toJson());
 			}
 		});
 	}
@@ -130,11 +122,11 @@ public class MongoDbStorageService {
 	public <T> void findDiffsForRule(SharedRule rule, Subscriber<T> callback, Function<Document, T> transformation) {
 
 		Bson filter = Filters.eq("rule", rule.getName());
-		getCollection().countDocuments(filter).subscribe(new SimplifiedSubscriber<Long>() {
+		getDiffCollection().countDocuments(filter).subscribe(new SimplifiedSubscriber<Long>() {
 
 			@Override
 			public void onNext(Long count) {
-				getCollection().find(filter).subscribe(new Subscriber<Document>() {
+				getDiffCollection().find(filter).subscribe(new Subscriber<Document>() {
 
 					@Override
 					public void onSubscribe(Subscription s) {
@@ -163,5 +155,71 @@ public class MongoDbStorageService {
 				LOG.error("MongoDB Error: {} ", t.getMessage());
 			}
 		});
+	}
+
+	public <T> void getAllRules(Subscriber<T> callback, Function<Document, T> transformation) {
+		getDiffCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
+
+			@Override
+			public void onNext(Long count) {
+				getRuleCollection().find().subscribe(new Subscriber<Document>() {
+
+					@Override
+					public void onSubscribe(Subscription s) {
+						s.request(count);
+					}
+
+					@Override
+					public void onNext(Document t) {
+						callback.onNext(transformation.apply(t));
+					}
+
+					@Override
+					public void onError(Throwable t) {
+						callback.onError(t);
+					}
+
+					@Override
+					public void onComplete() {
+						callback.onComplete();
+					}
+				});
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				LOG.error("MongoDB Error: {} ", t.getMessage());
+			}
+		});
+	}
+
+	private class CollectionCreationSubscriber implements Subscriber<Success> {
+
+		private final String collectionName;
+
+		private CollectionCreationSubscriber(String collectionName) {
+			this.collectionName = collectionName;
+		}
+
+		@Override
+		public void onSubscribe(Subscription s) {
+			s.request(1);
+		}
+
+		@Override
+		public void onNext(Success t) {
+		}
+
+		@Override
+		public void onError(Throwable t) {
+			LOG.error("Unable to create diffCollection '{}' in mongodb: {}", collectionName, t.getMessage());
+			initialized.complete(false);
+		}
+
+		@Override
+		public void onComplete() {
+			LOG.info("Created diffCollection '{}' successfully.", collectionName);
+			initialized.complete(true);
+		}
 	}
 }
