@@ -91,7 +91,7 @@ public class MongoDbStorageService {
 		return collection;
 	}
 
-	public void containsRule(String ruleName, SimplifiedSubscriber callback) {
+	public void containsRule(String ruleName, SimplifiedSubscriber<Document> callback) {
 		getCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
 	}
 

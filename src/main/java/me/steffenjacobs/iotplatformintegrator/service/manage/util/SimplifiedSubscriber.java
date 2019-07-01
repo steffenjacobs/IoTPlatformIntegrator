@@ -1,11 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.service.manage.util;
 
-import org.bson.Document;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 /** @author Steffen Jacobs */
-public interface SimplifiedSubscriber extends Subscriber<Document> {
+public interface SimplifiedSubscriber<T> extends Subscriber<T> {
 
 	@Override
 	default void onSubscribe(Subscription s) {
@@ -13,7 +12,16 @@ public interface SimplifiedSubscriber extends Subscriber<Document> {
 	}
 
 	@Override
-	default void onNext(Document t) {
+	default void onNext(T t) {
+	}
+
+	@Override
+	default void onComplete() {
+	}
+	
+	@Override
+	default void onError(Throwable t) {
+		
 	}
 
 }
