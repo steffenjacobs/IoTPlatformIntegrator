@@ -58,21 +58,21 @@ public class SharedRuleElementDiffJsonTransformer {
 		String uid = getStringOrNull(json, KEY_ID);
 		String label = getStringOrNull(json, KEY_LABEL);
 		String description = getStringOrNull(json, KEY_DESCRIPTION);
-		String subType = getStringOrNull(json, KEY_ELEMENT_SUBTYPE);
+		String type = getStringOrNull(json, KEY_ELEMENT_TYPE);
 
 		final SharedElementType elementType;
-		if (subType.equals(SharedElementType.ACTION_TYPE)) {
-			elementType = ActionType.valueOf(getStringOrNull(json, KEY_ELEMENT_TYPE));
+		if (type.equals(SharedElementType.ACTION_TYPE)) {
+			elementType = ActionType.valueOf(getStringOrNull(json, KEY_ELEMENT_SUBTYPE));
 
-		} else if (subType.contentEquals(SharedElementType.CONDITION_TYPE)) {
-			elementType = ConditionType.valueOf(getStringOrNull(json, KEY_ELEMENT_TYPE));
+		} else if (type.contentEquals(SharedElementType.CONDITION_TYPE)) {
+			elementType = ConditionType.valueOf(getStringOrNull(json, KEY_ELEMENT_SUBTYPE));
 
-		} else if (subType.equals(SharedElementType.TRIGGER_TYPE)) {
-			elementType = TriggerType.valueOf(getStringOrNull(json, KEY_ELEMENT_TYPE));
+		} else if (type.equals(SharedElementType.TRIGGER_TYPE)) {
+			elementType = TriggerType.valueOf(getStringOrNull(json, KEY_ELEMENT_SUBTYPE));
 
 		} else {
 			elementType = UnknownSharedElementType.INSTANCE;
-			LOG.error("Invalid element sub type: {}", subType);
+			LOG.error("Invalid element sub type: {}", type);
 		}
 
 		Boolean isNegative = getBooleanOrNull(json, KEY_NEGATIVE);
