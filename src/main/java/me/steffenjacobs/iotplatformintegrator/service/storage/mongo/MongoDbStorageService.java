@@ -161,8 +161,8 @@ public class MongoDbStorageService {
 		});
 	}
 
-	public <T> void getAllRules(Subscriber<T> callback, Function<Document, T> transformation) {
-		getDiffCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
+	public synchronized <T> void getAllRules(Subscriber<T> callback, Function<Document, T> transformation) {
+		getRuleCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
 
 			@Override
 			public void onNext(Long count) {
