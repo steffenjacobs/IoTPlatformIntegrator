@@ -11,6 +11,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
@@ -31,8 +32,10 @@ public class RemoteRuleDiffPanel extends JPanel {
 	private final RemoteRuleController controller;
 
 	private JButton uploadButton;
-	
+
 	private SharedRule selectedRule = null;
+
+	private JTree tree;
 
 	public RemoteRuleDiffPanel(RemoteRuleController controller) {
 		super();
@@ -59,7 +62,7 @@ public class RemoteRuleDiffPanel extends JPanel {
 			}
 		};
 
-		JTree tree = new JTree(this.model);
+		tree = new JTree(this.model);
 		tree.setExpandsSelectedPaths(true);
 
 		tree.addTreeSelectionListener(e -> {
@@ -104,8 +107,28 @@ public class RemoteRuleDiffPanel extends JPanel {
 
 		DefaultMutableTreeNode node = new DefaultMutableTreeNode(String.format("%s (%s)", rule.getName(), rule.getId()), true);
 		controller.getDiffs(rule, diff -> {
-			DefaultMutableTreeNode diffNode = new DefaultMutableTreeNode(String.format("%s (%s)", diff.getLabel(), diff.getRelativeElementId()), true);
+			int added = diff.getPropertiesAdded().size();
+			int removed = diff.getPropertiesRemoved().size();
+			int updated = diff.getPropertiesUpdated().size();
+
+			StringBuilder sb = new StringBuilder();
+			if (added > 0) {
+				sb.append("+");
+				sb.append(added);
+				sb.append(" ");
+			}
+			if (removed > 0) {
+				sb.append("-");
+				sb.append(removed);
+				sb.append(" ");
+			}
+			if (updated > 0) {
+				sb.append("\uD83D\uDD03");
+				sb.append(updated);
+			}
+			DefaultMutableTreeNode diffNode = new DefaultMutableTreeNode(sb.toString(), true);
 			node.add(diffNode);
+			
 			model.nodeStructureChanged(node);
 		});
 
