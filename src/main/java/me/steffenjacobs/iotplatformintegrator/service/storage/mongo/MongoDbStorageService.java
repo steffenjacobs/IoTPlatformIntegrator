@@ -1,8 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -16,6 +18,7 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.mongodb.reactivestreams.client.Success;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 
 /** @author Steffen Jacobs */
@@ -120,6 +123,44 @@ public class MongoDbStorageService {
 			@Override
 			public void onComplete() {
 				LOG.info("Inserted document into collection: {} complete", document.toJson());
+			}
+		});
+	}
+
+	public <T> void findDiffsForRule(SharedRule rule, Subscriber<T> callback, Function<Document, T> transformation) {
+
+		Bson filter = Filters.eq("rule", rule.getName());
+		getCollection().countDocuments(filter).subscribe(new SimplifiedSubscriber<Long>() {
+
+			@Override
+			public void onNext(Long count) {
+				getCollection().find(filter).subscribe(new Subscriber<Document>() {
+
+					@Override
+					public void onSubscribe(Subscription s) {
+						s.request(count);
+					}
+
+					@Override
+					public void onNext(Document t) {
+						callback.onNext(transformation.apply(t));
+					}
+
+					@Override
+					public void onError(Throwable t) {
+						callback.onError(t);
+					}
+
+					@Override
+					public void onComplete() {
+						callback.onComplete();
+					}
+				});
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				LOG.error("MongoDB Error: {} ", t.getMessage());
 			}
 		});
 	}
