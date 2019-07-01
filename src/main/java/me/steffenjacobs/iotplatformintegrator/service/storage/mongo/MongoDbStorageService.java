@@ -1,6 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import java.util.concurrent.CompletableFuture;
+
+import javax.security.auth.callback.Callback;
+
+import org.bson.BSON;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -8,11 +12,14 @@ import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.mongodb.reactivestreams.client.Success;
+
+import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 
 /** @author Steffen Jacobs */
 public class MongoDbStorageService {
@@ -85,6 +92,10 @@ public class MongoDbStorageService {
 			collection = getDatabase().getCollection(COLLECTION_NAME_DIFF_STORE);
 		}
 		return collection;
+	}
+
+	public void containsRule(String ruleName, SimplifiedSubscriber callback) {
+		getCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
 	}
 
 	public void insert(Document document) {
