@@ -51,17 +51,24 @@ public class SharedRuleJsonTransformer {
 	public SharedRule fromJson(String jsonStr) {
 		JSONObject json = new JSONObject(jsonStr);
 		String name = json.getString(KEY_NAME);
-		UUID uuid = UUID.fromString(json.getString(KEY_ID));
+		String id = json.getString(KEY_ID);
 		String description = json.getString(KEY_DESCRIPTION);
 		String status = json.getString(KEY_STATUS);
 		String visible = json.getString(KEY_VISIBLE);
 
 		JSONArray jsonTriggers = json.getJSONArray(KEY_TRIGGERS);
+		Set<SharedTrigger> triggers = parseRuleElements(jsonTriggers).getLeft();
 
-		return null;
+		JSONArray jsonConditions = json.getJSONArray(KEY_CONDITIONS);
+		Set<SharedCondition> conditions = parseRuleElements(jsonConditions).getMiddle();
+
+		JSONArray jsonActions = json.getJSONArray(KEY_ACTIONS);
+		Set<SharedAction> actions = parseRuleElements(jsonActions).getRight();
+
+		return new SharedRule(name, id, description, visible, status, triggers, conditions, actions);
 	}
 
-	private Triple<Set<SharedTrigger>, Set<SharedCondition>, Set<SharedAction>> parseTriggers(JSONArray jsonArr) {
+	private Triple<Set<SharedTrigger>, Set<SharedCondition>, Set<SharedAction>> parseRuleElements(JSONArray jsonArr) {
 		Set<SharedTrigger> triggers = new HashSet<>();
 		Set<SharedCondition> conditions = new HashSet<>();
 		Set<SharedAction> actions = new HashSet<>();
@@ -71,7 +78,7 @@ public class SharedRuleJsonTransformer {
 			String description = json.getString(KEY_RULE_ELEMENT_DESCRIPTION);
 			int elementId = Integer.parseInt(json.getString(KEY_RULE_ELEMENT_ELEMENT_ID));
 
-			final Map<String, Object> properties = readMap(json, KEY_RULE_ELEMENT_CONTAINER);
+			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);
 
 			String subType = json.getString(KEY_RULE_ELEMENT_SUBTYPE);
 
@@ -93,17 +100,6 @@ public class SharedRuleJsonTransformer {
 
 		}
 		return Triple.of(triggers, conditions, actions);
-	}
-
-	private Map<String, Object> readMap(JSONObject jsonArr, String key) {
-		Map<String, Object> map = new HashMap<>();
-		for (Object o : jsonArr.getJSONArray(key)) {
-			JSONObject json = (JSONObject) o;
-			for (String k : json.keySet()) {
-				map.put(k, json.get(k));
-			}
-		}
-		return map;
 	}
 
 	public JSONObject toJson(SharedRule rule) {
