@@ -1,6 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,17 +49,6 @@ public class SharedRuleElementDiffJsonTransformer {
 		return json;
 	}
 
-	private Map<String, Object> readMap(JSONObject jsonArr, String key) {
-		Map<String, Object> map = new HashMap<>();
-		for (Object o : jsonArr.getJSONArray(key)) {
-			JSONObject json = (JSONObject) o;
-			for (String k : json.keySet()) {
-				map.put(k, json.get(k));
-			}
-		}
-		return map;
-	}
-
 	public SharedRuleElementDiff fromJSON(String jsonStr) {
 		JSONObject json = new JSONObject(jsonStr);
 
@@ -86,9 +74,9 @@ public class SharedRuleElementDiffJsonTransformer {
 
 		Boolean isNegative = json.getBoolean(KEY_NEGATIVE);
 		Integer relativeElementId = json.getInt(KEY_RELATIVE_ELEMENT_ID);
-		Map<String, Object> propertiesAdded = readMap(json, KEY_PROPERTIES_ADDED);
-		Map<String, Object> propertiesRemoved = readMap(json, KEY_PROPERTIES_REMOVED);
-		Map<String, Object> propertiesUpdated = readMap(json, KEY_PROPERTIES_UPDATED);
+		Map<String, Object> propertiesAdded = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_ADDED);
+		Map<String, Object> propertiesRemoved = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_REMOVED);
+		Map<String, Object> propertiesUpdated = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_UPDATED);
 
 		return new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative,
 				relativeElementId);

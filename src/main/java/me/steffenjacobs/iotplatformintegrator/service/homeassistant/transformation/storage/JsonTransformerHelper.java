@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -43,5 +44,16 @@ public class JsonTransformerHelper {
 
 			json.put(key, jsonArr);
 		}
+	}
+
+	public Map<String, Object> readMapFromJson(JSONObject jsonArr, String key) {
+		Map<String, Object> map = new HashMap<>();
+		for (Object o : jsonArr.getJSONArray(key)) {
+			JSONObject json = (JSONObject) o;
+			for (String k : json.keySet()) {
+				map.put(k, json.get(k));
+			}
+		}
+		return map;
 	}
 }
