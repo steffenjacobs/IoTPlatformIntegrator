@@ -18,12 +18,13 @@ public class App {
 
 	public static void main(String[] args) {
 		LOG.info("Started.");
-		new UiEntrypoint().createAndShowGUIAsync();
-		new RuleChangeEventStore();
-
 		final MongoDbStorageService storageService = new MongoDbStorageService();
 		mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
 		mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
+
+		new UiEntrypoint().createAndShowGUIAsync();
+		new RuleChangeEventStore();
+
 		LOG.info("Setup complete.");
 	}
 
