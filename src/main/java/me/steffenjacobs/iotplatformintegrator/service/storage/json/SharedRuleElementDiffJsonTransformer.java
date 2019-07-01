@@ -20,6 +20,7 @@ public class SharedRuleElementDiffJsonTransformer {
 	private static final Logger LOG = LoggerFactory.getLogger(SharedRuleElementDiffJsonTransformer.class);
 	private static final JsonTransformerHelper jsonHelper = new JsonTransformerHelper();
 
+	private static final String KEY_ASSOCIATED_RULE_NAME = "rule";
 	private static final String KEY_ID = "_id";
 	private static final String KEY_LABEL = "label";
 	private static final String KEY_DESCRIPTION = "description";
@@ -32,8 +33,9 @@ public class SharedRuleElementDiffJsonTransformer {
 	private static final String KEY_PROPERTIES_REMOVED = "removed";
 	private static final String KEY_PROPERTIES_UPDATED = "updated";
 
-	public JSONObject toJSON(SharedRuleElementDiff diff) {
+	public JSONObject toJSON(SharedRuleElementDiff diff, String associatedRuleName) {
 		final JSONObject json = new JSONObject();
+		jsonHelper.putIfNotNull(json, KEY_ASSOCIATED_RULE_NAME, associatedRuleName);
 		jsonHelper.putIfNotNull(json, KEY_ID, diff.getUid().toString());
 		jsonHelper.putIfNotNull(json, KEY_LABEL, diff.getLabel());
 		jsonHelper.putIfNotNull(json, KEY_DESCRIPTION, diff.getDescription());
