@@ -76,26 +76,26 @@ public class SharedRuleJsonTransformer {
 			JSONObject json = jsonArr.getJSONObject(i);
 			String label = json.getString(KEY_RULE_ELEMENT_LABEL);
 			String description = json.getString(KEY_RULE_ELEMENT_DESCRIPTION);
-			int elementId = Integer.parseInt(json.getString(KEY_RULE_ELEMENT_ELEMENT_ID));
+			int elementId = json.getInt(KEY_RULE_ELEMENT_ELEMENT_ID);
 
 			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);
 
-			String subType = json.getString(KEY_RULE_ELEMENT_SUBTYPE);
+			String type = json.getString(KEY_RULE_ELEMENT_TYPE);
 
-			if (subType.equals(SharedElementType.ACTION_TYPE)) {
-				ActionType actionType = ActionType.valueOf(json.getString(KEY_RULE_ELEMENT_TYPE));
+			if (type.equals(SharedElementType.ACTION_TYPE)) {
+				ActionType actionType = ActionType.valueOf(json.getString(KEY_RULE_ELEMENT_SUBTYPE));
 				actions.add(new SharedAction(actionType, properties, description, label, elementId));
 
-			} else if (subType.contentEquals(SharedElementType.CONDITION_TYPE)) {
-				ConditionType conditionType = ConditionType.valueOf(json.getString(KEY_RULE_ELEMENT_TYPE));
+			} else if (type.contentEquals(SharedElementType.CONDITION_TYPE)) {
+				ConditionType conditionType = ConditionType.valueOf(json.getString(KEY_RULE_ELEMENT_SUBTYPE));
 				conditions.add(new SharedCondition(conditionType, properties, description, label, elementId));
 
-			} else if (subType.equals(SharedElementType.TRIGGER_TYPE)) {
-				TriggerType triggerType = TriggerType.valueOf(json.getString(KEY_RULE_ELEMENT_TYPE));
+			} else if (type.equals(SharedElementType.TRIGGER_TYPE)) {
+				TriggerType triggerType = TriggerType.valueOf(json.getString(KEY_RULE_ELEMENT_SUBTYPE));
 				triggers.add(new SharedTrigger(triggerType, properties, description, label, elementId));
 
 			} else {
-				LOG.error("Invalid element sub type: {}", subType);
+				LOG.error("Invalid element sub type: {}", type);
 			}
 
 		}
