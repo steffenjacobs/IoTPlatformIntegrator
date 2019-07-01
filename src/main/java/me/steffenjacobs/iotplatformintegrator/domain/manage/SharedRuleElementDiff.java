@@ -2,12 +2,15 @@ package me.steffenjacobs.iotplatformintegrator.domain.manage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.UnknownSharedElementType;
 
 /** @author Steffen Jacobs */
 
 public class SharedRuleElementDiff {
+	private final UUID uid;
 	private final String description;
 	private final String label;
 	private final SharedElementType elementType;
@@ -17,10 +20,15 @@ public class SharedRuleElementDiff {
 	private final boolean negative;
 	private final int relativeElementId;
 
-	public SharedRuleElementDiff(String description, String label, SharedElementType elementType,
-			Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
+	public SharedRuleElementDiff(String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
 			Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId) {
+		this(UUID.randomUUID(), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative, relativeElementId);
+	}
+
+	public SharedRuleElementDiff(UUID uid, String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded,
+			Map<String, Object> propertiesRemoved, Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId) {
 		super();
+		this.uid = uid;
 		this.description = description;
 		this.label = label;
 		this.elementType = elementType;
@@ -39,11 +47,7 @@ public class SharedRuleElementDiff {
 
 	/** Constructor to create an empty diff element. */
 	public SharedRuleElementDiff(boolean isNegative, int relativeElementId) {
-		this.description = null;
-		this.label = null;
-		this.elementType = null;
-		this.negative = isNegative;
-		this.relativeElementId = relativeElementId;
+		this(null, null, UnknownSharedElementType.INSTANCE, null, null, null, isNegative, relativeElementId);
 	}
 
 	public String getDescription() {
@@ -71,8 +75,7 @@ public class SharedRuleElementDiff {
 	}
 
 	public boolean isEmpty() {
-		return description == null && label == null && elementType == null && propertiesAdded.isEmpty()
-				&& propertiesRemoved.isEmpty() && propertiesUpdated.isEmpty();
+		return description == null && label == null && elementType == null && propertiesAdded.isEmpty() && propertiesRemoved.isEmpty() && propertiesUpdated.isEmpty();
 	}
 
 	/**
@@ -87,4 +90,7 @@ public class SharedRuleElementDiff {
 		return relativeElementId;
 	}
 
+	public UUID getUid() {
+		return uid;
+	}
 }
