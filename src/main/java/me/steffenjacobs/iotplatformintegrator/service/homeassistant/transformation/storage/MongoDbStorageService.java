@@ -27,38 +27,42 @@ public class MongoDbStorageService {
 
 	private CompletableFuture<Boolean> initialized = new CompletableFuture<>();
 
-	public void connect() {
+	public void checkAndValidateConnection() {
+		if (mongoClient == null) {
+			mongoClient = MongoClients.create("mongodb://localhost");
+		}
+		if (database == null) {
+			database = mongoClient.getDatabase("IotPlatformIntegrator");
+		}
 
-		mongoClient = MongoClients.create("mongodb://localhost");
-
-		database = mongoClient.getDatabase("IotPlatformIntegrator");
-
-		collection = database.getCollection(COLLECTION_NAME_DIFF_STORE);
 		if (collection == null) {
-			database.createCollection(COLLECTION_NAME_DIFF_STORE).subscribe(new Subscriber<Success>() {
+			collection = database.getCollection(COLLECTION_NAME_DIFF_STORE);
+			if (collection == null) {
+				database.createCollection(COLLECTION_NAME_DIFF_STORE).subscribe(new Subscriber<Success>() {
 
-				@Override
-				public void onSubscribe(Subscription s) {
-					s.request(1);
-				}
+					@Override
+					public void onSubscribe(Subscription s) {
+						s.request(1);
+					}
 
-				@Override
-				public void onNext(Success t) {
-				}
+					@Override
+					public void onNext(Success t) {
+					}
 
-				@Override
-				public void onError(Throwable t) {
-					LOG.error("Unable to create collection '{}' in mongodb: {}", COLLECTION_NAME_DIFF_STORE, t.getMessage());
-					initialized.complete(false);
-				}
+					@Override
+					public void onError(Throwable t) {
+						LOG.error("Unable to create collection '{}' in mongodb: {}", COLLECTION_NAME_DIFF_STORE, t.getMessage());
+						initialized.complete(false);
+					}
 
-				@Override
-				public void onComplete() {
-					LOG.info("Created collection '{}' successfully.", COLLECTION_NAME_DIFF_STORE);
-					initialized.complete(true);
-				}
-			});
-			;
+					@Override
+					public void onComplete() {
+						LOG.info("Created collection '{}' successfully.", COLLECTION_NAME_DIFF_STORE);
+						initialized.complete(true);
+					}
+				});
+				;
+			}
 		}
 	}
 

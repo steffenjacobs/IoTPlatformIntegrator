@@ -2,10 +2,8 @@ package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformat
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

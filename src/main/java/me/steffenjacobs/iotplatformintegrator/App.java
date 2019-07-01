@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage.MongoDbRuleDiffStorageService;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage.MongoDbSharedRuleStorageService;
+import me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage.MongoDbStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleChangeEventStore;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 
@@ -15,6 +17,9 @@ public class App {
 		LOG.info("Started.");
 		new UiEntrypoint().createAndShowGUIAsync();
 		new RuleChangeEventStore();
-		new MongoDbRuleDiffStorageService();
+
+		final MongoDbStorageService storageService = new MongoDbStorageService();
+		new MongoDbRuleDiffStorageService(storageService);
+		new MongoDbSharedRuleStorageService(storageService);
 	}
 }
