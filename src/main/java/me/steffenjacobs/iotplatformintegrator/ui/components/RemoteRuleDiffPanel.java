@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -64,9 +65,18 @@ public class RemoteRuleDiffPanel extends JPanel {
 
 		model.nodeStructureChanged((TreeNode) model.getRoot());
 
+		super.add(createButtonBar(), BorderLayout.NORTH);
 		super.add(tree, BorderLayout.CENTER);
 
 		EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> addRule(((RemoteRuleAddedEvent) e).getSelectedRule()));
+	}
+
+	private JPanel createButtonBar() {
+		JPanel fp = new JPanel();
+		JButton refreshButton = new JButton("Refresh");
+		refreshButton.addActionListener(e -> controller.getRules(rule -> addRule(rule)));
+		fp.add(refreshButton);
+		return fp;
 	}
 
 	private void addRule(SharedRule rule) {
