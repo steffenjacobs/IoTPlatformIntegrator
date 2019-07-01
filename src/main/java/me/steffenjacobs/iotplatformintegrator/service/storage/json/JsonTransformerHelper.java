@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
@@ -48,12 +49,20 @@ public class JsonTransformerHelper {
 
 	public Map<String, Object> readMapFromJson(JSONObject jsonArr, String key) {
 		Map<String, Object> map = new HashMap<>();
-		for (Object o : jsonArr.getJSONArray(key)) {
+		for (Object o : getArrayOrEmpty(jsonArr, key)) {
 			JSONObject json = (JSONObject) o;
 			for (String k : json.keySet()) {
 				map.put(k, json.get(k));
 			}
 		}
 		return map;
+	}
+
+	private JSONArray getArrayOrEmpty(JSONObject json, String key) {
+		try {
+			return json.getJSONArray(key);
+		} catch (JSONException e) {
+			return new JSONArray();
+		}
 	}
 }

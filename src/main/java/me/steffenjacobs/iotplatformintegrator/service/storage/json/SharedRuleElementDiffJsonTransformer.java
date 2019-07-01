@@ -3,6 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,34 +55,58 @@ public class SharedRuleElementDiffJsonTransformer {
 	public SharedRuleElementDiff fromJSON(String jsonStr) {
 		JSONObject json = new JSONObject(jsonStr);
 
-		String uid = json.getString(KEY_ID);
-		String label = json.getString(KEY_LABEL);
-		String description = json.getString(KEY_DESCRIPTION);
-		String subType = json.getString(KEY_ELEMENT_SUBTYPE);
+		String uid = getStringOrNull(json, KEY_ID);
+		String label = getStringOrNull(json, KEY_LABEL);
+		String description = getStringOrNull(json, KEY_DESCRIPTION);
+		String subType = getStringOrNull(json, KEY_ELEMENT_SUBTYPE);
 
 		final SharedElementType elementType;
 		if (subType.equals(SharedElementType.ACTION_TYPE)) {
-			elementType = ActionType.valueOf(json.getString(KEY_ELEMENT_TYPE));
+			elementType = ActionType.valueOf(getStringOrNull(json, KEY_ELEMENT_TYPE));
 
 		} else if (subType.contentEquals(SharedElementType.CONDITION_TYPE)) {
-			elementType = ConditionType.valueOf(json.getString(KEY_ELEMENT_TYPE));
+			elementType = ConditionType.valueOf(getStringOrNull(json, KEY_ELEMENT_TYPE));
 
 		} else if (subType.equals(SharedElementType.TRIGGER_TYPE)) {
-			elementType = TriggerType.valueOf(json.getString(KEY_ELEMENT_TYPE));
+			elementType = TriggerType.valueOf(getStringOrNull(json, KEY_ELEMENT_TYPE));
 
 		} else {
 			elementType = UnknownSharedElementType.INSTANCE;
 			LOG.error("Invalid element sub type: {}", subType);
 		}
 
-		Boolean isNegative = json.getBoolean(KEY_NEGATIVE);
-		Integer relativeElementId = json.getInt(KEY_RELATIVE_ELEMENT_ID);
+		Boolean isNegative = getBooleanOrNull(json, KEY_NEGATIVE);
+		Integer relativeElementId = getIntOrNull(json, KEY_RELATIVE_ELEMENT_ID);
 		Map<String, Object> propertiesAdded = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_ADDED);
 		Map<String, Object> propertiesRemoved = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_REMOVED);
 		Map<String, Object> propertiesUpdated = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_UPDATED);
 
 		return new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative,
 				relativeElementId);
+	}
+
+	public int getIntOrNull(JSONObject json, String key) {
+		try {
+			return json.getInt(key);
+		} catch (JSONException e) {
+			return 0;
+		}
+	}
+
+	public boolean getBooleanOrNull(JSONObject json, String key) {
+		try {
+			return json.getBoolean(key);
+		} catch (JSONException e) {
+			return false;
+		}
+	}
+
+	public String getStringOrNull(JSONObject json, String key) {
+		try {
+			return json.getString(key);
+		} catch (JSONException e) {
+			return null;
+		}
 	}
 
 }
