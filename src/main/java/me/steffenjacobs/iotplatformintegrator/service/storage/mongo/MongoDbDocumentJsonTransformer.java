@@ -1,10 +1,10 @@
-package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage;
+package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import org.bson.Document;
 import org.json.JSONObject;
 
 /** @author Steffen Jacobs */
-public class SharedRuleElementDiffDocumentTransformer {
+public class MongoDbDocumentJsonTransformer {
 
 	public Document toDocument(JSONObject json) {
 		return Document.parse(json.toString());

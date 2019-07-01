@@ -1,12 +1,13 @@
-package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage;
+package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleJsonTransformer;
 
 /** @author Steffen Jacobs */
 public class MongoDbSharedRuleStorageService {
 
 	private final SharedRuleJsonTransformer jsonTransformer = new SharedRuleJsonTransformer();
-	private final SharedRuleElementDiffDocumentTransformer documentTransformer = new SharedRuleElementDiffDocumentTransformer();
+	private final MongoDbDocumentJsonTransformer documentTransformer = new MongoDbDocumentJsonTransformer();
 	private final MongoDbStorageService storageService;
 
 	public MongoDbSharedRuleStorageService(MongoDbStorageService storageService) {

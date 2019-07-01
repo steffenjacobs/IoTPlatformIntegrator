@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage;
+package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 
 import java.util.Map;
 import java.util.UUID;

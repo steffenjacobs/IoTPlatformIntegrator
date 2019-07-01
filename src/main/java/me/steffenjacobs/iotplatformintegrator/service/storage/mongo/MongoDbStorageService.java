@@ -1,4 +1,4 @@
-package me.steffenjacobs.iotplatformintegrator.service.homeassistant.transformation.storage;
+package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import java.util.concurrent.CompletableFuture;
 import org.bson.Document;
