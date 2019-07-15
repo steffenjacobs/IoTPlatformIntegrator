@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -11,6 +12,8 @@ import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
@@ -20,6 +23,7 @@ import com.mongodb.reactivestreams.client.Success;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
+import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer;
 
 /** @author Steffen Jacobs */
 public class MongoDbStorageService {
@@ -142,6 +146,43 @@ public class MongoDbStorageService {
 			@Override
 			public void onComplete() {
 				LOG.info("Inserted document into diffCollection: {} complete", document.toJson());
+			}
+		});
+	}
+
+	public <T> void getStats(Subscriber<T> callback, Function<Document, T> transformation) {
+
+		getUserCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
+			@Override
+			public void onNext(Long count) {
+				getDiffCollection().aggregate(Arrays.asList(
+						// Aggregates.match(Filters.eq("categories", "Bakery")),
+						Aggregates.group("$_id",
+								Arrays.asList(Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_ADDED, 1),
+										Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_REMOVED, 1),
+										Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_UPDATED, 1)))))
+						.subscribe(new Subscriber<Document>() {
+
+							@Override
+							public void onSubscribe(Subscription s) {
+								s.request(count);
+							}
+
+							@Override
+							public void onNext(Document t) {
+								callback.onNext(transformation.apply(t));
+							}
+
+							@Override
+							public void onError(Throwable t) {
+								callback.onError(t);
+							}
+
+							@Override
+							public void onComplete() {
+								callback.onComplete();
+							}
+						});
 			}
 		});
 	}
