@@ -23,6 +23,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceMock;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleChangeEventStore;
 
 public class TestRuleChangeEventStore {
@@ -33,7 +34,7 @@ public class TestRuleChangeEventStore {
 
 		SharedRuleElementDiff diff = new SharedRuleElementDiff("NewItemStateChangedDescription", null,
 				TriggerType.CommandReceived, null, null, null, false, 1);
-		RuleChangeEventStore store = new RuleChangeEventStore();
+		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff);
 
@@ -66,7 +67,7 @@ public class TestRuleChangeEventStore {
 		propertiesUpdated.put(TriggerTypeSpecificKey.Command.getKeyString(), Command.Off);
 		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.CommandReceived, null, null,
 				propertiesUpdated, false, 1);
-		RuleChangeEventStore store = new RuleChangeEventStore();
+		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff);
 
@@ -110,7 +111,7 @@ public class TestRuleChangeEventStore {
 
 		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.ItemStateUpdated,
 				propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1);
-		RuleChangeEventStore store = new RuleChangeEventStore();
+		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff);
 
@@ -151,7 +152,7 @@ public class TestRuleChangeEventStore {
 
 		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ConditionType.TimeOfDay, propertiesCreated,
 				propertiesRemoved, propertiesUpdated, false, 1337);
-		RuleChangeEventStore store = new RuleChangeEventStore();
+		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff);
 
@@ -192,7 +193,7 @@ public class TestRuleChangeEventStore {
 
 		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ActionType.SaySomething, propertiesCreated,
 				propertiesRemoved, propertiesUpdated, false, 1);
-		RuleChangeEventStore store = new RuleChangeEventStore();
+		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff);
 

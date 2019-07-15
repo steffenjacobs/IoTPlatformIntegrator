@@ -23,12 +23,12 @@ public class MongoDbRuleDiffStorageService {
 		storageService.checkAndValidateConnection();
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> {
 			RuleDiffChangeEvent event = (RuleDiffChangeEvent) e;
-			store(event.getDiffElement(), event.getSelectedRule());
+			store(event.getDiffElement(), event.getSelectedRule(), event.getCreator());
 		});
 	}
 
-	public void store(SharedRuleElementDiff diff, SharedRule associatedRule) {
-		storageService.insertDiff(documentTransformer.toDocument(diffTransformer.toJSON(diff, associatedRule.getName())));
+	public void store(SharedRuleElementDiff diff, SharedRule associatedRule, String creator) {
+		storageService.insertDiff(documentTransformer.toDocument(diffTransformer.toJSON(diff, associatedRule.getName(), creator)));
 	}
 
 	public void findForRule(SharedRule rule, SimplifiedSubscriber<SharedRuleElementDiff> subscriber) {

@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Share
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
@@ -37,7 +41,7 @@ public class RuleChangeEventStore {
 	private final Map<RuleChangeEvent, SharedRuleElementDiff> diffMap = new HashMap<>();
 	private final RuleDiffService diffService = new RuleDiffService();
 
-	public RuleChangeEventStore() {
+	public RuleChangeEventStore(AuthenticationService authenticationService) {
 		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
 			final RuleChangeEvent event = (RuleChangeEvent) e;
 			if (changedRule != event.getSelectedRule()) {
@@ -47,7 +51,12 @@ public class RuleChangeEventStore {
 			ruleChanges.add(event);
 			SharedRuleElementDiff calculatedDiff = diffService.getDiffSharedRuleElement(event.getOldElement(), event.getNewElement());
 			diffMap.put(event, calculatedDiff);
-			EventBus.getInstance().fireEvent(new RuleDiffChangeEvent(event.getSelectedRule(), calculatedDiff));
+			if (authenticationService.isLoginSuccessful()) {
+				EventBus.getInstance().fireEvent(new RuleDiffChangeEvent(event.getSelectedRule(), calculatedDiff, authenticationService.getCurrentUser().getUserId().toString()));
+			} else {
+				JOptionPane.showMessageDialog(new JDialog(), "Invalid user credentials. Please restart the application or provide correct credentials under File -> Settings",
+						"Invalid user credentials.", JOptionPane.ERROR_MESSAGE);
+			}
 		});
 	}
 

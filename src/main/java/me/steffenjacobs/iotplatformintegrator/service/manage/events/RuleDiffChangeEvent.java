@@ -8,13 +8,20 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class RuleDiffChangeEvent extends WithSharedRuleEvent {
 
 	private final SharedRuleElementDiff diffElement;
+	private final String creator;
 
-	public RuleDiffChangeEvent(SharedRule sharedRule, SharedRuleElementDiff diffElement) {
+	public RuleDiffChangeEvent(SharedRule sharedRule, SharedRuleElementDiff diffElement, String creator) {
 		super(EventType.RuleDiffChangeEvent, sharedRule);
 		this.diffElement = diffElement;
+		this.creator = creator;
 	}
 
 	public SharedRuleElementDiff getDiffElement() {
 		return diffElement;
 	}
+
+	public String getCreator() {
+		return creator;
+	}
+
 }

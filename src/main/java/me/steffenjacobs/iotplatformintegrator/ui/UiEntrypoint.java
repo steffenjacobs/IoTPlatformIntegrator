@@ -26,6 +26,7 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.AdoptionPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.Perspective;
+import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ScoreboardPerspective;
 
 /** @author Steffen Jacobs */
 public class UiEntrypoint {
@@ -36,6 +37,7 @@ public class UiEntrypoint {
 
 	private final ImportPerspective importPerspective;
 	private final AdoptionPerspective adoptionPerspective;
+	private final ScoreboardPerspective scoreboardPerspective;
 	private final ServerConnectionManager serverConnectionManager;
 	private final AuthenticationService authenticationService;
 	private final SettingService settingService;
@@ -43,13 +45,14 @@ public class UiEntrypoint {
 	private Perspective currentPerspective = null;
 	private JFrame frame;
 
-	public UiEntrypoint() {
-		settingService = new SettingService("./settings.config");
+	public UiEntrypoint(SettingService settingService, AuthenticationService authenticationService) {
+		this.settingService = settingService;
+		this.authenticationService = authenticationService;
 		settingsFrameFactory = new SettingsFrameFactory(settingService);
 		importPerspective = new ImportPerspective(settingService);
 		adoptionPerspective = new AdoptionPerspective();
+		scoreboardPerspective = new ScoreboardPerspective();
 		serverConnectionManager = new ServerConnectionManager(settingService);
-		authenticationService = new AuthenticationService(settingService);
 	}
 
 	private void createAndShowGUI() {
@@ -158,11 +161,25 @@ public class UiEntrypoint {
 
 		mPerspective.add(mImportPerspective);
 		mPerspective.add(mAdoptionPerspective);
+
+		if (isAdmin()) {
+
+			JMenuItem mScorebaordPerspective = new JMenuItem("Scoreboard");
+			mScorebaordPerspective.addActionListener(e -> {
+				setActivePerspective(scoreboardPerspective);
+			});
+			mPerspective.add(mScorebaordPerspective);
+		}
+
 		return mb;
 	}
 
 	public void createAndShowGUIAsync() {
 		javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
+	}
+
+	public boolean isAdmin() {
+		return settingService.getSetting(SettingKey.USERNAME).equals("admin") && settingService.getSetting(SettingKey.PASSWORD).equals("nobodywilleverknowthispassword");
 	}
 
 }
