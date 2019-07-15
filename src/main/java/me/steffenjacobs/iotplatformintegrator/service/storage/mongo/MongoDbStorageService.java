@@ -27,10 +27,12 @@ public class MongoDbStorageService {
 	private static final Logger LOG = LoggerFactory.getLogger(MongoDbStorageService.class);
 	private static final String COLLECTION_NAME_DIFF_STORE = "diffStore";
 	private static final String COLLECTION_NAME_RULE_STORE = "ruleStore";
+	private static final String COLLECTION_NAME_USER_STORE = "userStore";
 	private static final String DATABASE_NAME = "IotPlatformIntegrator";
 
 	private MongoCollection<Document> ruleCollection;
 	private MongoCollection<Document> diffCollection;
+	private MongoCollection<Document> userCollection;
 	private MongoDatabase database;
 	private MongoClient mongoClient;
 
@@ -54,6 +56,12 @@ public class MongoDbStorageService {
 			ruleCollection = database.getCollection(COLLECTION_NAME_RULE_STORE);
 			if (diffCollection == null) {
 				database.createCollection(COLLECTION_NAME_RULE_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_RULE_STORE));
+			}
+		}
+		if (userCollection == null) {
+			userCollection = database.getCollection(COLLECTION_NAME_USER_STORE);
+			if (userCollection == null) {
+				database.createCollection(COLLECTION_NAME_USER_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_USER_STORE));
 			}
 		}
 	}
@@ -86,6 +94,13 @@ public class MongoDbStorageService {
 		return ruleCollection;
 	}
 
+	private MongoCollection<Document> getUserCollection() {
+		if (userCollection == null) {
+			userCollection = getDatabase().getCollection(COLLECTION_NAME_USER_STORE);
+		}
+		return userCollection;
+	}
+
 	public void containsRule(String ruleName, SimplifiedSubscriber<Document> callback) {
 		getRuleCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
 	}
@@ -96,6 +111,14 @@ public class MongoDbStorageService {
 
 	public void insertDiff(Document document) {
 		insert(getDiffCollection(), document);
+	}
+
+	public void insertUser(Document document) {
+		insert(getUserCollection(), document);
+	}
+
+	public void getUser(String id, SimplifiedSubscriber<Document> callback) {
+		getUserCollection().find(Filters.eq("_id", id)).first().subscribe(callback);
 	}
 
 	private void insert(MongoCollection<Document> collection, Document document) {
