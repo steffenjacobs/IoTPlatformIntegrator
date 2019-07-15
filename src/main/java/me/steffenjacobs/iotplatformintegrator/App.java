@@ -24,7 +24,7 @@ public class App {
 		mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
 		mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
 		mongoDbUserStorageService = new MongoDbUserStorageService(storageService);
-
+		
 		new UiEntrypoint().createAndShowGUIAsync();
 		new RuleChangeEventStore();
 

@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,7 +19,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ServerConnectionManager;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.AdoptionPerspective;
 import me.steffenjacobs.iotplatformintegrator.ui.perspectives.ImportPerspective;
@@ -34,16 +37,19 @@ public class UiEntrypoint {
 	private final ImportPerspective importPerspective;
 	private final AdoptionPerspective adoptionPerspective;
 	private final ServerConnectionManager serverConnectionManager;
+	private final AuthenticationService authenticationService;
+	private final SettingService settingService;
 
 	private Perspective currentPerspective = null;
 	private JFrame frame;
 
 	public UiEntrypoint() {
-		final SettingService settingService = new SettingService("./settings.config");
+		settingService = new SettingService("./settings.config");
 		settingsFrameFactory = new SettingsFrameFactory(settingService);
 		importPerspective = new ImportPerspective(settingService);
 		adoptionPerspective = new AdoptionPerspective();
 		serverConnectionManager = new ServerConnectionManager(settingService);
+		authenticationService = new AuthenticationService(settingService);
 	}
 
 	private void createAndShowGUI() {
@@ -55,6 +61,13 @@ public class UiEntrypoint {
 
 		// setup docking environment
 		setActivePerspective(importPerspective);
+
+		// authentication if required
+		if (authenticationService.isSignupRequired() || !authenticationService.isLoginSuccessful()) {
+			JDialog loginFrame = new LoginFrameFactory(settingService, authenticationService).createSettingsFrame(this.frame);
+			loginFrame.setVisible(true);
+		}
+		LOG.info("Logged in as user {} ({})", settingService.getSetting(SettingKey.USERNAME), settingService.getSetting(SettingKey.USERID));
 
 		frame.setVisible(true);
 	}

@@ -25,6 +25,10 @@ public class MongoDbUserStorageService {
 	}
 
 	public void isUserValid(User user, CompletableFuture<Boolean> callback) {
+		if (user.getUserId() == null) {
+			callback.complete(false);
+			return;
+		}
 		storageService.getUser(user.getUserId().toString(), new SimplifiedSubscriber<Document>() {
 			@Override
 			public void onNext(Document t) {

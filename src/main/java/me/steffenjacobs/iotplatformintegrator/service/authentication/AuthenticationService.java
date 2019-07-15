@@ -24,6 +24,10 @@ public class AuthenticationService {
 		this.settingService = settingService;
 	}
 
+	public void registerUser(User user) {
+		App.getMongoDbUserStorageService().storeUser(user);
+	}
+
 	public boolean isSignupRequired() {
 		return SettingKey.USERID.getDefaultValue().equals(settingService.getSetting(SettingKey.USERID));
 	}
@@ -40,8 +44,13 @@ public class AuthenticationService {
 	}
 
 	private User loadUser() {
-		return new User(UUID.fromString(settingService.getSetting(SettingKey.USERID)), settingService.getSetting(SettingKey.USERNAME),
-				settingService.getSetting(SettingKey.PASSWORD));
+		UUID userid;
+		try {
+			userid = UUID.fromString(settingService.getSetting(SettingKey.USERID));
+		} catch (IllegalArgumentException e) {
+			userid = null;
+		}
+		return new User(userid, settingService.getSetting(SettingKey.USERNAME), settingService.getSetting(SettingKey.PASSWORD));
 	}
 
 }
