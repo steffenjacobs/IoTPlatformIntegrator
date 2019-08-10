@@ -4,6 +4,11 @@ import java.util.function.Consumer;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ClearAllRemoteRulesEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleAddedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
@@ -17,6 +22,14 @@ public class RemoteRuleController {
 	public RemoteRuleController(MongoDbRuleDiffStorageService diffStorage, MongoDbSharedRuleStorageService ruleStorage) {
 		this.diffStorage = diffStorage;
 		this.ruleStorage = ruleStorage;
+
+		EventBus.getInstance().addEventHandler(EventType.StoreRuleToDatabase, e -> {
+			StoreRuleToDatabaseEvent event = (StoreRuleToDatabaseEvent) e;
+			SharedRule rule = new SharedRule(event.getNewRuleName(), event.getSelectedRule());
+			uploadRule(rule);
+		});
+		
+		refreshRules();
 	}
 
 	public void getDiffs(SharedRule rule, Consumer<SharedRuleElementDiff> consumer) {
@@ -38,7 +51,11 @@ public class RemoteRuleController {
 	}
 
 	public void uploadRule(SharedRule selectedRule) {
-		ruleStorage.insertRule(selectedRule);
+		ruleStorage.insertRule(selectedRule, this::refreshRules);
 	}
 
+	private void refreshRules() {
+		EventBus.getInstance().fireEvent(new ClearAllRemoteRulesEvent());
+		getRules(r -> EventBus.getInstance().fireEvent(new RemoteRuleAddedEvent(r)));
+	}
 }

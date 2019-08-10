@@ -15,6 +15,7 @@ import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbStora
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbUserStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.RemoteRuleController;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleChangeEventStore;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
 
@@ -26,6 +27,7 @@ public class App {
 	private static MongoDbSharedRuleStorageService mongoDbSharedRuleStorageService;
 	private static MongoDbUserStorageService mongoDbUserStorageService;
 	private static AuthenticationService authenticationService;
+	private static RemoteRuleController remoteRuleController;
 
 	public static void main(String[] args) {
 		LOG.info("Started.");
@@ -40,6 +42,8 @@ public class App {
 
 			new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
 			new RuleChangeEventStore(authenticationService);
+			
+			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService);
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
@@ -60,6 +64,10 @@ public class App {
 
 	public static MongoDbUserStorageService getMongoDbUserStorageService() {
 		return mongoDbUserStorageService;
+	}
+	
+	public static RemoteRuleController getRemoteRuleController() {
+		return remoteRuleController;
 	}
 
 }

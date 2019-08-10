@@ -3,7 +3,6 @@ package me.steffenjacobs.iotplatformintegrator.ui;
 import javax.swing.JTable;
 
 import me.steffenjacobs.iotplatformintegrator.App;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.RemoteRuleController;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ScoreboardController;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.InstanceChooserPanel;
@@ -33,8 +32,7 @@ public class GlobalComponentHolder {
 	private final ItemTableHolder itemTableHolder = new ItemTableHolder(ItemTableHolderType.Default);
 	private final ItemTableHolder itemTableSourceHolder = new ItemTableHolder(ItemTableHolderType.Source);
 	private final ItemTableHolder itemTableTargetHolder = new ItemTableHolder(ItemTableHolderType.Target);
-	private final RemoteRuleDiffPanel remoteRulesPanel = new RemoteRuleDiffPanel(
-			new RemoteRuleController(App.getMongoDbRuleDiffStorageService(), App.getMongoDbSharedRuleStorageService()));
+	private final RemoteRuleDiffPanel remoteRulesPanel = new RemoteRuleDiffPanel(App.getRemoteRuleController());
 	private final ScoreboardPanel scoreboardPanel = new ScoreboardPanel(new ScoreboardController());
 
 	private final RuleDetailsPanel ruleDetailsPanel = new RuleDetailsPanel();

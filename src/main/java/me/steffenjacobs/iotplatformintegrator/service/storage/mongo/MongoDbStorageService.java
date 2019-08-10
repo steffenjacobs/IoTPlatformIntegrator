@@ -116,8 +116,8 @@ public class MongoDbStorageService {
 		getRuleCollection().find(Filters.eq("name", ruleName)).first().subscribe(callback);
 	}
 
-	public void insertRule(Document document) {
-		insert(getRuleCollection(), document);
+	public void insertRule(Document document, Runnable callWhenDone) {
+		insert(getRuleCollection(), document, callWhenDone);
 	}
 
 	public void insertDiff(Document document) {
@@ -131,8 +131,11 @@ public class MongoDbStorageService {
 	public void getUser(String id, SimplifiedSubscriber<Document> callback) {
 		getUserCollection().find(Filters.eq("_id", id)).first().subscribe(callback);
 	}
-
 	private void insert(MongoCollection<Document> collection, Document document) {
+		insert(collection, document, () ->{});
+	}
+
+	private void insert(MongoCollection<Document> collection, Document document, Runnable callWhenDone) {
 		Publisher<Success> publisher = collection.insertOne(document);
 		publisher.subscribe(new Subscriber<Success>() {
 			@Override
@@ -148,11 +151,13 @@ public class MongoDbStorageService {
 			@Override
 			public void onError(final Throwable t) {
 				LOG.error("Could not insert document into diffCollection: {} ", t.getMessage());
+				callWhenDone.run();
 			}
 
 			@Override
 			public void onComplete() {
 				LOG.info("Inserted document into diffCollection: {} complete", document.toJson());
+				callWhenDone.run();
 			}
 		});
 	}

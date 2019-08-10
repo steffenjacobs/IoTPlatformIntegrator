@@ -54,9 +54,12 @@ public class RuleTableHolder {
 			});
 			break;
 		case Remote:
-
 			EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> {
 				((ArrayList<SharedRule>) lastRules).add(((RemoteRuleAddedEvent) e).getSelectedRule());
+				updateRuleTable(rulesTable, lastRules);
+			});
+			EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> {
+				lastRules = new ArrayList<>();
 				updateRuleTable(rulesTable, lastRules);
 			});
 			break;

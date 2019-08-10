@@ -1,6 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.rule;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
@@ -30,6 +32,16 @@ public class SharedRule {
 		this.triggers = triggers;
 		this.conditions = conditions;
 		this.actions = actions;
+	}
+
+	/**Copy constructor with a {@link String new rule name} that also generates a new ID and copies the changes from {@link SharedRule rule}.*/
+	public SharedRule(String newRuleName, SharedRule rule) {
+			this(newRuleName, UUID.randomUUID().toString(), rule.getDescription(), rule.getVisible(), rule.getStatus(), rule.getTriggers(), rule.getConditions(), rule.getActions());
+	}
+	
+	/**Constructor to create a dummy role with an {@String error message} if parsing went wrong.*/
+	public SharedRule(String errorMessage) {
+		this(errorMessage, "", "" ,"", "", new HashSet<SharedTrigger>(), new HashSet<SharedCondition>(), new HashSet<SharedAction>());
 	}
 
 	public String getName() {

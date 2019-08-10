@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,8 @@ public class SharedRuleJsonTransformer {
 	private static final String KEY_RULE_ELEMENT_CONTAINER = "container";
 
 	public SharedRule fromJson(String jsonStr) {
+		try {
+			
 		JSONObject json = new JSONObject(jsonStr);
 		String name = json.getString(KEY_NAME);
 		String id = json.getString(KEY_ID);
@@ -56,16 +59,36 @@ public class SharedRuleJsonTransformer {
 		String status = json.getString(KEY_STATUS);
 		String visible = json.getString(KEY_VISIBLE);
 
-		JSONArray jsonTriggers = json.getJSONArray(KEY_TRIGGERS);
-		Set<SharedTrigger> triggers = parseRuleElements(jsonTriggers).getLeft();
+		Set<SharedTrigger> triggers = new HashSet<>();
+		try {
+			JSONArray jsonTriggers = json.getJSONArray(KEY_TRIGGERS);
+			triggers = parseRuleElements(jsonTriggers).getLeft();
+		} catch (JSONException e) {
+			// nothing to do
+		}
 
-		JSONArray jsonConditions = json.getJSONArray(KEY_CONDITIONS);
-		Set<SharedCondition> conditions = parseRuleElements(jsonConditions).getMiddle();
+		Set<SharedCondition> conditions = new HashSet<>();
+		try {
+			JSONArray jsonConditions = json.getJSONArray(KEY_CONDITIONS);
+			conditions = parseRuleElements(jsonConditions).getMiddle();
+		} catch (JSONException e) {
+			// nothing to do
+		}
 
-		JSONArray jsonActions = json.getJSONArray(KEY_ACTIONS);
-		Set<SharedAction> actions = parseRuleElements(jsonActions).getRight();
+		Set<SharedAction> actions = new HashSet<>();
+		try {
+			JSONArray jsonActions = json.getJSONArray(KEY_ACTIONS);
+			actions = parseRuleElements(jsonActions).getRight();
+		} catch (JSONException e) {
+			// nothing to do
+		}
 
 		return new SharedRule(name, id, description, visible, status, triggers, conditions, actions);
+		}
+		catch(JSONException e) {
+			LOG.warn("Invalid JSON detected: {}", e.getMessage(), e);
+			return new SharedRule("#INVALID#");
+		}
 	}
 
 	private Triple<Set<SharedTrigger>, Set<SharedCondition>, Set<SharedAction>> parseRuleElements(JSONArray jsonArr) {
