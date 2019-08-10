@@ -13,7 +13,7 @@ public class ItemDirectory {
 
 	public SharedItem getItemByName(String name) {
 		SharedItem item = items.get(name);
-		return item == null ? new SharedItem("<unknown-item>", String.format("Unknown Item '%s'", name), ItemType.Unknown) : item;
+		return item == null ? new SharedItem("<" + name + "-unknown-item>", String.format("Unknown Item '%s'", name), ItemType.Unknown) : item;
 	}
 
 	public void addItems(Iterable<SharedItem> addedItems) {

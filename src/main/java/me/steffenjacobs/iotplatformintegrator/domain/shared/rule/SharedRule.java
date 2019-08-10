@@ -36,7 +36,18 @@ public class SharedRule {
 
 	/**Copy constructor with a {@link String new rule name} that also generates a new ID and copies the changes from {@link SharedRule rule}.*/
 	public SharedRule(String newRuleName, SharedRule rule) {
-			this(newRuleName, UUID.randomUUID().toString(), rule.getDescription(), rule.getVisible(), rule.getStatus(), rule.getTriggers(), rule.getConditions(), rule.getActions());
+		this.name = newRuleName;
+		this.id = UUID.randomUUID().toString();
+		this.description = rule.getDescription();
+		this.visible = rule.getVisible();
+		this.status = rule.getStatus();
+		this.triggers = new HashSet<SharedTrigger>();
+		this.conditions = new HashSet<SharedCondition>();
+		this.actions = new HashSet<SharedAction>();
+		
+		rule.getActions().forEach(a -> this.actions.add(new SharedAction(a)));
+		rule.getConditions().forEach(a -> this.conditions.add(new SharedCondition(a)));
+		rule.getTriggers().forEach(a -> this.triggers.add(new SharedTrigger(a)));
 	}
 	
 	/**Constructor to create a dummy role with an {@String error message} if parsing went wrong.*/
