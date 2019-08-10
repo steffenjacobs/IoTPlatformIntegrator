@@ -1,6 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
 import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -12,33 +14,43 @@ import me.steffenjacobs.iotplatformintegrator.domain.authentication.UserScore;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ScoreboardController;
 
 /** @author Steffen Jacobs */
-public class ScoreboardPanel extends JPanel{
+public class ScoreboardPanel extends JPanel {
 	private static final long serialVersionUID = -8556971313008407678L;
-	
+
 	private final JTable scoreboard;
 
+	private final List<UserScore> currentScores = new ArrayList<>();
+
 	public ScoreboardPanel(ScoreboardController controller) {
-		
+
 		JPanel contentPanel = new JPanel();
-		
+
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-		
+
 		JPanel rightBoundPanel = new JPanel();
 		rightBoundPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		
+
 		JButton buttonUpdate = new JButton("Refresh");
-		
-		buttonUpdate.addActionListener(e -> updateItemsTable(controller.refreshedTable()));
-		
+
+		buttonUpdate.addActionListener(e -> refresh(controller));
+
 		scoreboard = createItemsTable();
 		contentPanel.add(rightBoundPanel);
 		contentPanel.add(scoreboard);
-		
+
 		this.add(contentPanel);
-		
-		updateItemsTable(controller.refreshedTable());
+
+		refresh(controller);
 	}
-	
+
+	private void refresh(ScoreboardController controller) {
+		currentScores.clear();
+		controller.refreshedTable(s -> {
+			currentScores.add(s);
+			updateItemsTable(currentScores.toArray(new UserScore[currentScores.size()]));
+		});
+	}
+
 	public JTable getScoreboard() {
 		return scoreboard;
 	}
