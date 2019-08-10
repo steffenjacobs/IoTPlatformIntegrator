@@ -36,6 +36,13 @@ public class MongoDbUserStorageService {
 				User storedUser = userTransformer.fromJSON(documentTransformer.toJSON(t));
 				callback.complete(isValid(storedUser));
 			}
+			
+			@Override
+			public void onComplete() {
+				if(!callback.isDone()) {
+					callback.complete(false);
+				}
+			}
 
 			private boolean isValid(User storedUser) {
 				return user.getUserId().equals(storedUser.getUserId()) && user.getPassword().equals(storedUser.getPassword());
