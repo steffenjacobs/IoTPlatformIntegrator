@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
@@ -194,7 +196,7 @@ public class MongoDbStorageService {
 		});
 	}
 	private void upsert(MongoCollection<Document> collection, Bson filter, Document document, Runnable callWhenDone) {
-		Publisher<UpdateResult> publisher = collection.replaceOne(filter, document);
+		Publisher<UpdateResult> publisher = collection.replaceOne(filter, document, new ReplaceOptions().upsert(true));
 		publisher.subscribe(new Subscriber<UpdateResult>() {
 			@Override
 			public void onSubscribe(final Subscription s) {
