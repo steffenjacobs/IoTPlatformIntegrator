@@ -12,8 +12,6 @@ import javax.swing.JPanel;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
-import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
 

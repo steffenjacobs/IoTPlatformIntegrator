@@ -2,7 +2,6 @@ package me.steffenjacobs.iotplatformintegrator.ui;
 
 import javax.swing.JTable;
 
-import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ScoreboardController;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.InstanceChooserPanel;
@@ -10,7 +9,6 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.ItemTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ItemTableHolder.ItemTableHolderType;
-import me.steffenjacobs.iotplatformintegrator.ui.components.RemoteRuleDiffPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder.RuleTableHolderType;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ScoreboardPanel;
 
@@ -32,7 +30,6 @@ public class GlobalComponentHolder {
 	private final ItemTableHolder itemTableHolder = new ItemTableHolder(ItemTableHolderType.Default);
 	private final ItemTableHolder itemTableSourceHolder = new ItemTableHolder(ItemTableHolderType.Source);
 	private final ItemTableHolder itemTableTargetHolder = new ItemTableHolder(ItemTableHolderType.Target);
-	private final RemoteRuleDiffPanel remoteRulesPanel = new RemoteRuleDiffPanel(App.getRemoteRuleController());
 	private final ScoreboardPanel scoreboardPanel = new ScoreboardPanel(new ScoreboardController());
 
 	private final RuleDetailsPanel ruleDetailsPanel = new RuleDetailsPanel();
@@ -72,10 +69,6 @@ public class GlobalComponentHolder {
 
 	public InstanceChooserPanel getInstanceChooser() {
 		return instanceChooser;
-	}
-
-	public RemoteRuleDiffPanel getRemoteRulesPanel() {
-		return remoteRulesPanel;
 	}
 
 	public JTable getScoreboardPanel() {

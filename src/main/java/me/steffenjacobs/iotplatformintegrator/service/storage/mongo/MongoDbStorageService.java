@@ -257,6 +257,7 @@ public class MongoDbStorageService {
 					@Override
 					public void onError(Throwable t) {
 						callback.onError(t);
+						t.printStackTrace();
 					}
 
 					@Override

@@ -9,8 +9,10 @@ import javax.swing.JTable;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
+import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
+import me.steffenjacobs.iotplatformintegrator.ui.components.RemoteRuleDiffPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
@@ -66,7 +68,7 @@ public class IntegrationPerspective extends Perspective {
 		control.addDockable(sourceItemWindow);
 
 		// create remote rules window
-		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", GlobalComponentHolder.getInstance().getRemoteRulesPanel());
+		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", new RemoteRuleDiffPanel(App.getRemoteRuleController()));
 		control.addDockable(remoteRulesWindow);
 
 		// create target item table window
