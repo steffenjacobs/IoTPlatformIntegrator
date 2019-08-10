@@ -110,7 +110,14 @@ public class RuleTableHolder {
 	private JTable createRulesTable() {
 
 		// create table model
-		DefaultTableModel tableModel = new DefaultTableModel();
+		DefaultTableModel tableModel = new DefaultTableModel() {
+			private static final long serialVersionUID = 7112329891318711679L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		tableModel.setColumnCount(3);
 
 		// setup columns

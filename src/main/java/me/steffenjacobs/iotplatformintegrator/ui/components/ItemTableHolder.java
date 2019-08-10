@@ -49,7 +49,14 @@ public class ItemTableHolder {
 	private JTable createItemsTable() {
 
 		// create table model
-		DefaultTableModel tableModel = new DefaultTableModel();
+		DefaultTableModel tableModel = new DefaultTableModel() {
+			private static final long serialVersionUID = 4977511240634826062L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		tableModel.setColumnCount(3);
 
 		// setup columns
