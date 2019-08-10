@@ -26,7 +26,7 @@ public class LoginFrameFactory {
 		this.authenticationService = authenticationService;
 	}
 
-	public JDialog createSettingsFrame(Window parent) {
+	public JDialog createLoginFrame(Window parent) {
 		JDialog frame = new JDialog(parent);
 		frame.setTitle("Registration required!");
 		frame.setSize(400, 300);

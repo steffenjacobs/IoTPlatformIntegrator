@@ -67,7 +67,7 @@ public class UiEntrypoint {
 
 		// authentication if required
 		if (authenticationService.isSignupRequired() || !authenticationService.isLoginSuccessful()) {
-			JDialog loginFrame = new LoginFrameFactory(settingService, authenticationService).createSettingsFrame(this.frame);
+			JDialog loginFrame = new LoginFrameFactory(settingService, authenticationService).createLoginFrame(this.frame);
 			loginFrame.setVisible(true);
 		}
 		LOG.info("Logged in as user {} ({})", settingService.getSetting(SettingKey.USERNAME), settingService.getSetting(SettingKey.USERID));
