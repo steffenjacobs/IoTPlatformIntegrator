@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -188,6 +189,32 @@ public class MongoDbStorageService {
 			@Override
 			public void onComplete() {
 				LOG.info("Inserted document into diffCollection: {} complete", document.toJson());
+				callWhenDone.run();
+			}
+		});
+	}
+	private void upsert(MongoCollection<Document> collection, Bson filter, Document document, Runnable callWhenDone) {
+		Publisher<UpdateResult> publisher = collection.replaceOne(filter, document);
+		publisher.subscribe(new Subscriber<UpdateResult>() {
+			@Override
+			public void onSubscribe(final Subscription s) {
+				s.request(1);
+			}
+			
+			@Override
+			public void onNext(final UpdateResult success) {
+				LOG.info("Upserted document into diffCollection: {}", document.toJson());
+			}
+			
+			@Override
+			public void onError(final Throwable t) {
+				LOG.error("Could not upsert document into diffCollection: {} ", t.getMessage());
+				callWhenDone.run();
+			}
+			
+			@Override
+			public void onComplete() {
+				LOG.info("Upserted document into diffCollection: {} complete", document.toJson());
 				callWhenDone.run();
 			}
 		});
@@ -419,7 +446,7 @@ public class MongoDbStorageService {
 	}
 
 	public void insertItem(Document document, Runnable callWhenDone) {
-		insert(getItemCollection(), document, callWhenDone);
+		upsert(getItemCollection(),Filters.and(Filters.eq("name", document.get("name")), Filters.eq("type", document.get("type"))),  document, callWhenDone);
 	}
 
 	public void getAllRules(Subscriber<SharedRule> subscriber, Function<Document, SharedRule> transformation, MongoDbStorageService storageService) {
