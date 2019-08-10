@@ -30,9 +30,9 @@ public class AdoptionPerspective extends Perspective {
 		platformRulesTablePanel.removeAll();
 		platformRulesTablePanel.add(new JScrollPane(ruleTableSource), BorderLayout.CENTER);
 
-		JTable ruleTableTarget = GlobalComponentHolder.getInstance().getRemoteRuleTable();
+		JTable ruleTableRemote = GlobalComponentHolder.getInstance().getRemoteRuleTable();
 		remoteRulesTablePanel.removeAll();
-		remoteRulesTablePanel.add(new JScrollPane(ruleTableTarget), BorderLayout.CENTER);
+		remoteRulesTablePanel.add(new JScrollPane(ruleTableRemote), BorderLayout.CENTER);
 	}
 
 	public AdoptionPerspective() {
@@ -58,7 +58,7 @@ public class AdoptionPerspective extends Perspective {
 		control.addDockable(ruleNetWindow);
 
 		// create remote rules window
-		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", GlobalComponentHolder.getInstance().getRemoteRulesPanel());
+		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", remoteRulesTablePanel);
 		control.addDockable(remoteRulesWindow);
 
 		// create rule builder window

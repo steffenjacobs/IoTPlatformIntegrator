@@ -22,7 +22,8 @@ public class EventBus {
 		SelectedServerConnectionChanged, ServerDisconnected, ServerConnected, SelectedRuleChanged, SourceConnectionChanged, TargetConnectionChanged, //
 		SelectedSourceRuleChanged, SelectedTargetRuleChanged, RuleElementAdded, RuleElementRemoved, RuleChangeEvent, RuleElementChangeEvent, //
 		RuleDiffChangeEvent, //
-		RemoteRuleAdded, RemoteRuleChange;
+		RemoteRuleAdded, RemoteRuleChange,//
+		StoreRuleToDatabase, ExportRuleToPlatform;
 	}
 
 	private EventBus() {
