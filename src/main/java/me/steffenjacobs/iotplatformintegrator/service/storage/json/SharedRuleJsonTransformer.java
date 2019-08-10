@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
@@ -131,7 +132,29 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) -> itemDirectory.getItemByName(i.toString()));
 	}
 
+	private void reverseTransformActionObjectsInMap(Map<ActionTypeSpecificKey, Object> map) {
+		map.computeIfPresent(ActionTypeSpecificKey.Command, (k, c) -> ((Command) c).name());
+		map.computeIfPresent(ActionTypeSpecificKey.ItemName, (k, i) -> ((SharedItem) i).getName());
+	}
+
+	private void reverseTransformConditionObjectsInMap(Map<ConditionTypeSpecificKey, Object> map) {
+		map.computeIfPresent(ConditionTypeSpecificKey.Operator, (k, o) -> ((Operation) o).name());
+		map.computeIfPresent(ConditionTypeSpecificKey.ItemName, (k, i) -> ((SharedItem) i).getName());
+	}
+
+	private void reverseTransformTriggerObjectsInMap(Map<TriggerTypeSpecificKey, Object> map) {
+		map.computeIfPresent(TriggerTypeSpecificKey.Command, (k, c) -> ((Command) c).name());
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName, (k, i) -> ((SharedItem) i).getName());
+	}
+
 	public JSONObject toJson(SharedRule rule) {
+
+		rule = new SharedRule(rule.getName(), rule);
+
+		rule.getActions().forEach(a -> reverseTransformActionObjectsInMap(a.getActionTypeContainer().getActionTypeSpecificValues()));
+		rule.getConditions().forEach(a -> reverseTransformConditionObjectsInMap(a.getConditionTypeContainer().getConditionTypeSpecificValues()));
+		rule.getTriggers().forEach(a -> reverseTransformTriggerObjectsInMap(a.getTriggerTypeContainer().getTriggerTypeSpecificValues()));
+
 		JSONObject json = new JSONObject();
 		jsonHelper.putIfNotNull(json, KEY_NAME, rule.getName());
 		jsonHelper.putIfNotNull(json, KEY_ID, rule.getId());
