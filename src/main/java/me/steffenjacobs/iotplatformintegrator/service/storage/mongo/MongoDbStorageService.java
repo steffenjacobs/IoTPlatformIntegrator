@@ -179,8 +179,11 @@ public class MongoDbStorageService {
 	public <T> void getStats(Subscriber<T> callback, Function<Document, T> transformation) {
 
 		getUserCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
+			private Long count;
+
 			@Override
 			public void onNext(Long count) {
+				this.count = count;
 				getDiffCollection().aggregate(Arrays.asList(
 						// Aggregates.match(Filters.eq("categories", "Bakery")),
 						Aggregates.group("$_id",
@@ -209,6 +212,18 @@ public class MongoDbStorageService {
 								callback.onComplete();
 							}
 						});
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				callback.onError(t);
+			}
+
+			@Override
+			public void onComplete() {
+				if (count == 0) {
+					callback.onComplete();
+				}
 			}
 		});
 	}

@@ -37,6 +37,12 @@ public class ScoreboardController {
 			public void onComplete() {
 				future.complete(scores.toArray(new UserScore[scores.size()]));
 			}
+			
+			@Override
+			public void onError(Throwable t) {
+				LOG.error("Could not retrive user score: ", t);
+				future.complete(new UserScore[0]);
+			}
 		});
 
 		try {

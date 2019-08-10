@@ -37,7 +37,7 @@ public class GlobalComponentHolder {
 	private final InstanceChooserPanel instanceChooser = new InstanceChooserPanel();
 	
 	public GlobalComponentHolder() {
-		remoteRuleTableHolder  = new RuleTableHolder(RuleTableHolderType.Remote, App.getDatabaseConnectionObject());
+		remoteRuleTableHolder  = new RuleTableHolder(RuleTableHolderType.Remote, App.getDatabaseConnectionObject());;
 	}
 
 	public ConnectionExplorer getConnectionExplorer() {
