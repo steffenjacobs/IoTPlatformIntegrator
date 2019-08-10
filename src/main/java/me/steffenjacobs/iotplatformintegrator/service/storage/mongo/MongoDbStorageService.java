@@ -195,51 +195,53 @@ public class MongoDbStorageService {
 	public <T> void getStats(Subscriber<T> callback, Function<Document, T> transformation) {
 
 		getUserCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
-			private Long count;
 
 			@Override
 			public void onNext(Long count) {
-				this.count = count;
-				getDiffCollection().aggregate(Arrays.asList(
-						// Aggregates.match(Filters.eq("categories", "Bakery")),
-						Aggregates.group("$_id",
-								Arrays.asList(Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_ADDED, 1),
-										Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_REMOVED, 1),
-										Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_UPDATED, 1)))))
-						.subscribe(new Subscriber<Document>() {
+				if (count > 0) {
 
-							@Override
-							public void onSubscribe(Subscription s) {
-								s.request(count);
-							}
+					getDiffCollection().aggregate(Arrays.asList(
+							// Aggregates.match(Filters.eq("categories", "Bakery")),
+							Aggregates.group("$_id",
+									Arrays.asList(Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_ADDED, 1),
+											Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_REMOVED, 1),
+											Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_UPDATED, 1)))))
+							.subscribe(new Subscriber<Document>() {
+								int cnt = 0;
 
-							@Override
-							public void onNext(Document t) {
-								callback.onNext(transformation.apply(t));
-							}
+								@Override
+								public void onSubscribe(Subscription s) {
+									s.request(count);
+								}
 
-							@Override
-							public void onError(Throwable t) {
-								callback.onError(t);
-							}
+								@Override
+								public void onNext(Document t) {
+									callback.onNext(transformation.apply(t));
+									cnt++;
+									//bugfix because onComplete is never called
+									if(cnt == count) {
+										onComplete();
+									}
+								}
 
-							@Override
-							public void onComplete() {
-								callback.onComplete();
-							}
-						});
+								@Override
+								public void onError(Throwable t) {
+									callback.onError(t);
+								}
+
+								@Override
+								public void onComplete() {
+									callback.onComplete();
+								}
+							});
+				} else {
+					callback.onComplete();
+				}
 			}
 
 			@Override
 			public void onError(Throwable t) {
 				callback.onError(t);
-			}
-
-			@Override
-			public void onComplete() {
-				if (count == 0) {
-					callback.onComplete();
-				}
 			}
 		});
 	}
@@ -251,28 +253,37 @@ public class MongoDbStorageService {
 
 			@Override
 			public void onNext(Long count) {
-				getDiffCollection().find(filter).subscribe(new Subscriber<Document>() {
+				if (count > 0) {
+					getDiffCollection().find(filter).subscribe(new Subscriber<Document>() {
+						int cnt = 0;
+						@Override
+						public void onSubscribe(Subscription s) {
+							s.request(count);
+						}
 
-					@Override
-					public void onSubscribe(Subscription s) {
-						s.request(count);
-					}
+						@Override
+						public void onNext(Document t) {
+							callback.onNext(transformation.apply(t));
+							cnt++;
+							//bugfix because onComplete is never called
+							if(cnt == count) {
+								onComplete();
+							}
+						}
 
-					@Override
-					public void onNext(Document t) {
-						callback.onNext(transformation.apply(t));
-					}
+						@Override
+						public void onError(Throwable t) {
+							callback.onError(t);
+						}
 
-					@Override
-					public void onError(Throwable t) {
-						callback.onError(t);
-					}
-
-					@Override
-					public void onComplete() {
-						callback.onComplete();
-					}
-				});
+						@Override
+						public void onComplete() {
+							callback.onComplete();
+						}
+					});
+				} else {
+					callback.onComplete();
+				}
 			}
 
 			@Override
@@ -290,6 +301,7 @@ public class MongoDbStorageService {
 				if (count > 0) {
 					collection.find().subscribe(new Subscriber<Document>() {
 
+						int cnt = 0;
 						@Override
 						public void onSubscribe(Subscription s) {
 							s.request(count);
@@ -298,6 +310,11 @@ public class MongoDbStorageService {
 						@Override
 						public void onNext(Document t) {
 							callback.onNext(transformation.apply(t));
+							cnt++;
+							//bugfix because onComplete is never called
+							if(cnt == count) {
+								onComplete();
+							}
 						}
 
 						@Override
@@ -311,6 +328,8 @@ public class MongoDbStorageService {
 							callback.onComplete();
 						}
 					});
+				} else {
+					callback.onComplete();
 				}
 			}
 
