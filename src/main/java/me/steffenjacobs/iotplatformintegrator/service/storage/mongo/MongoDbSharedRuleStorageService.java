@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
+import java.io.IOException;
+
 import org.reactivestreams.Subscriber;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
@@ -12,7 +14,7 @@ public class MongoDbSharedRuleStorageService {
 	private final MongoDbDocumentJsonTransformer documentTransformer = new MongoDbDocumentJsonTransformer();
 	private final MongoDbStorageService storageService;
 
-	public MongoDbSharedRuleStorageService(MongoDbStorageService storageService) {
+	public MongoDbSharedRuleStorageService(MongoDbStorageService storageService) throws IOException {
 		this.storageService = storageService;
 		storageService.checkAndValidateConnection();
 		// TODO: add correct event handler

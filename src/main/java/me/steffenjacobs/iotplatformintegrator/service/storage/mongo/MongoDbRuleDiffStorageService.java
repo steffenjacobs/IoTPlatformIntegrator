@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
+import java.io.IOException;
+
 import me.steffenjacobs.iotplatformintegrator.domain.authentication.UserScore;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
@@ -18,7 +20,7 @@ public class MongoDbRuleDiffStorageService {
 	private final UserScoreJsonTransformer userScoreTransformer = new UserScoreJsonTransformer();
 	private final MongoDbStorageService storageService;
 
-	public MongoDbRuleDiffStorageService(MongoDbStorageService storageService) {
+	public MongoDbRuleDiffStorageService(MongoDbStorageService storageService) throws IOException {
 		this.storageService = storageService;
 		storageService.checkAndValidateConnection();
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> {

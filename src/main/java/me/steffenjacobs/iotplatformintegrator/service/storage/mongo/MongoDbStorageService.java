@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -46,6 +47,8 @@ public class MongoDbStorageService {
 		if (mongoClient == null) {
 			mongoClient = MongoClients.create("mongodb://localhost");
 		}
+	public void checkAndValidateConnection() throws IOException {
+		
 		if (database == null) {
 			database = mongoClient.getDatabase("IotPlatformIntegrator");
 		}

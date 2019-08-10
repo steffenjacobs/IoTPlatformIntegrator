@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import org.bson.Document;
@@ -15,7 +16,7 @@ public class MongoDbUserStorageService {
 	private final UserJsonTransformer userTransformer = new UserJsonTransformer();
 	private final MongoDbStorageService storageService;
 
-	public MongoDbUserStorageService(MongoDbStorageService storageService) {
+	public MongoDbUserStorageService(MongoDbStorageService storageService) throws IOException {
 		this.storageService = storageService;
 		storageService.checkAndValidateConnection();
 	}

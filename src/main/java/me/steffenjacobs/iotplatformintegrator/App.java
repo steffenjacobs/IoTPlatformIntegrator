@@ -1,5 +1,9 @@
 package me.steffenjacobs.iotplatformintegrator;
 
+import java.io.IOException;
+
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +32,7 @@ public class App {
 		mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
 		mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
 		mongoDbUserStorageService = new MongoDbUserStorageService(storageService);
+		try {
 
 		SettingService settingService = new SettingService("./settings.config");
 		authenticationService = new AuthenticationServiceImpl(settingService);
@@ -35,7 +40,13 @@ public class App {
 		new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
 		new RuleChangeEventStore(authenticationService);
 
-		LOG.info("Setup complete.");
+			LOG.info("Setup complete.");
+		} catch (IOException e) {
+			e.printStackTrace();
+			LOG.error("Could not connect to database.");
+			JOptionPane.showMessageDialog(null, String.format("Could not connect ot database %s", settingService.getSetting(SettingKey.DATABASE_URI)), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public static MongoDbRuleDiffStorageService getMongoDbRuleDiffStorageService() {
