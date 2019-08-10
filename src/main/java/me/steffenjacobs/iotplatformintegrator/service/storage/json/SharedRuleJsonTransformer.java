@@ -32,10 +32,11 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.manage.render.ItemPlaceholderFactory;
 
 /** @author Steffen Jacobs */
 @SuppressWarnings("unused")
-public class SharedRuleJsonTransformer {
+public class SharedRuleJsonTransformer implements ItemPlaceholderFactory{
 	private static final Logger LOG = LoggerFactory.getLogger(SharedRuleJsonTransformer.class);
 	private static final JsonTransformerHelper jsonHelper = new JsonTransformerHelper();
 
@@ -136,7 +137,7 @@ public class SharedRuleJsonTransformer {
 	private void transformObjectsInMap(Map<String, Object> map) {
 		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k,c) -> Command.valueOf(c.toString()));
 		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k,o) -> Operation.valueOf(o.toString()));
-		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k,i) -> new SharedItem(i.toString(), "Dummy Item", ItemType.Unknown));
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k,i) -> getItemOrPlaceholder(i));
 	}
 
 	public JSONObject toJson(SharedRule rule) {
