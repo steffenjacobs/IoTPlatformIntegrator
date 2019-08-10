@@ -10,7 +10,8 @@ public enum SettingKey {
 	HOMEASSISTANT_FILE_URI("C:\\Users\\Steffen\\Dropbox\\Masterarbeit", "homeassistant-file-uri", "HomeAssistant URI to automation file"), //
 	USERNAME("user", "username", "Username"), //
 	PASSWORD("changeme", "password", "Password"), //
-	USERID("1337", "userid", "UserId");
+	USERID("1337", "userid", "UserId"), //
+	DATABASE_URI("mongodb://localhost", "database-uri", "Database URI");
 
 	private final String defaultValue;
 	private final String configKey;

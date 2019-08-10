@@ -25,6 +25,8 @@ import com.mongodb.reactivestreams.client.Success;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 /** @author Steffen Jacobs */
 public class MongoDbStorageService {
@@ -35,6 +37,8 @@ public class MongoDbStorageService {
 	private static final String COLLECTION_NAME_USER_STORE = "userStore";
 	private static final String DATABASE_NAME = "IotPlatformIntegrator";
 
+	private final SettingService settingService;
+
 	private MongoCollection<Document> ruleCollection;
 	private MongoCollection<Document> diffCollection;
 	private MongoCollection<Document> userCollection;
@@ -42,15 +46,15 @@ public class MongoDbStorageService {
 	private MongoClient mongoClient;
 
 	private CompletableFuture<Boolean> initialized = new CompletableFuture<>();
+	
+	public MongoDbStorageService(SettingService settingService) {
+		this.settingService = settingService;
+	}
 
-	public void checkAndValidateConnection() {
-		if (mongoClient == null) {
-			mongoClient = MongoClients.create("mongodb://localhost");
-		}
 	public void checkAndValidateConnection() throws IOException {
 		
 		if (database == null) {
-			database = mongoClient.getDatabase("IotPlatformIntegrator");
+			database = getDatabase();
 		}
 
 		if (diffCollection == null) {
@@ -75,7 +79,7 @@ public class MongoDbStorageService {
 
 	private MongoClient getClient() {
 		if (mongoClient == null) {
-			mongoClient = MongoClients.create("mongodb://localhost");
+			mongoClient = MongoClients.create(settingService.getSetting(SettingKey.DATABASE_URI));
 		}
 		return mongoClient;
 	}

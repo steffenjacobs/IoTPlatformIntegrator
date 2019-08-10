@@ -13,6 +13,7 @@ import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleD
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbUserStorageService;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleChangeEventStore;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
@@ -28,17 +29,17 @@ public class App {
 
 	public static void main(String[] args) {
 		LOG.info("Started.");
-		final MongoDbStorageService storageService = new MongoDbStorageService();
-		mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
-		mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
-		mongoDbUserStorageService = new MongoDbUserStorageService(storageService);
+		final SettingService settingService = new SettingService("./settings.config");
+		final MongoDbStorageService storageService = new MongoDbStorageService(settingService);
 		try {
+			mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
+			mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
+			mongoDbUserStorageService = new MongoDbUserStorageService(storageService);
 
-		SettingService settingService = new SettingService("./settings.config");
-		authenticationService = new AuthenticationServiceImpl(settingService);
+			authenticationService = new AuthenticationServiceImpl(settingService);
 
-		new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
-		new RuleChangeEventStore(authenticationService);
+			new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
+			new RuleChangeEventStore(authenticationService);
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
