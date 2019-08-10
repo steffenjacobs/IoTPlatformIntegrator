@@ -10,7 +10,7 @@ import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 public class ServerConnection {
 
 	public static enum PlatformType {
-		OPENHAB, HOMEASSISTANT;
+		OPENHAB, HOMEASSISTANT, MONGO;
 	}
 
 	private final PlatformType platformType;

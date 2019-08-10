@@ -1,10 +1,16 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.reactivestreams.Publisher;
@@ -22,6 +28,8 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.mongodb.reactivestreams.client.Success;
 
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection.PlatformType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer;
@@ -45,14 +53,16 @@ public class MongoDbStorageService {
 	private MongoDatabase database;
 	private MongoClient mongoClient;
 
+	private ServerConnection databaseConnectionObject;
+
 	private CompletableFuture<Boolean> initialized = new CompletableFuture<>();
-	
+
 	public MongoDbStorageService(SettingService settingService) {
 		this.settingService = settingService;
 	}
 
 	public void checkAndValidateConnection() throws IOException {
-		
+
 		if (database == null) {
 			database = getDatabase();
 		}
@@ -75,6 +85,8 @@ public class MongoDbStorageService {
 				database.createCollection(COLLECTION_NAME_USER_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_USER_STORE));
 			}
 		}
+
+		databaseConnectionObject = createDatabaseConnectionObject();
 	}
 
 	private MongoClient getClient() {
@@ -131,8 +143,10 @@ public class MongoDbStorageService {
 	public void getUser(String id, SimplifiedSubscriber<Document> callback) {
 		getUserCollection().find(Filters.eq("_id", id)).first().subscribe(callback);
 	}
+
 	private void insert(MongoCollection<Document> collection, Document document) {
-		insert(collection, document, () ->{});
+		insert(collection, document, () -> {
+		});
 	}
 
 	private void insert(MongoCollection<Document> collection, Document document, Runnable callWhenDone) {
@@ -302,5 +316,48 @@ public class MongoDbStorageService {
 			LOG.info("Created diffCollection '{}' successfully.", collectionName);
 			initialized.complete(true);
 		}
+	}
+
+	public ServerConnection getDatabaseConnection() {
+		return databaseConnectionObject;
+	}
+
+	private ServerConnection createDatabaseConnectionObject() {
+		CompletableFuture<String> futureVersion = new CompletableFuture<>();
+		getDatabase().runCommand(new BsonDocument("buildinfo", new BsonString(""))).subscribe(new Subscriber<Document>() {
+
+			@Override
+			public void onSubscribe(Subscription s) {
+			}
+
+			@Override
+			public void onNext(Document t) {
+				futureVersion.complete((String) t.get("version"));
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				futureVersion.complete("");
+			}
+
+			@Override
+			public void onComplete() {
+				if (!futureVersion.isDone()) {
+					futureVersion.complete("");
+				}
+			}
+		});
+		String version;
+		try {
+			version = futureVersion.get(5, TimeUnit.SECONDS);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			version = "";
+		}
+
+		URI uri = URI.create(settingService.getSetting(SettingKey.DATABASE_URI));
+		String instanceName = version;
+		String url = uri.getHost();
+		int port = uri.getPort();
+		return new ServerConnection(PlatformType.MONGO, version, instanceName, url, port);
 	}
 }

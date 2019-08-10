@@ -28,11 +28,20 @@ public class RuleTableHolder {
 	}
 
 	private final JTable rulesTable;
-	private final RuleController ruleController = new RuleController();
+	private final RuleController ruleController;
 	private final RuleTableHolderType type;
 	private Iterable<SharedRule> lastRules = new ArrayList<>();
 
 	public RuleTableHolder(RuleTableHolderType type) {
+		this(type, null);
+	}
+	
+	public RuleTableHolder(RuleTableHolderType type, ServerConnection databaseConnection) {
+		ruleController = new RuleController(type);
+		if(databaseConnection != null) {
+			ruleController.setMockConnection(databaseConnection);
+		}
+				
 		this.type = type;
 		rulesTable = createRulesTable();
 		setupRulesTable();

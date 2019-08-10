@@ -6,6 +6,8 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
+import me.steffenjacobs.iotplatformintegrator.ui.components.RuleTableHolder.RuleTableHolderType;
 
 /** @author Steffen Jacobs */
 public class RuleController {
@@ -13,14 +15,36 @@ public class RuleController {
 	private SharedRule lastRule = null;
 	private ServerConnection currentConnection = null;
 
-	public RuleController() {
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
-			lastRule = ((SelectedRuleChangeEvent) e).getSelectedRule();
-		});
-		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
-			currentConnection = ((SelectedServerConnectionChangeEvent) e).getServerConnection();
-			lastRule = null;
-		});
+	public RuleController(RuleTableHolderType type) {
+		switch (type) {
+		case Default:
+		case Source:
+		case Target:
+			EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
+				lastRule = ((SelectedRuleChangeEvent) e).getSelectedRule();
+			});
+			EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+				currentConnection = ((SelectedServerConnectionChangeEvent) e).getServerConnection();
+				lastRule = null;
+			});
+			break;
+		case Remote:
+			EventBus.getInstance().addEventHandler(EventType.RemoteRuleChange, e -> {
+				lastRule = ((WithSharedRuleEvent) e).getSelectedRule();
+			});
+			EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> {
+				lastRule = null;
+				currentConnection.getRules().clear();
+			});
+			EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> {
+				currentConnection.getRules().add(((WithSharedRuleEvent) e).getSelectedRule());
+			});
+			break;
+		}
+	}
+
+	public void setMockConnection(ServerConnection currentConnection) {
+		this.currentConnection = currentConnection;
 	}
 
 	public SharedRule getLastSelectedRule() {

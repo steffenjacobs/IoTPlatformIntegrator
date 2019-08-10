@@ -2,6 +2,7 @@ package me.steffenjacobs.iotplatformintegrator.ui;
 
 import javax.swing.JTable;
 
+import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.ScoreboardController;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.InstanceChooserPanel;
@@ -23,7 +24,7 @@ public class GlobalComponentHolder {
 
 	private final ConnectionExplorer connectionExplorer = new ConnectionExplorer();
 
-	private final RuleTableHolder remoteRuleTableHolder = new RuleTableHolder(RuleTableHolderType.Remote);
+	private final RuleTableHolder remoteRuleTableHolder;
 	private final RuleTableHolder ruleTableHolder = new RuleTableHolder(RuleTableHolderType.Default);
 	private final RuleTableHolder ruleTableSourceHolder = new RuleTableHolder(RuleTableHolderType.Source);
 	private final RuleTableHolder ruleTableTargetHolder = new RuleTableHolder(RuleTableHolderType.Target);
@@ -34,6 +35,10 @@ public class GlobalComponentHolder {
 
 	private final RuleDetailsPanel ruleDetailsPanel = new RuleDetailsPanel();
 	private final InstanceChooserPanel instanceChooser = new InstanceChooserPanel();
+	
+	public GlobalComponentHolder() {
+		remoteRuleTableHolder  = new RuleTableHolder(RuleTableHolderType.Remote, App.getDatabaseConnectionObject());
+	}
 
 	public ConnectionExplorer getConnectionExplorer() {
 		return connectionExplorer;

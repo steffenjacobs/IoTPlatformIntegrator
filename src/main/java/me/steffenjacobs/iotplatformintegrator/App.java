@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceImpl;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
@@ -29,10 +30,12 @@ public class App {
 	private static AuthenticationService authenticationService;
 	private static RemoteRuleController remoteRuleController;
 
+	private static MongoDbStorageService storageService;
+
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		final SettingService settingService = new SettingService("./settings.config");
-		final MongoDbStorageService storageService = new MongoDbStorageService(settingService);
+		storageService = new MongoDbStorageService(settingService);
 		try {
 			mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
 			mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
@@ -68,6 +71,10 @@ public class App {
 	
 	public static RemoteRuleController getRemoteRuleController() {
 		return remoteRuleController;
+	}
+
+	public static ServerConnection getDatabaseConnectionObject() {
+		return storageService.getDatabaseConnection();
 	}
 
 }
