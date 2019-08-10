@@ -33,6 +33,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection.Pla
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
@@ -218,8 +219,8 @@ public class MongoDbStorageService {
 								public void onNext(Document t) {
 									callback.onNext(transformation.apply(t));
 									cnt++;
-									//bugfix because onComplete is never called
-									if(cnt == count) {
+									// bugfix because onComplete is never called
+									if (cnt == count) {
 										onComplete();
 									}
 								}
@@ -256,6 +257,7 @@ public class MongoDbStorageService {
 				if (count > 0) {
 					getDiffCollection().find(filter).subscribe(new Subscriber<Document>() {
 						int cnt = 0;
+
 						@Override
 						public void onSubscribe(Subscription s) {
 							s.request(count);
@@ -265,8 +267,8 @@ public class MongoDbStorageService {
 						public void onNext(Document t) {
 							callback.onNext(transformation.apply(t));
 							cnt++;
-							//bugfix because onComplete is never called
-							if(cnt == count) {
+							// bugfix because onComplete is never called
+							if (cnt == count) {
 								onComplete();
 							}
 						}
@@ -302,6 +304,7 @@ public class MongoDbStorageService {
 					collection.find().subscribe(new Subscriber<Document>() {
 
 						int cnt = 0;
+
 						@Override
 						public void onSubscribe(Subscription s) {
 							s.request(count);
@@ -311,8 +314,8 @@ public class MongoDbStorageService {
 						public void onNext(Document t) {
 							callback.onNext(transformation.apply(t));
 							cnt++;
-							//bugfix because onComplete is never called
-							if(cnt == count) {
+							// bugfix because onComplete is never called
+							if (cnt == count) {
 								onComplete();
 							}
 						}
@@ -407,10 +410,12 @@ public class MongoDbStorageService {
 		}
 
 		URI uri = URI.create(settingService.getSetting(SettingKey.DATABASE_URI));
-		String instanceName = version;
+		String instanceName = "MongoDB " + version;
 		String url = uri.getHost();
 		int port = uri.getPort();
-		return new ServerConnection(PlatformType.MONGO, version, instanceName, url, port);
+		ServerConnection dbConnection = new ServerConnection(PlatformType.MONGO, version, instanceName, url, port);
+		ItemDirectoryHolder.getInstance().add(dbConnection);
+		return dbConnection;
 	}
 
 	public void insertItem(Document document, Runnable callWhenDone) {

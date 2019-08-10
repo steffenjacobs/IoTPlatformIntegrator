@@ -13,6 +13,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleComponentRegistry;
 
@@ -80,7 +81,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.getName() : ""));
 		itemModel.addElement(item);
 		chooseItem.setSelectedItem(item);
-		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s)", TokenType.ITEM, item.getName(), item.getLabel()));
+		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s), Source: %s", TokenType.ITEM, item.getName(), item.getLabel(), ItemDirectoryHolder.getInstance().getServerConnection(item).getInstanceName()));
 		registry.addAnnotatedComponent(chooseItem, key, -1);
 		return chooseItem;
 	}

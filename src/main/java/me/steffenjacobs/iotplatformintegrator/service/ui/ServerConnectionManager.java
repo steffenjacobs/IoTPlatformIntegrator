@@ -32,6 +32,7 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabExperimenta
 import me.steffenjacobs.iotplatformintegrator.service.openhab.OpenHabItemService;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in.OpenHabCommandParser;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.in.OpenHabTransformationAdapter;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.shared.RuleValidator;
 
@@ -110,6 +111,7 @@ public class ServerConnectionManager {
 		ServerConnection serverConnection = new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT,
 				versionInfo.getVersion(), versionInfo.getLocationName(), parsedUrlAndPort.getLeft(),
 				parsedUrlAndPort.getRight());
+		ItemDirectoryHolder.getInstance().add(serverConnection);
 		currentConnections.add(serverConnection);
 		EventBus.getInstance().fireEvent(new ServerConnectedEvent(serverConnection));
 
@@ -140,6 +142,7 @@ public class ServerConnectionManager {
 		ServerConnection connection = new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(),
 				"Open Hab Instance on port: " + parsedUrlAndPort.getRight(), parsedUrlAndPort.getLeft(),
 				parsedUrlAndPort.getRight());
+		ItemDirectoryHolder.getInstance().add(connection);
 		currentConnections.add(connection);
 
 		EventBus.getInstance().fireEvent(new ServerConnectedEvent(connection));

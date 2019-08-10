@@ -65,7 +65,6 @@ public class RemoteRuleController {
 
 	public void getItemsSync(Consumer<SharedItem> consumer) {
 		CompletableFuture<Void> complete = new CompletableFuture<>();
-		System.out.println("Retrieving items");
 		itemStorage.getItems(new SimplifiedSubscriber<SharedItem>() {
 			@Override
 			public void onNext(SharedItem t) {
