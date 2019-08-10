@@ -1,9 +1,13 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
@@ -14,10 +18,33 @@ public class RuleBuilder extends JPanel {
 
 	private final JPanel rulePanel = new JPanel();
 
+	private String ruleName;
+
 	public RuleBuilder() {
 
+		this.setLayout(new BorderLayout());
 		rulePanel.setLayout(new BoxLayout(rulePanel, BoxLayout.Y_AXIS));
-		this.add(rulePanel);
+
+		final JPanel rulePanelWrapper = new JPanel();
+
+		rulePanelWrapper.add(rulePanel);
+		this.add(rulePanelWrapper, BorderLayout.CENTER);
+
+		final JPanel buttonBar = new JPanel();
+		buttonBar.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+
+		final JButton exportToPlatformButton = new JButton("Export to Platform");
+		exportToPlatformButton.addActionListener(e -> {
+			String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", ruleName + "-new");
+		});
+		buttonBar.add(exportToPlatformButton);
+
+		final JButton exportToDatabaseButton = new JButton("Store changes to Database");
+
+		buttonBar.add(exportToDatabaseButton);
+		buttonBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+		this.add(buttonBar, BorderLayout.SOUTH);
+
 		new RuleBuilderRenderController(this);
 	}
 
@@ -32,6 +59,7 @@ public class RuleBuilder extends JPanel {
 	}
 
 	public void setHeader(String ruleName, String ruleStatus, String ruleDescription) {
+		this.ruleName = ruleName;
 		JPanel headerPanel = new JPanel();
 		headerPanel.setLayout(new FlowLayout());
 		headerPanel.add(new JLabel("Name: " + ruleName));
