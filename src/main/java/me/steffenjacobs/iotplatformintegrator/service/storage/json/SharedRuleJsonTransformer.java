@@ -14,6 +14,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
@@ -21,10 +25,13 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpeci
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.UnknownSharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 
 /** @author Steffen Jacobs */
 @SuppressWarnings("unused")
@@ -101,8 +108,9 @@ public class SharedRuleJsonTransformer {
 			String description = json.getString(KEY_RULE_ELEMENT_DESCRIPTION);
 			int elementId = json.getInt(KEY_RULE_ELEMENT_ELEMENT_ID);
 
-			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);
-
+			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);			
+			transformObjectsInMap(properties);
+			
 			String type = json.getString(KEY_RULE_ELEMENT_TYPE);
 
 			if (type.equals(SharedElementType.ACTION_TYPE)) {
@@ -121,8 +129,14 @@ public class SharedRuleJsonTransformer {
 				LOG.error("Invalid element sub type: {}", type);
 			}
 
-		}
+		}		
 		return Triple.of(triggers, conditions, actions);
+	}
+	
+	private void transformObjectsInMap(Map<String, Object> map) {
+		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k,c) -> Command.valueOf(c.toString()));
+		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k,o) -> Operation.valueOf(o.toString()));
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k,i) -> new SharedItem(i.toString(), "Dummy Item", ItemType.Unknown));
 	}
 
 	public JSONObject toJson(SharedRule rule) {
