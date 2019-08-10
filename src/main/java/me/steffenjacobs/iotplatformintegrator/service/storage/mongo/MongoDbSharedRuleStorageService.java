@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.reactivestreams.Subscriber;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleJsonTransformer;
 
 /** @author Steffen Jacobs */
@@ -20,12 +21,12 @@ public class MongoDbSharedRuleStorageService {
 		// TODO: add correct event handler
 	}
 
-	public void store(SharedRule rule) {
+	public void storeDiff(SharedRule rule) {
 		storageService.insertDiff(documentTransformer.toDocument(jsonTransformer.toJson(rule)));
 	}
 
-	public void getRules(Subscriber<SharedRule> subscriber) {
-		storageService.getAllRules(subscriber, d -> jsonTransformer.fromJson(documentTransformer.toJSON(d)));
+	public void getRules(Subscriber<SharedRule> subscriber, ItemDirectory itemDirectory) {
+		storageService.getAllRules(subscriber, d -> jsonTransformer.fromJson(documentTransformer.toJSON(d), itemDirectory), storageService);
 	}
 
 	public void insertRule(SharedRule rule, Runnable callWhenDone) {

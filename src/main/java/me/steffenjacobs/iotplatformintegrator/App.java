@@ -11,6 +11,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceImpl;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
+import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedItemStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbUserStorageService;
@@ -27,6 +28,7 @@ public class App {
 	private static MongoDbRuleDiffStorageService mongoDbRuleDiffStorageService;
 	private static MongoDbSharedRuleStorageService mongoDbSharedRuleStorageService;
 	private static MongoDbUserStorageService mongoDbUserStorageService;
+	private static MongoDbSharedItemStorageService mongoDbSharedItemStorageService;
 	private static AuthenticationService authenticationService;
 	private static RemoteRuleController remoteRuleController;
 
@@ -38,6 +40,7 @@ public class App {
 		storageService = new MongoDbStorageService(settingService);
 		try {
 			mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
+			mongoDbSharedItemStorageService = new MongoDbSharedItemStorageService(storageService);
 			mongoDbSharedRuleStorageService = new MongoDbSharedRuleStorageService(storageService);
 			mongoDbUserStorageService = new MongoDbUserStorageService(storageService);
 
@@ -45,8 +48,8 @@ public class App {
 
 			new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
 			new RuleChangeEventStore(authenticationService);
-			
-			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService);
+
+			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
@@ -68,13 +71,17 @@ public class App {
 	public static MongoDbUserStorageService getMongoDbUserStorageService() {
 		return mongoDbUserStorageService;
 	}
-	
+
 	public static RemoteRuleController getRemoteRuleController() {
 		return remoteRuleController;
 	}
 
 	public static ServerConnection getDatabaseConnectionObject() {
 		return storageService.getDatabaseConnection();
+	}
+
+	public static MongoDbSharedItemStorageService getMongoDbSharedItemStorageService() {
+		return mongoDbSharedItemStorageService;
 	}
 
 }

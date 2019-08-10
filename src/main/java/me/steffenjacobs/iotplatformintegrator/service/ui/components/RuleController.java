@@ -4,6 +4,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteItemAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
@@ -20,25 +21,21 @@ public class RuleController {
 		case Default:
 		case Source:
 		case Target:
-			EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> {
-				lastRule = ((SelectedRuleChangeEvent) e).getSelectedRule();
-			});
+			EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> lastRule = ((SelectedRuleChangeEvent) e).getSelectedRule());
 			EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
 				currentConnection = ((SelectedServerConnectionChangeEvent) e).getServerConnection();
 				lastRule = null;
 			});
 			break;
 		case Remote:
-			EventBus.getInstance().addEventHandler(EventType.RemoteRuleChange, e -> {
-				lastRule = ((WithSharedRuleEvent) e).getSelectedRule();
-			});
+			EventBus.getInstance().addEventHandler(EventType.RemoteRuleChange, e -> lastRule = ((WithSharedRuleEvent) e).getSelectedRule());
 			EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> {
 				lastRule = null;
 				currentConnection.getRules().clear();
 			});
-			EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> {
-				currentConnection.getRules().add(((WithSharedRuleEvent) e).getSelectedRule());
-			});
+			EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> currentConnection.getRules().add(((WithSharedRuleEvent) e).getSelectedRule()));
+			EventBus.getInstance().addEventHandler(EventType.RemoteItemAdded, e -> currentConnection.getItemDirectory().addItem(((RemoteItemAddedEvent) e).getItem()));
+			EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteItems, e -> currentConnection.getItemDirectory().clearItems());
 			break;
 		}
 	}

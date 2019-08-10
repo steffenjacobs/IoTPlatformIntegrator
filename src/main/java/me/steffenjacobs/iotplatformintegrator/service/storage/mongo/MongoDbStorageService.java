@@ -30,6 +30,7 @@ import com.mongodb.reactivestreams.client.Success;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection.PlatformType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer;
@@ -43,6 +44,7 @@ public class MongoDbStorageService {
 	private static final String COLLECTION_NAME_DIFF_STORE = "diffStore";
 	private static final String COLLECTION_NAME_RULE_STORE = "ruleStore";
 	private static final String COLLECTION_NAME_USER_STORE = "userStore";
+	private static final String COLLECTION_NAME_ITEM_STORE = "itemStore";
 	private static final String DATABASE_NAME = "IotPlatformIntegrator";
 
 	private final SettingService settingService;
@@ -50,6 +52,7 @@ public class MongoDbStorageService {
 	private MongoCollection<Document> ruleCollection;
 	private MongoCollection<Document> diffCollection;
 	private MongoCollection<Document> userCollection;
+	private MongoCollection<Document> itemCollection;
 	private MongoDatabase database;
 	private MongoClient mongoClient;
 
@@ -85,6 +88,12 @@ public class MongoDbStorageService {
 				database.createCollection(COLLECTION_NAME_USER_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_USER_STORE));
 			}
 		}
+		if (itemCollection == null) {
+			itemCollection = database.getCollection(COLLECTION_NAME_ITEM_STORE);
+			if (itemCollection == null) {
+				database.createCollection(COLLECTION_NAME_ITEM_STORE).subscribe(new CollectionCreationSubscriber(COLLECTION_NAME_ITEM_STORE));
+			}
+		}
 
 		databaseConnectionObject = createDatabaseConnectionObject();
 	}
@@ -108,6 +117,13 @@ public class MongoDbStorageService {
 			diffCollection = getDatabase().getCollection(COLLECTION_NAME_DIFF_STORE);
 		}
 		return diffCollection;
+	}
+
+	private MongoCollection<Document> getItemCollection() {
+		if (itemCollection == null) {
+			itemCollection = getDatabase().getCollection(COLLECTION_NAME_ITEM_STORE);
+		}
+		return itemCollection;
 	}
 
 	private MongoCollection<Document> getRuleCollection() {
@@ -266,13 +282,13 @@ public class MongoDbStorageService {
 		});
 	}
 
-	public synchronized <T> void getAllRules(Subscriber<T> callback, Function<Document, T> transformation) {
-		getRuleCollection().countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
+	public synchronized <T> void getAll(Subscriber<T> callback, Function<Document, T> transformation, MongoCollection<Document> collection) {
+		collection.countDocuments().subscribe(new SimplifiedSubscriber<Long>() {
 
 			@Override
 			public void onNext(Long count) {
 				if (count > 0) {
-					getRuleCollection().find().subscribe(new Subscriber<Document>() {
+					collection.find().subscribe(new Subscriber<Document>() {
 
 						@Override
 						public void onSubscribe(Subscription s) {
@@ -376,5 +392,17 @@ public class MongoDbStorageService {
 		String url = uri.getHost();
 		int port = uri.getPort();
 		return new ServerConnection(PlatformType.MONGO, version, instanceName, url, port);
+	}
+
+	public void insertItem(Document document, Runnable callWhenDone) {
+		insert(getItemCollection(), document, callWhenDone);
+	}
+
+	public void getAllRules(Subscriber<SharedRule> subscriber, Function<Document, SharedRule> transformation, MongoDbStorageService storageService) {
+		getAll(subscriber, transformation, getRuleCollection());
+	}
+
+	public void getAllItems(Subscriber<SharedItem> subscriber, Function<Document, SharedItem> transformation) {
+		getAll(subscriber, transformation, getItemCollection());
 	}
 }

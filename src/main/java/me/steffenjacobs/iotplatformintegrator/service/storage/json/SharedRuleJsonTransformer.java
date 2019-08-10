@@ -1,12 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,15 +10,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.UnknownSharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
@@ -33,9 +25,9 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ItemPlaceholderFactory;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 
 /** @author Steffen Jacobs */
-@SuppressWarnings("unused")
 public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(SharedRuleJsonTransformer.class);
 	private static final JsonTransformerHelper jsonHelper = new JsonTransformerHelper();
@@ -57,7 +49,7 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 	private static final String KEY_RULE_ELEMENT_SUBTYPE = "subtype";
 	private static final String KEY_RULE_ELEMENT_CONTAINER = "container";
 
-	public SharedRule fromJson(String jsonStr) {
+	public SharedRule fromJson(String jsonStr, ItemDirectory itemDirectory) {
 		try {
 
 			JSONObject json = new JSONObject(jsonStr);
@@ -70,7 +62,7 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 			Set<SharedTrigger> triggers = new HashSet<>();
 			try {
 				JSONArray jsonTriggers = json.getJSONArray(KEY_TRIGGERS);
-				triggers = parseRuleElements(jsonTriggers).getLeft();
+				triggers = parseRuleElements(jsonTriggers, itemDirectory).getLeft();
 			} catch (JSONException e) {
 				// nothing to do
 			}
@@ -78,7 +70,7 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 			Set<SharedCondition> conditions = new HashSet<>();
 			try {
 				JSONArray jsonConditions = json.getJSONArray(KEY_CONDITIONS);
-				conditions = parseRuleElements(jsonConditions).getMiddle();
+				conditions = parseRuleElements(jsonConditions, itemDirectory).getMiddle();
 			} catch (JSONException e) {
 				// nothing to do
 			}
@@ -86,7 +78,7 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 			Set<SharedAction> actions = new HashSet<>();
 			try {
 				JSONArray jsonActions = json.getJSONArray(KEY_ACTIONS);
-				actions = parseRuleElements(jsonActions).getRight();
+				actions = parseRuleElements(jsonActions, itemDirectory).getRight();
 			} catch (JSONException e) {
 				// nothing to do
 			}
@@ -98,7 +90,7 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 		}
 	}
 
-	private Triple<Set<SharedTrigger>, Set<SharedCondition>, Set<SharedAction>> parseRuleElements(JSONArray jsonArr) {
+	private Triple<Set<SharedTrigger>, Set<SharedCondition>, Set<SharedAction>> parseRuleElements(JSONArray jsonArr, ItemDirectory itemDirectory) {
 		Set<SharedTrigger> triggers = new HashSet<>();
 		Set<SharedCondition> conditions = new HashSet<>();
 		Set<SharedAction> actions = new HashSet<>();
@@ -109,7 +101,7 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 			int elementId = json.getInt(KEY_RULE_ELEMENT_ELEMENT_ID);
 
 			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);
-			transformObjectsInMap(properties);
+			transformObjectsInMap(properties, itemDirectory);
 
 			String type = json.getString(KEY_RULE_ELEMENT_TYPE);
 
@@ -133,10 +125,10 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 		return Triple.of(triggers, conditions, actions);
 	}
 
-	private void transformObjectsInMap(Map<String, Object> map) {
+	private void transformObjectsInMap(Map<String, Object> map, ItemDirectory itemDirectory) {
 		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k, c) -> Command.valueOf(c.toString()));
 		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k, o) -> Operation.valueOf(o.toString()));
-		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) -> getItemOrPlaceholder(i));
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) -> itemDirectory.getItemByName(i.toString()));
 	}
 
 	public JSONObject toJson(SharedRule rule) {
