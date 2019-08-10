@@ -10,6 +10,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleAddedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
@@ -22,12 +24,13 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.components.RuleControll
 public class RuleTableHolder {
 
 	public static enum RuleTableHolderType {
-		Default, Source, Target
+		Default, Source, Target, Remote
 	}
 
 	private final JTable rulesTable;
 	private final RuleController ruleController = new RuleController();
 	private final RuleTableHolderType type;
+	private Iterable<SharedRule> lastRules = new ArrayList<>();
 
 	public RuleTableHolder(RuleTableHolderType type) {
 		this.type = type;
@@ -48,6 +51,13 @@ public class RuleTableHolder {
 		case Target:
 			EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
 				refreshRulesTable(((TargetConnectionChangeEvent) e).getServerConnection());
+			});
+			break;
+		case Remote:
+
+			EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> {
+				((ArrayList<SharedRule>) lastRules).add(((RemoteRuleAddedEvent) e).getSelectedRule());
+				updateRuleTable(rulesTable, lastRules);
 			});
 			break;
 		}
@@ -71,6 +81,9 @@ public class RuleTableHolder {
 			case Target:
 				EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(rule));
 				break;
+			case Remote:
+				EventBus.getInstance().fireEvent(new RemoteRuleChangeEvent(rule));			
+				break;
 			}
 		});
 	}
@@ -87,13 +100,19 @@ public class RuleTableHolder {
 			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(null));
 			break;
 		case Source:
-			EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(null));
+			EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(null));		
+			break;
 		case Target:
-			EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(null));
+			EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(null));		
+			break;
+		case Remote:
+			EventBus.getInstance().fireEvent(new RemoteRuleChangeEvent(null));				
+			break;	
 		}
 	}
 
 	private void updateRuleTable(JTable rulesTable, Iterable<SharedRule> rules) {
+		this.lastRules = rules;
 		DefaultTableModel tableModel = (DefaultTableModel) rulesTable.getModel();
 
 		tableModel.setNumRows(0);

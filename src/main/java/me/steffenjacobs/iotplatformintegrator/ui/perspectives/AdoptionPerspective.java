@@ -18,27 +18,27 @@ import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 public class AdoptionPerspective extends Perspective {
 
 	private final JPanel connectionExplorerPanel = new JPanel();
-	private final JPanel ruleTableSourcePanel = new JPanel();
-	private final JPanel ruleTableTargetPanel = new JPanel();
+	private final JPanel platformRulesTablePanel = new JPanel();
+	private final JPanel remoteRulesTablePanel = new JPanel();
 
 	@Override
 	public void onAppear() {
 		ConnectionExplorer connectionExplorer = GlobalComponentHolder.getInstance().getConnectionExplorer();
 		connectionExplorerPanel.add(connectionExplorer, BorderLayout.CENTER);
 
-		JTable ruleTableSource = GlobalComponentHolder.getInstance().getRuleTableSource();
-		ruleTableSourcePanel.removeAll();
-		ruleTableSourcePanel.add(new JScrollPane(ruleTableSource), BorderLayout.CENTER);
+		JTable ruleTableSource = GlobalComponentHolder.getInstance().getRuleTable();
+		platformRulesTablePanel.removeAll();
+		platformRulesTablePanel.add(new JScrollPane(ruleTableSource), BorderLayout.CENTER);
 
-		JTable ruleTableTarget = GlobalComponentHolder.getInstance().getRuleTableTarget();
-		ruleTableTargetPanel.removeAll();
-		ruleTableTargetPanel.add(new JScrollPane(ruleTableTarget), BorderLayout.CENTER);
+		JTable ruleTableTarget = GlobalComponentHolder.getInstance().getRemoteRuleTable();
+		remoteRulesTablePanel.removeAll();
+		remoteRulesTablePanel.add(new JScrollPane(ruleTableTarget), BorderLayout.CENTER);
 	}
 
 	public AdoptionPerspective() {
 		connectionExplorerPanel.setLayout(new BorderLayout());
-		ruleTableSourcePanel.setLayout(new BorderLayout());
-		ruleTableTargetPanel.setLayout(new BorderLayout());
+		platformRulesTablePanel.setLayout(new BorderLayout());
+		remoteRulesTablePanel.setLayout(new BorderLayout());
 		setupDockingEnvironment();
 	}
 
@@ -49,29 +49,17 @@ public class AdoptionPerspective extends Perspective {
 		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorerPanel);
 		control.addDockable(connectionExplorerWindow);
 
-		// create source rule table window
-		SingleCDockable ruleTableSourceWindow = DockableUtil.createDockable("RuleTableSource-Window", "Rules from Source", ruleTableSourcePanel);
+		// create platform rule table window
+		SingleCDockable ruleTableSourceWindow = DockableUtil.createDockable("RuleTablePlatform-Window", "Rules from Platform", platformRulesTablePanel);
 		control.addDockable(ruleTableSourceWindow);
 
-		// create target rule table window
-		SingleCDockable ruleTableTargetWindow = DockableUtil.createDockable("RuleTableTarget-Window", "Rules from Target", ruleTableTargetPanel);
-		control.addDockable(ruleTableTargetWindow);
-
-		// create instance chooser window
-		SingleCDockable instanceChooserWindow = DockableUtil.createDockable("InstanceChooser-Window", "Instance Chooser", GlobalComponentHolder.getInstance().getInstanceChooser());
-		control.addDockable(instanceChooserWindow);
-
-		// create source item table window
-		SingleCDockable sourceItemWindow = DockableUtil.createDockable("SourceItemTable-Window", "Source Items", GlobalComponentHolder.getInstance().getItemSourceTable());
-		control.addDockable(sourceItemWindow);
+		// create rule net window
+		SingleCDockable ruleNetWindow = DockableUtil.createDockable("RuleNet-Window", "Remote Rules Network", new JPanel());
+		control.addDockable(ruleNetWindow);
 
 		// create remote rules window
 		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", GlobalComponentHolder.getInstance().getRemoteRulesPanel());
 		control.addDockable(remoteRulesWindow);
-
-		// create target item table window
-		SingleCDockable targetItemWindow = DockableUtil.createDockable("TargetItemTable-Window", "Target Items", GlobalComponentHolder.getInstance().getItemTargetTable());
-		control.addDockable(targetItemWindow);
 
 		// create rule builder window
 		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new RuleBuilder());
@@ -80,16 +68,11 @@ public class AdoptionPerspective extends Perspective {
 		// configure grid
 		CGrid grid = new CGrid(control);
 
-		grid.add(0, 0, .15, .4, connectionExplorerWindow);
-		grid.add(0, .4, .15, .3, instanceChooserWindow);
-		grid.add(0, .7, .3, .3, ruleTableSourceWindow);
-		grid.add(.3, .7, .3, .3, ruleTableTargetWindow);
-
-		grid.add(.15, 0, .65, .7, ruleBuilderWindow);
-
-		grid.add(.8, 0, .2, .25, sourceItemWindow);
-		grid.add(.8, .25, .2, .25, remoteRulesWindow);
-		grid.add(.8, .5, .2, .5, targetItemWindow);
+		grid.add(0, 0, .5, .7, ruleNetWindow);
+		grid.add(.5, 0, .5, .7, ruleBuilderWindow);
+		grid.add(0, .7, .15, .3, connectionExplorerWindow);
+		grid.add(.15, .7, .425, .3, ruleTableSourceWindow);
+		grid.add(.575, .7, .425, .3, remoteRulesWindow);
 
 		control.getContentArea().deploy(grid);
 	}

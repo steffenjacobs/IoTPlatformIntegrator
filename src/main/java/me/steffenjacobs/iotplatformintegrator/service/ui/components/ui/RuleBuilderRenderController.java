@@ -27,7 +27,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedSourceRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRenderer;
@@ -68,7 +68,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		new RuleMutator(this);
 		this.ruleBuilder = ruleBuilder;
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedSourceRuleChanged, e -> renderRule(((SelectedSourceRuleChangeEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> renderRule(((WithSharedRuleEvent) e).getSelectedRule()));
 
 		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
 			RuleChangeEvent event = (RuleChangeEvent) e;

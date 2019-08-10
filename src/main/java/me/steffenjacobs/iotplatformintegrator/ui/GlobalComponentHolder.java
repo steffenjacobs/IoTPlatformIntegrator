@@ -26,6 +26,7 @@ public class GlobalComponentHolder {
 
 	private final ConnectionExplorer connectionExplorer = new ConnectionExplorer();
 
+	private final RuleTableHolder remoteRuleTableHolder = new RuleTableHolder(RuleTableHolderType.Remote);
 	private final RuleTableHolder ruleTableHolder = new RuleTableHolder(RuleTableHolderType.Default);
 	private final RuleTableHolder ruleTableSourceHolder = new RuleTableHolder(RuleTableHolderType.Source);
 	private final RuleTableHolder ruleTableTargetHolder = new RuleTableHolder(RuleTableHolderType.Target);
@@ -81,5 +82,9 @@ public class GlobalComponentHolder {
 
 	public JTable getScoreboardPanel() {
 		return scoreboardPanel.getScoreboard();
+	}
+
+	public JTable getRemoteRuleTable() {
+		return remoteRuleTableHolder.getRulesTable();
 	}
 }
