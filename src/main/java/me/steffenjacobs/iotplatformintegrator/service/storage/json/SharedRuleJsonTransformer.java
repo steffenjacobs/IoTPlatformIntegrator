@@ -36,7 +36,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.render.ItemPlacehol
 
 /** @author Steffen Jacobs */
 @SuppressWarnings("unused")
-public class SharedRuleJsonTransformer implements ItemPlaceholderFactory{
+public class SharedRuleJsonTransformer implements ItemPlaceholderFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(SharedRuleJsonTransformer.class);
 	private static final JsonTransformerHelper jsonHelper = new JsonTransformerHelper();
 
@@ -59,41 +59,40 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory{
 
 	public SharedRule fromJson(String jsonStr) {
 		try {
-			
-		JSONObject json = new JSONObject(jsonStr);
-		String name = json.getString(KEY_NAME);
-		String id = json.getString(KEY_ID);
-		String description = json.getString(KEY_DESCRIPTION);
-		String status = json.getString(KEY_STATUS);
-		String visible = json.getString(KEY_VISIBLE);
 
-		Set<SharedTrigger> triggers = new HashSet<>();
-		try {
-			JSONArray jsonTriggers = json.getJSONArray(KEY_TRIGGERS);
-			triggers = parseRuleElements(jsonTriggers).getLeft();
+			JSONObject json = new JSONObject(jsonStr);
+			String name = json.getString(KEY_NAME);
+			String id = json.getString(KEY_ID);
+			String description = json.getString(KEY_DESCRIPTION);
+			String status = json.getString(KEY_STATUS);
+			String visible = json.getString(KEY_VISIBLE);
+
+			Set<SharedTrigger> triggers = new HashSet<>();
+			try {
+				JSONArray jsonTriggers = json.getJSONArray(KEY_TRIGGERS);
+				triggers = parseRuleElements(jsonTriggers).getLeft();
+			} catch (JSONException e) {
+				// nothing to do
+			}
+
+			Set<SharedCondition> conditions = new HashSet<>();
+			try {
+				JSONArray jsonConditions = json.getJSONArray(KEY_CONDITIONS);
+				conditions = parseRuleElements(jsonConditions).getMiddle();
+			} catch (JSONException e) {
+				// nothing to do
+			}
+
+			Set<SharedAction> actions = new HashSet<>();
+			try {
+				JSONArray jsonActions = json.getJSONArray(KEY_ACTIONS);
+				actions = parseRuleElements(jsonActions).getRight();
+			} catch (JSONException e) {
+				// nothing to do
+			}
+
+			return new SharedRule(name, id, description, visible, status, triggers, conditions, actions);
 		} catch (JSONException e) {
-			// nothing to do
-		}
-
-		Set<SharedCondition> conditions = new HashSet<>();
-		try {
-			JSONArray jsonConditions = json.getJSONArray(KEY_CONDITIONS);
-			conditions = parseRuleElements(jsonConditions).getMiddle();
-		} catch (JSONException e) {
-			// nothing to do
-		}
-
-		Set<SharedAction> actions = new HashSet<>();
-		try {
-			JSONArray jsonActions = json.getJSONArray(KEY_ACTIONS);
-			actions = parseRuleElements(jsonActions).getRight();
-		} catch (JSONException e) {
-			// nothing to do
-		}
-
-		return new SharedRule(name, id, description, visible, status, triggers, conditions, actions);
-		}
-		catch(JSONException e) {
 			LOG.warn("Invalid JSON detected: {}", e.getMessage(), e);
 			return new SharedRule("#INVALID#");
 		}
@@ -109,9 +108,9 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory{
 			String description = json.getString(KEY_RULE_ELEMENT_DESCRIPTION);
 			int elementId = json.getInt(KEY_RULE_ELEMENT_ELEMENT_ID);
 
-			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);			
+			final Map<String, Object> properties = jsonHelper.readMapFromJson(json, KEY_RULE_ELEMENT_CONTAINER);
 			transformObjectsInMap(properties);
-			
+
 			String type = json.getString(KEY_RULE_ELEMENT_TYPE);
 
 			if (type.equals(SharedElementType.ACTION_TYPE)) {
@@ -130,14 +129,14 @@ public class SharedRuleJsonTransformer implements ItemPlaceholderFactory{
 				LOG.error("Invalid element sub type: {}", type);
 			}
 
-		}		
+		}
 		return Triple.of(triggers, conditions, actions);
 	}
-	
+
 	private void transformObjectsInMap(Map<String, Object> map) {
-		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k,c) -> Command.valueOf(c.toString()));
-		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k,o) -> Operation.valueOf(o.toString()));
-		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k,i) -> getItemOrPlaceholder(i));
+		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k, c) -> Command.valueOf(c.toString()));
+		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k, o) -> Operation.valueOf(o.toString()));
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) -> getItemOrPlaceholder(i));
 	}
 
 	public JSONObject toJson(SharedRule rule) {

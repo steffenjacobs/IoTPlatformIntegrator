@@ -271,29 +271,31 @@ public class MongoDbStorageService {
 
 			@Override
 			public void onNext(Long count) {
-				getRuleCollection().find().subscribe(new Subscriber<Document>() {
+				if (count > 0) {
+					getRuleCollection().find().subscribe(new Subscriber<Document>() {
 
-					@Override
-					public void onSubscribe(Subscription s) {
-						s.request(count);
-					}
+						@Override
+						public void onSubscribe(Subscription s) {
+							s.request(count);
+						}
 
-					@Override
-					public void onNext(Document t) {
-						callback.onNext(transformation.apply(t));
-					}
+						@Override
+						public void onNext(Document t) {
+							callback.onNext(transformation.apply(t));
+						}
 
-					@Override
-					public void onError(Throwable t) {
-						callback.onError(t);
-						t.printStackTrace();
-					}
+						@Override
+						public void onError(Throwable t) {
+							callback.onError(t);
+							t.printStackTrace();
+						}
 
-					@Override
-					public void onComplete() {
-						callback.onComplete();
-					}
-				});
+						@Override
+						public void onComplete() {
+							callback.onComplete();
+						}
+					});
+				}
 			}
 
 			@Override
