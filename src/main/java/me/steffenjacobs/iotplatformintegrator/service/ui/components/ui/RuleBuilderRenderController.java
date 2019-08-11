@@ -1,14 +1,18 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui.components.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
@@ -16,13 +20,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.RuleRelatedAnnotation;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection.PlatformType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
@@ -32,6 +42,8 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRender
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.VisualRenderingStrategy;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.RuleAnalyzer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ActionElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ConditionElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement;
@@ -40,7 +52,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuil
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.TriggerElement;
 
 /** @author Steffen Jacobs */
-public class RuleBuilderRenderController implements RuleComponentRegistry {
+public class RuleBuilderRenderController implements RuleComponentRegistry, RuleAnalyzer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RuleBuilderRenderController.class);
 
@@ -52,6 +64,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 
 	private final Map<UUID, DynamicElement> renderedRuleElements = new HashMap<>();
 	private final Map<UUID, SharedRuleElement> ruleElements = new HashMap<>();
+	private final Map<SharedItem, Set<JComboBox<SharedItem>>> itemElements = new HashMap<>();
 
 	private final Map<Component, RuleRelatedAnnotation> annotatedComponents = new HashMap<>();
 
@@ -113,7 +126,8 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 	private SharedTrigger parseTriggerFromView(UUID source) {
 		SharedTrigger oldTrigger = (SharedTrigger) ruleElements.get(source);
 		final Map<String, Object> properties = parsePropertiesFromView(renderedRuleElements.get(source));
-		SharedTrigger trigger = new SharedTrigger(oldTrigger.getTriggerTypeContainer().getTriggerType(), properties, oldTrigger.getDescription(), oldTrigger.getLabel(), oldTrigger.getRelativeElementId());
+		SharedTrigger trigger = new SharedTrigger(oldTrigger.getTriggerTypeContainer().getTriggerType(), properties, oldTrigger.getDescription(), oldTrigger.getLabel(),
+				oldTrigger.getRelativeElementId());
 		return trigger;
 	}
 
@@ -128,7 +142,8 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 	private SharedAction parseActionFromView(UUID source) {
 		SharedAction oldAction = (SharedAction) ruleElements.get(source);
 		final Map<String, Object> properties = parsePropertiesFromView(renderedRuleElements.get(source));
-		SharedAction action = new SharedAction(oldAction.getActionTypeContainer().getActionType(), properties, oldAction.getDescription(), oldAction.getLabel(), oldAction.getRelativeElementId());
+		SharedAction action = new SharedAction(oldAction.getActionTypeContainer().getActionType(), properties, oldAction.getDescription(), oldAction.getLabel(),
+				oldAction.getRelativeElementId());
 		return action;
 	}
 
@@ -222,6 +237,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		ruleBuilder.clear();
 		ruleElements.clear();
 		annotatedComponents.clear();
+		itemElements.clear();
 		if (rule == null) {
 			return;
 		}
@@ -254,6 +270,24 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		elem.setStrategyElements(strategyElements);
 		ruleElements.put(uuid, trigger);
 		renderedRuleElements.put(uuid, elem);
+
+		if (trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().containsKey(TriggerTypeSpecificKey.ItemName)) {
+			for (Component c : strategyElements) {
+				if (c instanceof JComboBox) {
+					try {
+						@SuppressWarnings("unchecked")
+						final JComboBox<SharedItem> box = (JComboBox<SharedItem>) c;
+						if (box.getSelectedItem() instanceof SharedItem) {
+							final SharedItem item = (SharedItem) trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(TriggerTypeSpecificKey.ItemName);
+							itemElements.putIfAbsent(item, new HashSet<>());
+							itemElements.get(item).add(box);
+						}
+					} catch (ClassCastException e) {
+						// nothing to do
+					}
+				}
+			}
+		}
 		return elem;
 	}
 
@@ -272,6 +306,24 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		elem.setStrategyElements(strategyElements);
 		renderedRuleElements.put(uuid, elem);
 		ruleElements.put(uuid, action);
+
+		if (action.getActionTypeContainer().getActionTypeSpecificValues().containsKey(ActionTypeSpecificKey.ItemName)) {
+			for (Component c : strategyElements) {
+				if (c instanceof JComboBox) {
+					try {
+						@SuppressWarnings("unchecked")
+						final JComboBox<SharedItem> box = (JComboBox<SharedItem>) c;
+						if (box.getSelectedItem() instanceof SharedItem) {
+							final SharedItem item = (SharedItem) action.getActionTypeContainer().getActionTypeSpecificValues().get(ActionTypeSpecificKey.ItemName);
+							itemElements.putIfAbsent(item, new HashSet<>());
+							itemElements.get(item).add(box);
+						}
+					} catch (ClassCastException e) {
+						// nothing to do
+					}
+				}
+			}
+		}
 		return elem;
 	}
 
@@ -292,6 +344,24 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 		elem.setStrategyElements(strategyElements);
 		ruleElements.put(uuid, condition);
 		renderedRuleElements.put(uuid, elem);
+
+		if (condition.getConditionTypeContainer().getConditionTypeSpecificValues().containsKey(ConditionTypeSpecificKey.ItemName)) {
+			for (Component c : strategyElements) {
+				if (c instanceof JComboBox) {
+					try {
+						@SuppressWarnings("unchecked")
+						final JComboBox<SharedItem> box = (JComboBox<SharedItem>) c;
+						if (box.getSelectedItem() instanceof SharedItem) {
+							final SharedItem item = (SharedItem) condition.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.ItemName);
+							itemElements.putIfAbsent(item, new HashSet<>());
+							itemElements.get(item).add(box);
+						}
+					} catch (ClassCastException e) {
+						// nothing to do
+					}
+				}
+			}
+		}
 		return elem;
 	}
 
@@ -367,6 +437,21 @@ public class RuleBuilderRenderController implements RuleComponentRegistry {
 
 			counter++;
 		}
+	}
+
+	public boolean validateForPlatformExport() {
+		final Iterable<SharedItem> items = aggregateItemsFromRuleWithDuplicates(rule);
+		boolean result = true;
+		for (SharedItem item : items) {
+			ServerConnection serverConnection = ItemDirectoryHolder.getInstance().getServerConnection(item);
+			if (serverConnection.getPlatformType() == PlatformType.MONGO) {
+				result = false;
+				itemElements.get(item).stream()
+						.filter(c -> ItemDirectoryHolder.getInstance().getServerConnection((SharedItem) c.getSelectedItem()).getPlatformType() == PlatformType.MONGO)
+						.forEach(c -> c.setBorder(BorderFactory.createEtchedBorder(Color.RED, Color.BLACK)));
+			}
+		}
+		return result;
 	}
 
 }

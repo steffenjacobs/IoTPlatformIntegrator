@@ -38,7 +38,11 @@ public class RuleBuilder extends JPanel {
 
 		final JButton exportToPlatformButton = new JButton("Export to Platform");
 		exportToPlatformButton.addActionListener(e -> {
-			String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName() + "-new");
+			boolean result = controller.validateForPlatformExport();
+			if(result) {
+				String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
+				//TODO: export to platform
+			}
 		});
 		buttonBar.add(exportToPlatformButton);
 
