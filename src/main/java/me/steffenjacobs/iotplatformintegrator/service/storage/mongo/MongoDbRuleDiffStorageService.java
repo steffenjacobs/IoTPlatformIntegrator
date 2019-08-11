@@ -5,9 +5,6 @@ import java.io.IOException;
 import me.steffenjacobs.iotplatformintegrator.domain.authentication.UserScore;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
-import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
-import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.UserScoreJsonTransformer;
@@ -23,10 +20,6 @@ public class MongoDbRuleDiffStorageService {
 	public MongoDbRuleDiffStorageService(MongoDbStorageService storageService) throws IOException {
 		this.storageService = storageService;
 		storageService.checkAndValidateConnection();
-		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> {
-			RuleDiffChangeEvent event = (RuleDiffChangeEvent) e;
-			store(event.getDiffElement(), event.getSelectedRule(), event.getCreator());
-		});
 	}
 
 	public void store(SharedRuleElementDiff diff, SharedRule associatedRule, String creator) {

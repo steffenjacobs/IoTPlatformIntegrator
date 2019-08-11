@@ -2,6 +2,7 @@ package me.steffenjacobs.iotplatformintegrator.domain.manage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
@@ -19,6 +20,8 @@ public class SharedRuleElementDiff {
 	private final Map<String, Object> propertiesUpdated = new HashMap<>();
 	private final boolean negative;
 	private final int relativeElementId;
+	
+	private Optional<String> targetRuleName = Optional.empty();
 
 	public SharedRuleElementDiff(String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
 			Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId) {
@@ -43,6 +46,10 @@ public class SharedRuleElementDiff {
 			this.propertiesUpdated.putAll(propertiesUpdated);
 		}
 		this.negative = isNegative;
+	}
+	
+	public void setTargetRuleName(String targetRuleName) {
+		this.targetRuleName = Optional.of(targetRuleName);
 	}
 
 	/** Constructor to create an empty diff element. */
@@ -92,5 +99,9 @@ public class SharedRuleElementDiff {
 
 	public UUID getUid() {
 		return uid;
+	}
+	
+	public Optional<String> getTargetRule() {
+		return targetRuleName;
 	}
 }

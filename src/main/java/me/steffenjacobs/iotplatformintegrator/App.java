@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceImpl;
+import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffManager;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedItemStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
@@ -50,6 +51,8 @@ public class App {
 			new RuleChangeEventStore(authenticationService);
 
 			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
+
+			new RuleDiffManager(mongoDbRuleDiffStorageService);
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {

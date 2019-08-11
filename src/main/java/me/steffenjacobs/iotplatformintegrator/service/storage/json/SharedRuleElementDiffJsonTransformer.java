@@ -30,6 +30,7 @@ public class SharedRuleElementDiffJsonTransformer {
 	private static final String KEY_ELEMENT_TYPE = "type";
 	private static final String KEY_NEGATIVE = "negative";
 	private static final String KEY_RELATIVE_ELEMENT_ID = "rel-elem-id";
+	private static final String KEY_TARGET_RULE_NAME = "target-rule-name";
 
 	public static final String KEY_PROPERTIES_ADDED = "added";
 	public static final String KEY_PROPERTIES_REMOVED = "removed";
@@ -52,6 +53,7 @@ public class SharedRuleElementDiffJsonTransformer {
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_ADDED, diff.getPropertiesAdded());
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_REMOVED, diff.getPropertiesRemoved());
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_UPDATED, diff.getPropertiesUpdated());
+		diff.getTargetRule().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_TARGET_RULE_NAME, r));
 		return json;
 	}
 
