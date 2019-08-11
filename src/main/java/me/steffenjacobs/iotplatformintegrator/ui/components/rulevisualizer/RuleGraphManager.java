@@ -1,9 +1,8 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.swing.JPanel;
 
@@ -28,7 +27,7 @@ public class RuleGraphManager {
 	private static final Logger LOG = LoggerFactory.getLogger(RuleGraphManager.class);
 
 	private final Map<String, Node> nodesByUUID = new HashMap<>();
-	private final Set<Pair<String>> edges = new HashSet<>();
+	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
 
 	private final ClickableGraph graph;
 

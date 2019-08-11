@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -91,7 +92,8 @@ public class ClickableGraph implements ViewerListener {
 		graph.clear();
 	}
 
-	public void refreshEdges(Set<Pair<String>> edges) {
+	public synchronized void refreshEdges(Set<Pair<String>> edges) {
+		edges = new HashSet<Pair<String>>(edges);
 		LOG.info("Cleared edges.");
 		LOG.info("Available nodes: {}", graph.getNodeSet());
 		clearEdges();
@@ -104,7 +106,7 @@ public class ClickableGraph implements ViewerListener {
 		}
 	}
 
-	private void clearEdges() {
+	private synchronized void clearEdges() {
 		for (int i = 0; i < graph.getEdgeCount(); i++) {
 			graph.removeEdge(i);
 		}
