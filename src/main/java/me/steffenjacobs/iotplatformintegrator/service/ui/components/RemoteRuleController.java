@@ -1,7 +1,5 @@
 package me.steffenjacobs.iotplatformintegrator.service.ui.components;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +23,7 @@ import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbShare
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
 
 /** @author Steffen Jacobs */
-public class RemoteRuleController {
+public class RemoteRuleController implements RuleAnalyzer {
 
 	private final MongoDbRuleDiffStorageService diffStorage;
 	private final MongoDbSharedRuleStorageService ruleStorage;
@@ -75,7 +73,7 @@ public class RemoteRuleController {
 			public void onComplete() {
 				complete.complete(null);
 			}
-			
+
 			@Override
 			public void onError(Throwable t) {
 				t.printStackTrace();
@@ -90,28 +88,8 @@ public class RemoteRuleController {
 
 	public void uploadRule(SharedRule selectedRule) {
 		ruleStorage.insertRule(selectedRule, this::refreshRules);
-		aggregateItemsFromRule(selectedRule).forEach(i -> itemStorage.insertItem(i, () -> {
+		aggregateItemsFromRuleWithoutDuplicates(selectedRule).forEach(i -> itemStorage.insertItem(i, () -> {
 		}));
-	}
-
-	private Iterable<SharedItem> aggregateItemsFromRule(SharedRule rule) {
-		Set<SharedItem> items = new HashSet<>();
-		rule.getActions().forEach(a -> a.getActionTypeContainer().getActionTypeSpecificValues().values().forEach(e -> {
-			if (e instanceof SharedItem) {
-				items.add((SharedItem) e);
-			}
-		}));
-		rule.getConditions().forEach(c -> c.getConditionTypeContainer().getConditionTypeSpecificValues().values().forEach(e -> {
-			if (e instanceof SharedItem) {
-				items.add((SharedItem) e);
-			}
-		}));
-		rule.getTriggers().forEach(t -> t.getTriggerTypeContainer().getTriggerTypeSpecificValues().values().forEach(e -> {
-			if (e instanceof SharedItem) {
-				items.add((SharedItem) e);
-			}
-		}));
-		return items;
 	}
 
 	private void refreshRules() {
