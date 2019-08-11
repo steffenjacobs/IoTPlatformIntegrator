@@ -21,6 +21,7 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.RemoteRuleController;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleChangeEventStore;
 import me.steffenjacobs.iotplatformintegrator.ui.UiEntrypoint;
+import me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer.RuleGraphManager;
 
 public class App {
 
@@ -32,8 +33,10 @@ public class App {
 	private static MongoDbSharedItemStorageService mongoDbSharedItemStorageService;
 	private static AuthenticationService authenticationService;
 	private static RemoteRuleController remoteRuleController;
-
+	
 	private static MongoDbStorageService storageService;
+	
+	private static RuleGraphManager ruleGraphManager;
 
 	public static void main(String[] args) {
 		LOG.info("Started.");
@@ -46,6 +49,7 @@ public class App {
 			mongoDbUserStorageService = new MongoDbUserStorageService(storageService);
 
 			authenticationService = new AuthenticationServiceImpl(settingService);
+			ruleGraphManager = new RuleGraphManager();
 
 			new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
 			new RuleChangeEventStore(authenticationService);
@@ -53,6 +57,7 @@ public class App {
 			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
 
 			new RuleDiffManager(mongoDbRuleDiffStorageService);
+			
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
@@ -85,6 +90,10 @@ public class App {
 
 	public static MongoDbSharedItemStorageService getMongoDbSharedItemStorageService() {
 		return mongoDbSharedItemStorageService;
+	}
+	
+	public static RuleGraphManager getRuleGraphManager() {
+		return ruleGraphManager;
 	}
 
 }

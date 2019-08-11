@@ -3,6 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ public class SharedRuleElementDiffJsonTransformer {
 	private static final String KEY_NEGATIVE = "negative";
 	private static final String KEY_RELATIVE_ELEMENT_ID = "rel-elem-id";
 	private static final String KEY_TARGET_RULE_NAME = "target-rule-name";
+	private static final String KEY_PREV_DIFF_ID = "prev-diff-id";
 
 	public static final String KEY_PROPERTIES_ADDED = "added";
 	public static final String KEY_PROPERTIES_REMOVED = "removed";
@@ -54,10 +56,11 @@ public class SharedRuleElementDiffJsonTransformer {
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_REMOVED, diff.getPropertiesRemoved());
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_UPDATED, diff.getPropertiesUpdated());
 		diff.getTargetRule().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_TARGET_RULE_NAME, r));
+		diff.getPrevDiff().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_PREV_DIFF_ID, r.getUid()));
 		return json;
 	}
 
-	public SharedRuleElementDiff fromJSON(String jsonStr) {
+	public Pair<SharedRuleElementDiff, String> fromJSON(String jsonStr) {
 		JSONObject json = new JSONObject(jsonStr);
 
 		String uid = getStringOrNull(json, KEY_ID);
@@ -86,8 +89,10 @@ public class SharedRuleElementDiffJsonTransformer {
 		Map<String, Object> propertiesRemoved = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_REMOVED);
 		Map<String, Object> propertiesUpdated = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_UPDATED);
 
-		return new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative,
-				relativeElementId);
+		String creator = getStringOrNull(json, KEY_CREATOR);
+		
+		return Pair.of(new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative,
+				relativeElementId), creator);
 	}
 
 	public int getIntOrNull(JSONObject json, String key) {

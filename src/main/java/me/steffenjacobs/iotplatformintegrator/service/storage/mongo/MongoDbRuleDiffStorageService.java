@@ -2,6 +2,8 @@ package me.steffenjacobs.iotplatformintegrator.service.storage.mongo;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import me.steffenjacobs.iotplatformintegrator.domain.authentication.UserScore;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
@@ -26,12 +28,17 @@ public class MongoDbRuleDiffStorageService {
 		storageService.insertDiff(documentTransformer.toDocument(diffTransformer.toJSON(diff, associatedRule.getName(), creator)));
 	}
 
-	public void findForRule(SharedRule rule, SimplifiedSubscriber<SharedRuleElementDiff> subscriber) {
+	public void findForRule(SharedRule rule, SimplifiedSubscriber<Pair<SharedRuleElementDiff, String>> subscriber) {
 		storageService.findDiffsForRule(rule, subscriber, d -> diffTransformer.fromJSON(documentTransformer.toJSON(d)));
 	}
 
 	public void getStats(SimplifiedSubscriber<UserScore> subscriber) {
 		storageService.getStats(subscriber, d -> userScoreTransformer.fromJSON(documentTransformer.toJSON(d)));
+	}
+
+	public void getAllDiffs(SimplifiedSubscriber<Pair<SharedRuleElementDiff, String>> subscriber) {
+		storageService.getAllDiffs(subscriber, d -> diffTransformer.fromJSON(documentTransformer.toJSON(d)));
+
 	}
 
 }

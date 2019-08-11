@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.Document;
@@ -32,6 +33,7 @@ import com.mongodb.reactivestreams.client.Success;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection.PlatformType;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
@@ -456,5 +458,9 @@ public class MongoDbStorageService {
 
 	public void getAllItems(Subscriber<SharedItem> subscriber, Function<Document, SharedItem> transformation) {
 		getAll(subscriber, transformation, getItemCollection());
+	}
+
+	public void getAllDiffs(Subscriber<Pair<SharedRuleElementDiff, String>> subscriber, Function<Document, Pair<SharedRuleElementDiff, String>> transformation) {
+		getAll(subscriber, transformation, getDiffCollection());
 	}
 }

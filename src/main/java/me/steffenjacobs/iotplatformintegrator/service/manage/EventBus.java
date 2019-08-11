@@ -23,6 +23,7 @@ public class EventBus {
 		SelectedSourceRuleChanged, SelectedTargetRuleChanged, RuleElementAdded, RuleElementRemoved, RuleChangeEvent, RuleElementChangeEvent, //
 		RuleDiffChangeEvent, //
 		RemoteRuleAdded, ClearAllRemoteRules, RemoteRuleChange, RemoteItemAdded, ClearAllRemoteItems, //
+		RuleDiffAdded, //
 		StoreRuleToDatabase, ExportRuleToPlatform;
 	}
 

@@ -9,6 +9,7 @@ import javax.swing.JTable;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
+import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
@@ -54,7 +55,7 @@ public class AdoptionPerspective extends Perspective {
 		control.addDockable(ruleTableSourceWindow);
 
 		// create rule net window
-		SingleCDockable ruleNetWindow = DockableUtil.createDockable("RuleNet-Window", "Remote Rules Network", new JPanel());
+		SingleCDockable ruleNetWindow = DockableUtil.createDockable("RuleNet-Window", "Remote Rules Network", App.getRuleGraphManager().getGraphPanel());
 		control.addDockable(ruleNetWindow);
 
 		// create remote rules window
