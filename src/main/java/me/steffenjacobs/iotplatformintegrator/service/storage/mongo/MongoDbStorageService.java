@@ -179,18 +179,18 @@ public class MongoDbStorageService {
 
 			@Override
 			public void onNext(final Success success) {
-				LOG.info("Inserted document into diffCollection: {}", document.toJson());
+				LOG.info("Inserted document into {}: {}", collection.getNamespace(), document.toJson());
 			}
 
 			@Override
 			public void onError(final Throwable t) {
-				LOG.error("Could not insert document into diffCollection: {} ", t.getMessage());
+				LOG.error("Could not insert document into {}: {} ", collection.getNamespace(), t.getMessage());
 				callWhenDone.run();
 			}
 
 			@Override
 			public void onComplete() {
-				LOG.info("Inserted document into diffCollection: {} complete", document.toJson());
+				LOG.info("Inserted document into {}: {} complete", collection.getNamespace(), document.toJson());
 				callWhenDone.run();
 			}
 		});
@@ -205,18 +205,18 @@ public class MongoDbStorageService {
 			
 			@Override
 			public void onNext(final UpdateResult success) {
-				LOG.info("Upserted document into diffCollection: {}", document.toJson());
+				LOG.info("Upserted document into {}: {}", collection.getNamespace(), document.toJson());
 			}
 			
 			@Override
 			public void onError(final Throwable t) {
-				LOG.error("Could not upsert document into diffCollection: {} ", t.getMessage());
+				LOG.error("Could not upsert document into {}: {} ", collection.getNamespace(), t.getMessage());
 				callWhenDone.run();
 			}
 			
 			@Override
 			public void onComplete() {
-				LOG.info("Upserted document into diffCollection: {} complete", document.toJson());
+				LOG.info("Upserted document into {}: {} complete", collection.getNamespace(), document.toJson());
 				callWhenDone.run();
 			}
 		});
@@ -391,13 +391,13 @@ public class MongoDbStorageService {
 
 		@Override
 		public void onError(Throwable t) {
-			LOG.error("Unable to create diffCollection '{}' in mongodb: {}", collectionName, t.getMessage());
+			LOG.error("Unable to create collection '{}' in mongodb: {}", collectionName, t.getMessage());
 			initialized.complete(false);
 		}
 
 		@Override
 		public void onComplete() {
-			LOG.info("Created diffCollection '{}' successfully.", collectionName);
+			LOG.info("Created collection '{}' successfully.", collectionName);
 			initialized.complete(true);
 		}
 	}
