@@ -40,7 +40,9 @@ public class RuleDiffManager {
 		});
 
 		EventBus.getInstance().addEventHandler(EventType.StoreRuleToDatabase, e -> {
-			diffs.get(diffs.size() - 1).setTargetRuleName(((StoreRuleToDatabaseEvent) e).getNewRuleName());
+			if(!diffs.isEmpty()) {
+				diffs.get(diffs.size() - 1).setTargetRuleName(((StoreRuleToDatabaseEvent) e).getNewRuleName());
+			}
 			diffs.forEach(d -> ruleDiffStorageService.store(d, rule, creator));
 			diffs.clear();
 			rule = null;
