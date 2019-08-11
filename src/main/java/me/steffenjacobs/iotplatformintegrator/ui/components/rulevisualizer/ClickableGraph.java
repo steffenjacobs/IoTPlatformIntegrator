@@ -1,8 +1,10 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.graphstream.graph.Edge;
+import org.apache.commons.lang3.tuple.Pair;
+import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -10,9 +12,13 @@ import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.ViewerListener;
 import org.graphstream.ui.view.ViewerPipe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClickableGraph implements ViewerListener {
-	protected AtomicBoolean loop = new AtomicBoolean(true);
+	private static final Logger LOG = LoggerFactory.getLogger(ClickableGraph.class);
+
+	private final AtomicBoolean loop = new AtomicBoolean(true);
 	private ViewPanel view;
 	private ViewerListener listener;
 	private Graph graph;
@@ -23,6 +29,7 @@ public class ClickableGraph implements ViewerListener {
 		graph.addNode("test-node");
 
 		Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+		viewer.enableAutoLayout();
 		view = viewer.addDefaultView(false);
 
 		viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.HIDE_ONLY);
@@ -56,10 +63,6 @@ public class ClickableGraph implements ViewerListener {
 		return graph.addNode(nodeId);
 	}
 
-	public Edge createAndAddEdge(String edgeId, Node node1, Node node2) {
-		return graph.addEdge(edgeId, node1.getId(), node2.getId());
-	}
-
 	public ViewPanel getViewPanel() {
 		return view;
 	}
@@ -81,5 +84,24 @@ public class ClickableGraph implements ViewerListener {
 
 	public void clear() {
 		graph.clear();
+	}
+
+	public void refreshEdges(Set<Pair<String, String>> edges) {
+		LOG.info("Cleared edges.");
+		LOG.info("Available nodes: {}", graph.getNodeSet());
+		clearEdges();
+		for (Pair<String, String> edge : edges) {
+			try {
+				graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight());
+			} catch (ElementNotFoundException e) {
+				LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
+			}
+		}
+	}
+
+	private void clearEdges() {
+		for (int i = 0; i < graph.getEdgeCount(); i++) {
+			graph.removeEdge(i);
+		}
 	}
 }

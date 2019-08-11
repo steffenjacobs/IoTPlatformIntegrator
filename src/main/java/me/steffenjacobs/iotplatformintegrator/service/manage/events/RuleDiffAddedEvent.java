@@ -1,26 +1,19 @@
 package me.steffenjacobs.iotplatformintegrator.service.manage.events;
 
-import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 
 /** @author Steffen Jacobs */
-public class RuleDiffAddedEvent extends Event{
+public class RuleDiffAddedEvent extends Event {
 
-	private final SharedRuleElementDiff diffElement;
-	private final String creator;
+	private RuleDiffParts ruleDiffParts;
 
-	public RuleDiffAddedEvent(SharedRuleElementDiff diffElement, String creator) {
+	public RuleDiffAddedEvent(RuleDiffParts ruleDiffParts) {
 		super(EventType.RuleDiffAdded);
-		this.diffElement = diffElement;
-		this.creator = creator;
+		this.ruleDiffParts = ruleDiffParts;
 	}
 
-	public SharedRuleElementDiff getDiffElement() {
-		return diffElement;
+	public RuleDiffParts getRuleDiffParts() {
+		return ruleDiffParts;
 	}
-
-	public String getCreator() {
-		return creator;
-	}
-
 }

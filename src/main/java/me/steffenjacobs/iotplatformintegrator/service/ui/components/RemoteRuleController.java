@@ -6,8 +6,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
@@ -20,6 +18,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteItemAd
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
+import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedItemStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
@@ -46,10 +45,10 @@ public class RemoteRuleController implements RuleAnalyzer {
 	}
 
 	public void getDiffs(SharedRule rule, Consumer<SharedRuleElementDiff> consumer) {
-		diffStorage.findForRule(rule, new SimplifiedSubscriber<Pair<SharedRuleElementDiff, String>>() {
+		diffStorage.findForRule(rule, new SimplifiedSubscriber<RuleDiffParts>() {
 			@Override
-			public void onNext(Pair<SharedRuleElementDiff, String> diff) {
-				consumer.accept(diff.getLeft());
+			public void onNext(RuleDiffParts diff) {
+				consumer.accept(diff.getRuleDiff());
 			}
 		});
 	}

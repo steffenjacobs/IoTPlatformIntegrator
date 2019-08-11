@@ -3,7 +3,6 @@ package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -38,7 +37,6 @@ public class SharedRuleElementDiffJsonTransformer {
 	public static final String KEY_PROPERTIES_REMOVED = "removed";
 	public static final String KEY_PROPERTIES_UPDATED = "updated";
 
-
 	public JSONObject toJSON(SharedRuleElementDiff diff, String associatedRuleName, String creatorName) {
 		final JSONObject json = new JSONObject();
 		jsonHelper.putIfNotNull(json, KEY_CREATOR, creatorName);
@@ -60,7 +58,7 @@ public class SharedRuleElementDiffJsonTransformer {
 		return json;
 	}
 
-	public Pair<SharedRuleElementDiff, String> fromJSON(String jsonStr) {
+	public RuleDiffParts fromJSON(String jsonStr) {
 		JSONObject json = new JSONObject(jsonStr);
 
 		String uid = getStringOrNull(json, KEY_ID);
@@ -90,9 +88,13 @@ public class SharedRuleElementDiffJsonTransformer {
 		Map<String, Object> propertiesUpdated = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_UPDATED);
 
 		String creator = getStringOrNull(json, KEY_CREATOR);
+
+		SharedRuleElementDiff ruleDiff = new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated,
+				isNegative, relativeElementId);
 		
-		return Pair.of(new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative,
-				relativeElementId), creator);
+		String targetRuleName = getStringOrNull(json, KEY_TARGET_RULE_NAME);
+		String previousDiffId = getStringOrNull(json, KEY_PREV_DIFF_ID);
+		return new RuleDiffParts(ruleDiff, creator, previousDiffId, targetRuleName);
 	}
 
 	public int getIntOrNull(JSONObject json, String key) {
@@ -116,6 +118,37 @@ public class SharedRuleElementDiffJsonTransformer {
 			return json.getString(key);
 		} catch (JSONException e) {
 			return null;
+		}
+	}
+
+	public static class RuleDiffParts {
+		private final SharedRuleElementDiff ruleDiff;
+		private final String creator;
+		private final String prevDiffId;
+		private final String targetRuleName;
+
+		public RuleDiffParts(SharedRuleElementDiff ruleDiff, String creator, String prevDiffId, String targetRuleName) {
+			super();
+			this.ruleDiff = ruleDiff;
+			this.creator = creator;
+			this.prevDiffId = prevDiffId;
+			this.targetRuleName = targetRuleName;
+		}
+
+		public String getCreator() {
+			return creator;
+		}
+
+		public String getPrevDiffId() {
+			return prevDiffId;
+		}
+
+		public SharedRuleElementDiff getRuleDiff() {
+			return ruleDiff;
+		}
+
+		public String getTargetRuleName() {
+			return targetRuleName;
 		}
 	}
 

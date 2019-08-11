@@ -3,8 +3,6 @@ package me.steffenjacobs.iotplatformintegrator.service.manage;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
@@ -12,6 +10,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAdde
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
+import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 
 /** @author Steffen Jacobs */
@@ -52,10 +51,10 @@ public class RuleDiffManager {
 	}
 	
 	private void refreshRemoteDiffs() {
-		 ruleDiffStorageService.getAllDiffs(new SimplifiedSubscriber<Pair<SharedRuleElementDiff, String>>() {
+		 ruleDiffStorageService.getAllDiffs(new SimplifiedSubscriber<RuleDiffParts>() {
 			 @Override
-			public void onNext(Pair<SharedRuleElementDiff, String> diffWithCreator) {
-				 EventBus.getInstance().fireEvent(new RuleDiffAddedEvent(diffWithCreator.getLeft(), diffWithCreator.getRight()));
+			public void onNext(RuleDiffParts parts) {
+				 EventBus.getInstance().fireEvent(new RuleDiffAddedEvent(parts));
 			}
 		});
 	}
