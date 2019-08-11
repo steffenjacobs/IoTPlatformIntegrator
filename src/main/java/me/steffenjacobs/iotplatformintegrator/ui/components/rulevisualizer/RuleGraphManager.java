@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.view.ViewerListener;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAdde
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
+import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
 
 /** @author Steffen Jacobs */
 public class RuleGraphManager {
@@ -28,7 +28,7 @@ public class RuleGraphManager {
 	private static final Logger LOG = LoggerFactory.getLogger(RuleGraphManager.class);
 
 	private final Map<String, Node> nodesByUUID = new HashMap<>();
-	private final Set<Pair<String, String>> edges = new HashSet<>();
+	private final Set<Pair<String>> edges = new HashSet<>();
 
 	private final ClickableGraph graph;
 
@@ -63,22 +63,41 @@ public class RuleGraphManager {
 	}
 
 	private void visualizeRule(SharedRule rule) {
-		Node n = graph.createAndAddNode(rule.getId());
+		Node n = graph.createAndAddNode(rule.getName());
 		nodesByUUID.put(rule.getName(), n);
+		graph.refreshEdges(edges);
 	}
 
 	private void visualizeRuleDiff(SharedRuleElementDiff diffElement) {
-		visualizeRuleDiff(diffElement, diffElement.getPrevDiff().get().getUid().toString(), diffElement.getTargetRule().orElse(null));
+		String sourceRuleName;
+		if (diffElement.getSourceRule().isPresent()) {
+			sourceRuleName = diffElement.getSourceRule().get().getName();
+		} else {
+			sourceRuleName = null;
+		}
+
+		String prevDiffUid;
+		if (diffElement.getPrevDiff().isPresent()) {
+			prevDiffUid = diffElement.getPrevDiff().get().getUid().toString();
+		} else {
+			prevDiffUid = null;
+		}
+		visualizeRuleDiff(diffElement, prevDiffUid, diffElement.getTargetRule().orElse(null), sourceRuleName);
 	}
 
-	private void visualizeRuleDiff(SharedRuleElementDiff diffElement, String prevDiffUid, String targetRuleId) {
+	private void visualizeRuleDiff(SharedRuleElementDiff diffElement, String prevDiffUid, String targetRuleName, String sourceRuleName) {
 		final Node anchor;
-		edges.add(Pair.of(prevDiffUid, diffElement.getUid().toString()));
-		
-		if(targetRuleId != null) {
-			edges.add(Pair.of(diffElement.getUid().toString(), targetRuleId));
+
+		if (prevDiffUid != null) {
+			edges.add(Pair.of(prevDiffUid, diffElement.getUid().toString()));
+		} else {
+			edges.add(Pair.of(sourceRuleName, diffElement.getUid().toString()));
 		}
-		
+
+		if (targetRuleName != null) {
+			edges.add(Pair.of(diffElement.getUid().toString(), targetRuleName));
+		}
+
 		if (prevDiffUid != null) {
 			anchor = nodesByUUID.get(prevDiffUid);
 			if (anchor == null) {
@@ -88,15 +107,15 @@ public class RuleGraphManager {
 			}
 		} else {
 
-			if (!diffElement.getSourceRule().isPresent()) {
+			if (sourceRuleName != null) {
 				createNode(diffElement);
-				LOG.warn("Could not find source rule for diff {}.", diffElement.getUid().toString());
+				LOG.warn("Could not find source rule for diff {}.", sourceRuleName);
 				return;
 			}
-			anchor = nodesByUUID.get(diffElement.getSourceRule().get().getId());
+			anchor = nodesByUUID.get(sourceRuleName);
 			if (anchor == null) {
 				createNode(diffElement);
-				LOG.warn("Could not find source rule node {}.", diffElement.getSourceRule().get().getId());
+				LOG.warn("Could not find source rule node {}.", sourceRuleName);
 				return;
 			}
 		}
@@ -105,7 +124,7 @@ public class RuleGraphManager {
 	}
 
 	private void visualizeRuleDiff(RuleDiffParts ruleDiffParts) {
-		visualizeRuleDiff(ruleDiffParts.getRuleDiff(), ruleDiffParts.getPrevDiffId(), ruleDiffParts.getTargetRuleName());
+		visualizeRuleDiff(ruleDiffParts.getRuleDiff(), ruleDiffParts.getPrevDiffId(), ruleDiffParts.getTargetRuleName(), ruleDiffParts.getSourceRuleName());
 	}
 
 	private Node createNode(SharedRuleElementDiff diffElement) {

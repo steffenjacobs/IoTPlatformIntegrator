@@ -3,9 +3,9 @@ package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.swingViewer.ViewPanel;
@@ -14,6 +14,8 @@ import org.graphstream.ui.view.ViewerListener;
 import org.graphstream.ui.view.ViewerPipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
 
 public class ClickableGraph implements ViewerListener {
 	private static final Logger LOG = LoggerFactory.getLogger(ClickableGraph.class);
@@ -24,6 +26,7 @@ public class ClickableGraph implements ViewerListener {
 	private Graph graph;
 
 	public ClickableGraph(ViewerListener listener) {
+		System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 		this.listener = listener;
 		graph = new SingleGraph("ClickableGraph");
 		graph.addNode("test-node");
@@ -60,7 +63,9 @@ public class ClickableGraph implements ViewerListener {
 	}
 
 	public Node createAndAddNode(String nodeId) {
-		return graph.addNode(nodeId);
+		Node n = graph.addNode(nodeId);
+		n.addAttribute("ui.label", n.getId());
+		return n;
 	}
 
 	public ViewPanel getViewPanel() {
@@ -86,14 +91,14 @@ public class ClickableGraph implements ViewerListener {
 		graph.clear();
 	}
 
-	public void refreshEdges(Set<Pair<String, String>> edges) {
+	public void refreshEdges(Set<Pair<String>> edges) {
 		LOG.info("Cleared edges.");
 		LOG.info("Available nodes: {}", graph.getNodeSet());
 		clearEdges();
-		for (Pair<String, String> edge : edges) {
+		for (Pair<String> edge : edges) {
 			try {
 				graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight());
-			} catch (ElementNotFoundException e) {
+			} catch (ElementNotFoundException | IdAlreadyInUseException e) {
 				LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
 			}
 		}

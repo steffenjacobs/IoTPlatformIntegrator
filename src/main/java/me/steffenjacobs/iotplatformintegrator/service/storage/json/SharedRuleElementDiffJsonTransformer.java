@@ -31,6 +31,7 @@ public class SharedRuleElementDiffJsonTransformer {
 	private static final String KEY_NEGATIVE = "negative";
 	private static final String KEY_RELATIVE_ELEMENT_ID = "rel-elem-id";
 	private static final String KEY_TARGET_RULE_NAME = "target-rule-name";
+	private static final String KEY_SOURCE_RULE_NAME = "source-rule-name";
 	private static final String KEY_PREV_DIFF_ID = "prev-diff-id";
 
 	public static final String KEY_PROPERTIES_ADDED = "added";
@@ -55,6 +56,7 @@ public class SharedRuleElementDiffJsonTransformer {
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_UPDATED, diff.getPropertiesUpdated());
 		diff.getTargetRule().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_TARGET_RULE_NAME, r));
 		diff.getPrevDiff().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_PREV_DIFF_ID, r.getUid()));
+		diff.getSourceRule().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_SOURCE_RULE_NAME, r.getName()));
 		return json;
 	}
 
@@ -91,10 +93,11 @@ public class SharedRuleElementDiffJsonTransformer {
 
 		SharedRuleElementDiff ruleDiff = new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated,
 				isNegative, relativeElementId);
-		
+
 		String targetRuleName = getStringOrNull(json, KEY_TARGET_RULE_NAME);
+		String sourceRuleName = getStringOrNull(json, KEY_SOURCE_RULE_NAME);
 		String previousDiffId = getStringOrNull(json, KEY_PREV_DIFF_ID);
-		return new RuleDiffParts(ruleDiff, creator, previousDiffId, targetRuleName);
+		return new RuleDiffParts(ruleDiff, creator, previousDiffId, targetRuleName, sourceRuleName);
 	}
 
 	public int getIntOrNull(JSONObject json, String key) {
@@ -126,13 +129,15 @@ public class SharedRuleElementDiffJsonTransformer {
 		private final String creator;
 		private final String prevDiffId;
 		private final String targetRuleName;
+		private final String sourceRuleName;
 
-		public RuleDiffParts(SharedRuleElementDiff ruleDiff, String creator, String prevDiffId, String targetRuleName) {
+		public RuleDiffParts(SharedRuleElementDiff ruleDiff, String creator, String prevDiffId, String targetRuleName, String sourceRuleName) {
 			super();
 			this.ruleDiff = ruleDiff;
 			this.creator = creator;
 			this.prevDiffId = prevDiffId;
 			this.targetRuleName = targetRuleName;
+			this.sourceRuleName = sourceRuleName;
 		}
 
 		public String getCreator() {
@@ -149,6 +154,10 @@ public class SharedRuleElementDiffJsonTransformer {
 
 		public String getTargetRuleName() {
 			return targetRuleName;
+		}
+
+		public String getSourceRuleName() {
+			return sourceRuleName;
 		}
 	}
 
