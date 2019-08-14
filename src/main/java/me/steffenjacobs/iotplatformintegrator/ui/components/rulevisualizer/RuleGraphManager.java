@@ -21,6 +21,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
@@ -30,11 +31,15 @@ public class RuleGraphManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RuleGraphManager.class);
 
+	private final Map<Node, Boolean> nodeWithType = new HashMap<>();
 	private final Map<String, Node> nodesByUUID = new HashMap<>();
+	private final Map<String, SharedRule> ruleByUUID = new HashMap<>();
 	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
 
+	private Node lastSelectedNode = null;
+
 	private final ClickableGraph graph;
-	
+
 	public RuleGraphManager() {
 		graph = createVisualization();
 
@@ -66,8 +71,48 @@ public class RuleGraphManager {
 
 			@Override
 			public void buttonReleased(String id) {
-				// TODO Auto-generated method stub
+				// de-select old node if present
+				if (lastSelectedNode != null) {
+					final Boolean nodeType = nodeWithType.get(lastSelectedNode);
+					lastSelectedNode.addAttribute("ui.style", "stroke-mode: none;");
+					lastSelectedNode.removeAttribute("ui.style");
+					if (nodeType == null) {
 
+					} else if (nodeType == true) {
+						lastSelectedNode.addAttribute("ui.style", "fill-color: #8bb0c4;");
+						lastSelectedNode.addAttribute("ui.style", "size: 8px;");
+					} else if (nodeType == false) {
+						lastSelectedNode.addAttribute("ui.style", "fill-color: #23729e;");
+						lastSelectedNode.addAttribute("ui.style", "size: 15px;");
+					}
+				}
+
+				// select new node
+				if (nodesByUUID.containsKey(id)) {
+					final Node node = nodesByUUID.get(id);
+					final Boolean nodeType = nodeWithType.get(node);
+
+					node.removeAttribute("ui.style");
+					if (nodeType == null) {
+
+					} else if (nodeType == true) {
+						node.addAttribute("ui.style", "stroke-mode: plain;");
+						node.addAttribute("ui.style", "stroke-color: #627782;");
+						node.addAttribute("ui.style", "stroke-width: 3px;");
+						node.addAttribute("ui.style", "size: 13px;");
+						lastSelectedNode = node;
+
+					} else if (nodeType == false) {
+						EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
+						node.addAttribute("ui.style", "size: 20px;");
+						node.addAttribute("ui.style", "stroke-mode: plain;");
+						node.addAttribute("ui.style", "stroke-color: #0b283d;");
+						node.addAttribute("ui.style", "stroke-width: 3px;");
+						lastSelectedNode = node;
+					}
+				}
+
+				// TODO click on diff
 			}
 
 			@Override
@@ -80,6 +125,8 @@ public class RuleGraphManager {
 	private void visualizeRule(SharedRule rule) {
 		Node n = graph.createAndAddNode(rule.getName(), false);
 		nodesByUUID.put(rule.getName(), n);
+		nodeWithType.put(n, false);
+		ruleByUUID.put(rule.getName(), rule);
 		graph.refreshEdges(edges);
 	}
 
@@ -145,6 +192,7 @@ public class RuleGraphManager {
 	private Node createDiffNode(SharedRuleElementDiff diffElement) {
 		Node n = graph.createAndAddNode(diffElement.getUid().toString(), true);
 		nodesByUUID.put(diffElement.getUid().toString(), n);
+		nodeWithType.put(n, true);
 		graph.refreshEdges(edges);
 		return n;
 	}
@@ -153,6 +201,8 @@ public class RuleGraphManager {
 		graph.clear();
 		edges.clear();
 		nodesByUUID.clear();
+		ruleByUUID.clear();
+		nodeWithType.clear();
 	}
 
 	public JPanel getGraphPanel() {
