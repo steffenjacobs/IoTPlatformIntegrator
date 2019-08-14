@@ -42,6 +42,10 @@ public class App {
 
 	private static RuleGraphManager ruleGraphManager;
 
+	private static RuleChangeEventStore ruleChangeEventStore;
+
+	private static RuleDiffManager ruleDiffManager;
+
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		final SettingService settingService = new SettingService("./settings.config");
@@ -58,11 +62,11 @@ public class App {
 			ruleGraphManager = new RuleGraphManager();
 
 			new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
-			new RuleChangeEventStore(authenticationService);
+			ruleChangeEventStore = new RuleChangeEventStore(authenticationService);
 
 			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
 
-			new RuleDiffManager(mongoDbRuleDiffStorageService);
+			ruleDiffManager = new RuleDiffManager(mongoDbRuleDiffStorageService);
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
@@ -107,6 +111,14 @@ public class App {
 
 	public static RemoteRuleCache getRemoteRuleCache() {
 		return remoteRuleCache;
+	}
+	
+	public static RuleChangeEventStore getRuleChangeEventStore() {
+		return ruleChangeEventStore;
+	}
+	
+	public static RuleDiffManager getRuleDiffManager() {
+		return ruleDiffManager;
 	}
 
 }

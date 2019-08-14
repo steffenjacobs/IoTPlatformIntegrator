@@ -1,12 +1,14 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -82,10 +84,18 @@ public class RuleGraphManager {
 			@Override
 			public void buttonReleased(String id) {
 				if (nextSelectedRuleIsTarget.getAndSet(false)) {
-					EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
-					edges.add(Pair.of(nextSelectedRuleIsTargetId.getAndSet(""), id));
-					graph.refreshEdges(edges);
-				}
+					SharedRule clickedRule = App.getRemoteRuleCache().getRuleByName(id);
+					RuleDiffParts diff = App.getRuleDiffCache().getRuleDiffParts(lastSelectedNode.getId());
+					SharedRule rebuiltRule = App.getRuleChangeEventStore().rebuildRule(diff);
+
+					List<String> warnings = App.getRuleChangeEventStore().checkRulesCompatible(clickedRule, rebuiltRule);
+					if (warnings.isEmpty()) {
+						EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
+						edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), id));
+						graph.refreshEdges(edges);
+					} else {
+						JOptionPane.showMessageDialog(null, "Please select a rule that is compatible with your current transformation state:\n" + String.join("\n", warnings),
+								"Rule cannot be matched", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 				selectNode(id, false);

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -74,7 +75,10 @@ public class RuleChangeEventStore {
 		});
 	}
 
-	private SharedRule rebuildRule(RuleDiffParts parts) {
+	public SharedRule rebuildRule(RuleDiffParts parts) {
+		if (parts == null) {
+			return null;
+		}
 		if (parts.getPrevDiffId() == null) {
 			final SharedRule ruleByName = App.getRemoteRuleCache().getRuleByName(parts.getSourceRuleName());
 			final SharedRule sharedRuleCopy = new SharedRule(ruleByName.getName(), ruleByName);
@@ -253,6 +257,157 @@ public class RuleChangeEventStore {
 			SharedAction action = (SharedAction) removedElement;
 			rule.getActions().remove(action);
 		}
+	}
+
+	public List<String> checkRulesCompatible(SharedRule clickedRule, SharedRule rebuiltRule) {
+		List<String> warnings = new ArrayList<>();
+		if (clickedRule.getActions().size() != rebuiltRule.getActions().size()) {
+			warnings.add(String.format("Target rule has to contain the same amount of actions (%s vs. %s).", clickedRule.getActions().size(), rebuiltRule.getActions().size()));
+			return warnings;
+		}
+		if (clickedRule.getConditions().size() != rebuiltRule.getConditions().size()) {
+			warnings.add(
+					String.format("Target rule has to contain the same amount of conditions (%s vs. %s).", clickedRule.getConditions().size(), rebuiltRule.getConditions().size()));
+		}
+		if (clickedRule.getTriggers().size() != rebuiltRule.getTriggers().size()) {
+			warnings.add(String.format("Target rule has to contain the same amount of triggers (%s vs. %s).", clickedRule.getTriggers().size(), rebuiltRule.getTriggers().size()));
+		}
+
+		if (!warnings.isEmpty()) {
+			return warnings;
+		}
+
+		warnings = actionsMatch(clickedRule.getActions(), rebuiltRule.getActions());
+		if (!warnings.isEmpty()) {
+			return warnings;
+		}
+
+		warnings = conditionsMatch(clickedRule.getConditions(), rebuiltRule.getConditions());
+		if (!warnings.isEmpty()) {
+			return warnings;
+		}
+		warnings = triggersMatch(clickedRule.getTriggers(), rebuiltRule.getTriggers());
+		return warnings;
+	}
+
+	private List<String> actionsMatch(Set<SharedAction> actionsClicked, Set<SharedAction> actionsRebuilt) {
+		List<String> warnings = new ArrayList<>();
+		int mappedActionCount = 0;
+		for (SharedAction actionClicked : actionsClicked) {
+			for (SharedAction actionRebuilt : actionsRebuilt) {
+				if (actionRebuilt.getActionTypeContainer().getActionType() != actionClicked.getActionTypeContainer().getActionType()) {
+					continue;
+				}
+
+				final Map<ActionTypeSpecificKey, Object> propertiesClicked = actionClicked.getActionTypeContainer().getActionTypeSpecificValues();
+				final Map<ActionTypeSpecificKey, Object> propertiesRebuilt = actionRebuilt.getActionTypeContainer().getActionTypeSpecificValues();
+
+				if (propertiesClicked.size() != propertiesRebuilt.size()) {
+					continue;
+				}
+
+				boolean allMapped = true;
+				for (ActionTypeSpecificKey key : propertiesClicked.keySet()) {
+					if (!propertiesRebuilt.containsKey(key)) {
+						allMapped = false;
+					}
+
+					allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+				}
+
+				if (!allMapped) {
+					continue;
+				}
+
+				mappedActionCount++;
+				break;
+			}
+		}
+		if (mappedActionCount != actionsClicked.size()) {
+			warnings.add(String.format("Not all actions could be mapped (only %s of %s).", mappedActionCount, actionsClicked.size()));
+			return warnings;
+		}
+		return warnings;
+	}
+
+	private List<String> conditionsMatch(Set<SharedCondition> conditionsClicked, Set<SharedCondition> conditionsRebuilt) {
+		List<String> warnings = new ArrayList<>();
+		int mappedConditionCount = 0;
+		for (SharedCondition conditionClicked : conditionsClicked) {
+			for (SharedCondition conditionRebuilt : conditionsRebuilt) {
+				if (conditionRebuilt.getConditionTypeContainer().getConditionType() != conditionClicked.getConditionTypeContainer().getConditionType()) {
+					continue;
+				}
+
+				final Map<ConditionTypeSpecificKey, Object> propertiesClicked = conditionClicked.getConditionTypeContainer().getConditionTypeSpecificValues();
+				final Map<ConditionTypeSpecificKey, Object> propertiesRebuilt = conditionRebuilt.getConditionTypeContainer().getConditionTypeSpecificValues();
+
+				if (propertiesClicked.size() != propertiesRebuilt.size()) {
+					continue;
+				}
+
+				boolean allMapped = true;
+				for (ConditionTypeSpecificKey key : propertiesClicked.keySet()) {
+					if (!propertiesRebuilt.containsKey(key)) {
+						allMapped = false;
+					}
+
+					allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+				}
+
+				if (!allMapped) {
+					continue;
+				}
+
+				mappedConditionCount++;
+				break;
+			}
+		}
+		if (mappedConditionCount != conditionsClicked.size()) {
+			warnings.add(String.format("Not all conditions could be mapped (only %s of %s).", mappedConditionCount, conditionsClicked.size()));
+			return warnings;
+		}
+		return warnings;
+	}
+
+	private List<String> triggersMatch(Set<SharedTrigger> triggersClicked, Set<SharedTrigger> triggersRebuilt) {
+		List<String> warnings = new ArrayList<>();
+		int mappedTriggerCount = 0;
+		for (SharedTrigger triggerClicked : triggersClicked) {
+			for (SharedTrigger triggerRebuilt : triggersRebuilt) {
+				if (triggerRebuilt.getTriggerTypeContainer().getTriggerType() != triggerClicked.getTriggerTypeContainer().getTriggerType()) {
+					continue;
+				}
+
+				final Map<TriggerTypeSpecificKey, Object> propertiesClicked = triggerClicked.getTriggerTypeContainer().getTriggerTypeSpecificValues();
+				final Map<TriggerTypeSpecificKey, Object> propertiesRebuilt = triggerRebuilt.getTriggerTypeContainer().getTriggerTypeSpecificValues();
+
+				if (propertiesClicked.size() != propertiesRebuilt.size()) {
+					continue;
+				}
+
+				boolean allMapped = true;
+				for (TriggerTypeSpecificKey key : propertiesClicked.keySet()) {
+					if (!propertiesRebuilt.containsKey(key)) {
+						allMapped = false;
+					}
+
+					allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+				}
+
+				if (!allMapped) {
+					continue;
+				}
+
+				mappedTriggerCount++;
+				break;
+			}
+		}
+		if (mappedTriggerCount != triggersClicked.size()) {
+			warnings.add(String.format("Not all triggersc could be mapped (only %s of %s).", mappedTriggerCount, triggersClicked.size()));
+			return warnings;
+		}
+		return warnings;
 	}
 
 }
