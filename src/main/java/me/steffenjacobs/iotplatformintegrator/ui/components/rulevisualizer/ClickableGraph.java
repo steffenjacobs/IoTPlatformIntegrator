@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
@@ -114,7 +115,8 @@ public class ClickableGraph implements ViewerListener {
 		clearEdges();
 		for (Pair<String> edge : edges) {
 			try {
-				graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
+				Edge e = graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
+				e.addAttribute("ui.style", "fill-color: #c5ccd1;");
 			} catch (ElementNotFoundException | IdAlreadyInUseException e) {
 				LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
 			}
