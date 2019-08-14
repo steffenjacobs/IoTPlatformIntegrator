@@ -6,6 +6,7 @@ import java.util.List;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
@@ -47,11 +48,11 @@ public class RuleDiffManager {
 			rule = null;
 		});
 
-		refreshRemoteDiffs();
-
 		EventBus.getInstance().addEventHandler(EventType.RefreshRuleDiffs, e -> {
 			refreshRemoteDiffs();
 		});
+
+		EventBus.getInstance().fireEvent(new RefreshRuleDiffsEvent());
 	}
 
 	private void refreshRemoteDiffs() {

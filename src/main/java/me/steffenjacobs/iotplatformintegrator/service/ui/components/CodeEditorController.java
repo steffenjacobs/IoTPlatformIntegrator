@@ -32,7 +32,7 @@ public class CodeEditorController {
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> renderPseudoCode(((SelectedRuleChangeEvent) e).getSelectedRule()));
 
-		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RuleChange, e -> {
 			RuleChangeEvent event = (RuleChangeEvent) e;
 			if (event.getSelectedRule() == rule) {
 				renderPseudoCode(event.getSelectedRule());

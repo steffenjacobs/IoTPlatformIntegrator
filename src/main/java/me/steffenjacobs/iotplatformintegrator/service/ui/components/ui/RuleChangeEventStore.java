@@ -51,7 +51,7 @@ public class RuleChangeEventStore {
 	private final RuleDiffService diffService = new RuleDiffService();
 
 	public RuleChangeEventStore(AuthenticationService authenticationService) {
-		EventBus.getInstance().addEventHandler(EventType.RuleChangeEvent, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RuleChange, e -> {
 			final RuleChangeEvent event = (RuleChangeEvent) e;
 			if (changedRule != event.getSelectedRule()) {
 				changedRule = event.getSelectedRule();

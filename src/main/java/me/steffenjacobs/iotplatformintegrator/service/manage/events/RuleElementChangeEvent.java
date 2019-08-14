@@ -10,7 +10,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicE
 public class RuleElementChangeEvent extends WithRuleElementAndRuleEvent {
 
 	public RuleElementChangeEvent(ElementType elementType, UUID elementUUID, SharedRule sharedRule) {
-		super(EventType.RuleElementChangeEvent, elementType, elementUUID, sharedRule);
+		super(EventType.RuleElementChange, elementType, elementUUID, sharedRule);
 	}
 
 }
