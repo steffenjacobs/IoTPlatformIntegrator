@@ -4,10 +4,9 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 
 /** @author Steffen Jacobs */
-public class RuleDiffAddedEvent extends WithRuleDiffEvent {
+public class SelectedRuleDiffChangeEvent extends WithRuleDiffEvent {
 
-	public RuleDiffAddedEvent(RuleDiffParts ruleDiffParts) {
-		super(EventType.RuleDiffAdded, ruleDiffParts);
+	public SelectedRuleDiffChangeEvent(RuleDiffParts ruleDiffParts) {
+		super(EventType.SelectedRuleDiffChanged, ruleDiffParts);
 	}
-
 }

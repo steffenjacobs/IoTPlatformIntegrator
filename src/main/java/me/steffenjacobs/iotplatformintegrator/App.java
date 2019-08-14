@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceImpl;
+import me.steffenjacobs.iotplatformintegrator.service.manage.RemoteRuleCache;
+import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffCache;
 import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffManager;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedItemStorageService;
@@ -33,14 +35,18 @@ public class App {
 	private static MongoDbSharedItemStorageService mongoDbSharedItemStorageService;
 	private static AuthenticationService authenticationService;
 	private static RemoteRuleController remoteRuleController;
-	
+	private static RuleDiffCache ruleDiffCache;
+	private static RemoteRuleCache remoteRuleCache;
+
 	private static MongoDbStorageService storageService;
-	
+
 	private static RuleGraphManager ruleGraphManager;
 
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		final SettingService settingService = new SettingService("./settings.config");
+		ruleDiffCache = new RuleDiffCache();
+		remoteRuleCache = new RemoteRuleCache();
 		storageService = new MongoDbStorageService(settingService);
 		try {
 			mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
@@ -57,7 +63,6 @@ public class App {
 			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
 
 			new RuleDiffManager(mongoDbRuleDiffStorageService);
-			
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
@@ -91,9 +96,17 @@ public class App {
 	public static MongoDbSharedItemStorageService getMongoDbSharedItemStorageService() {
 		return mongoDbSharedItemStorageService;
 	}
-	
+
 	public static RuleGraphManager getRuleGraphManager() {
 		return ruleGraphManager;
+	}
+
+	public static RuleDiffCache getRuleDiffCache() {
+		return ruleDiffCache;
+	}
+
+	public static RemoteRuleCache getRemoteRuleCache() {
+		return remoteRuleCache;
 	}
 
 }

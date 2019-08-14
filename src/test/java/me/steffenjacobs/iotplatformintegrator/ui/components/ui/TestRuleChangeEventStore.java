@@ -24,6 +24,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedT
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceMock;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleChangeEventStore;
 
 public class TestRuleChangeEventStore {
@@ -36,7 +37,7 @@ public class TestRuleChangeEventStore {
 				TriggerType.CommandReceived, null, null, null, false, 1);
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
-		store.applyDiff(rule, diff);
+		store.applyDiff(rule, diff, new ItemDirectory());
 
 		Assert.assertEquals("Test Description", rule.getDescription());
 		Assert.assertEquals("TestRule", rule.getName());
@@ -69,7 +70,7 @@ public class TestRuleChangeEventStore {
 				propertiesUpdated, false, 1);
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
-		store.applyDiff(rule, diff);
+		store.applyDiff(rule, diff, new ItemDirectory());
 
 		Assert.assertEquals("Test Description", rule.getDescription());
 		Assert.assertEquals("TestRule", rule.getName());
@@ -113,7 +114,7 @@ public class TestRuleChangeEventStore {
 				propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1);
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
-		store.applyDiff(rule, diff);
+		store.applyDiff(rule, diff, new ItemDirectory());
 
 		Assert.assertEquals("Test Description", rule.getDescription());
 		Assert.assertEquals("TestRule", rule.getName());
@@ -154,7 +155,7 @@ public class TestRuleChangeEventStore {
 				propertiesRemoved, propertiesUpdated, false, 1337);
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
-		store.applyDiff(rule, diff);
+		store.applyDiff(rule, diff, new ItemDirectory());
 
 		Assert.assertEquals("Test Description", rule.getDescription());
 		Assert.assertEquals("TestRule", rule.getName());
@@ -195,7 +196,7 @@ public class TestRuleChangeEventStore {
 				propertiesRemoved, propertiesUpdated, false, 1);
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
-		store.applyDiff(rule, diff);
+		store.applyDiff(rule, diff, new ItemDirectory());
 
 		Assert.assertEquals("Test Description", rule.getDescription());
 		Assert.assertEquals("TestRule", rule.getName());

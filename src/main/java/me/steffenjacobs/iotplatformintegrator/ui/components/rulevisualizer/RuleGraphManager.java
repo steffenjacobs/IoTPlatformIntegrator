@@ -23,6 +23,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleD
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
@@ -39,7 +40,7 @@ public class RuleGraphManager {
 	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
 
 	private Node lastSelectedNode = null;
-	
+
 	private final AtomicBoolean nextSelectedRuleIsTarget = new AtomicBoolean(false);
 
 	private final ClickableGraph graph;
@@ -76,7 +77,7 @@ public class RuleGraphManager {
 
 			@Override
 			public void buttonReleased(String id) {
-				if(nextSelectedRuleIsTarget.getAndSet(false)) {
+				if (nextSelectedRuleIsTarget.getAndSet(false)) {
 					EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
 				}
 				// de-select old node if present
@@ -108,6 +109,7 @@ public class RuleGraphManager {
 						node.addAttribute("ui.style", "stroke-color: #627782;");
 						node.addAttribute("ui.style", "stroke-width: 3px;");
 						node.addAttribute("ui.style", "size: 13px;");
+						EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
 						lastSelectedNode = node;
 
 					} else if (nodeType == false) {
