@@ -16,6 +16,7 @@ import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
@@ -67,7 +68,8 @@ public class RuleChangeEventStore {
 		});
 
 		EventBus.getInstance().addEventHandler(EventType.SelectedRuleDiffChanged, e -> {
-			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(rebuildRule(((SelectedRuleDiffChangeEvent) e).getRuleDiffParts())));
+			final SharedRule rebuildRule = rebuildRule(((SelectedRuleDiffChangeEvent) e).getRuleDiffParts());
+			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(rebuildRule));
 
 		});
 	}
@@ -91,7 +93,7 @@ public class RuleChangeEventStore {
 	private void transformObjectsInMap(Map<String, Object> map, ItemDirectory itemDirectory) {
 		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k, c) -> Command.valueOf(c.toString()));
 		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k, o) -> Operation.valueOf(o.toString()));
-		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) -> itemDirectory.getItemByName(i.toString()));
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) ->  i instanceof SharedItem ? i: itemDirectory.getItemByName(i.toString()));
 	}
 
 	public void applyDiff(SharedRule rule, SharedRuleElementDiff diff, ItemDirectory itemDirectory) {
@@ -106,8 +108,8 @@ public class RuleChangeEventStore {
 
 			final Map<TriggerTypeSpecificKey, Object> triggerTypeSpecificValues = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues();
 
-			final Map<String, Object> properties = generalize(triggerTypeSpecificValues, itemDirectory);
-			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated());
+			final Map<String, Object> properties = generalize(triggerTypeSpecificValues);
+			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
 
 			SharedTrigger newTrigger = new SharedTrigger((TriggerType) diff.getElementType(), properties, description, label, trigger.getRelativeElementId());
 			
@@ -123,8 +125,8 @@ public class RuleChangeEventStore {
 			final String label = diff.getLabel() == null ? condition.getLabel() : diff.getLabel();
 
 			final Map<ConditionTypeSpecificKey, Object> conditionTypeSpecificValues = condition.getConditionTypeContainer().getConditionTypeSpecificValues();
-			final Map<String, Object> properties = generalize(conditionTypeSpecificValues, itemDirectory);
-			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated());
+			final Map<String, Object> properties = generalize(conditionTypeSpecificValues);
+			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
 
 			SharedCondition newCondition = new SharedCondition((ConditionType) diff.getElementType(), properties, description, label, condition.getRelativeElementId());
 			rule.getConditions().add(newCondition);
@@ -138,8 +140,8 @@ public class RuleChangeEventStore {
 			final String label = diff.getLabel() == null ? action.getLabel() : diff.getLabel();
 
 			final Map<ActionTypeSpecificKey, Object> actionTypeSpecificValues = action.getActionTypeContainer().getActionTypeSpecificValues();
-			final Map<String, Object> properties = generalize(actionTypeSpecificValues, itemDirectory);
-			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated());
+			final Map<String, Object> properties = generalize(actionTypeSpecificValues);
+			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
 
 			SharedAction newAction = new SharedAction((ActionType) diff.getElementType(), properties, description, label, action.getRelativeElementId());
 			rule.getActions().add(newAction);
@@ -148,18 +150,17 @@ public class RuleChangeEventStore {
 		}
 	}
 
-	private Map<String, Object> generalize(Map<? extends SharedTypeSpecificKey, Object> map, ItemDirectory itemDirectory) {
+	private Map<String, Object> generalize(Map<? extends SharedTypeSpecificKey, Object> map) {
 		final Map<String, Object> result = new HashMap<>();
 		for (Entry<? extends SharedTypeSpecificKey, Object> e : map.entrySet()) {
 			result.put(e.getKey().getKeyString(), e.getValue());
 		}
-		transformObjectsInMap(result, itemDirectory);
 
 		return result;
 
 	}
 
-	private void updateMap(Map<String, Object> map, Map<String, Object> toAdd, Map<String, Object> toRemove, Map<String, Object> toUpdate) {
+	private void updateMap(Map<String, Object> map, Map<String, Object> toAdd, Map<String, Object> toRemove, Map<String, Object> toUpdate, ItemDirectory itemDirectory) {
 		for (Entry<String, Object> entr : toRemove.entrySet()) {
 			map.remove(entr.getKey());
 		}
@@ -169,6 +170,7 @@ public class RuleChangeEventStore {
 		for (Entry<String, Object> entr : toUpdate.entrySet()) {
 			map.put(entr.getKey(), entr.getValue());
 		}
+		transformObjectsInMap(map, itemDirectory);
 	}
 
 	private SharedTrigger getTriggerByRelativeId(SharedRule rule, int relativeTriggerId) {
