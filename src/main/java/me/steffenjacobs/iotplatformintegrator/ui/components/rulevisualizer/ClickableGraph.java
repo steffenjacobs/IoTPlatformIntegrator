@@ -66,10 +66,17 @@ public class ClickableGraph implements ViewerListener {
 		}).start();
 	}
 
-	public Node createAndAddNode(String nodeId) {
+	public Node createAndAddNode(String nodeId, boolean isDiff) {
 		lock.lock();
 		Node n = graph.addNode(nodeId);
-		n.addAttribute("ui.label", n.getId());
+		if(isDiff) {
+		    n.addAttribute("ui.style", "fill-color: #8bb0c4;");
+		    n.addAttribute("ui.style", "size: 8px;");
+		}else {
+			n.addAttribute("ui.label", n.getId());
+			n.addAttribute("ui.style", "fill-color: #23729e;");
+			n.addAttribute("ui.style", "size: 15px;");
+		}
 		lock.unlock();
 		return n;
 	}
@@ -107,7 +114,7 @@ public class ClickableGraph implements ViewerListener {
 		clearEdges();
 		for (Pair<String> edge : edges) {
 			try {
-				graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight());
+				graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
 			} catch (ElementNotFoundException | IdAlreadyInUseException e) {
 				LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
 			}

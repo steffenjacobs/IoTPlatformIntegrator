@@ -78,7 +78,7 @@ public class RuleGraphManager {
 	}
 
 	private void visualizeRule(SharedRule rule) {
-		Node n = graph.createAndAddNode(rule.getName());
+		Node n = graph.createAndAddNode(rule.getName(), false);
 		nodesByUUID.put(rule.getName(), n);
 		graph.refreshEdges(edges);
 	}
@@ -116,34 +116,34 @@ public class RuleGraphManager {
 		if (prevDiffUid != null) {
 			anchor = nodesByUUID.get(prevDiffUid);
 			if (anchor == null) {
-				createNode(diffElement);
+				createDiffNode(diffElement);
 				LOG.warn("Could not find diff anchor node {}.", prevDiffUid);
 				return;
 			}
 		} else {
 
 			if (sourceRuleName != null) {
-				createNode(diffElement);
+				createDiffNode(diffElement);
 				LOG.warn("Could not find source rule for diff {}.", sourceRuleName);
 				return;
 			}
 			anchor = nodesByUUID.get(sourceRuleName);
 			if (anchor == null) {
-				createNode(diffElement);
+				createDiffNode(diffElement);
 				LOG.warn("Could not find source rule node {}.", sourceRuleName);
 				return;
 			}
 		}
 
-		createNode(diffElement);
+		createDiffNode(diffElement);
 	}
 
 	private void visualizeRuleDiff(RuleDiffParts ruleDiffParts) {
 		visualizeRuleDiff(ruleDiffParts.getRuleDiff(), ruleDiffParts.getPrevDiffId(), ruleDiffParts.getTargetRuleName(), ruleDiffParts.getSourceRuleName());
 	}
 
-	private Node createNode(SharedRuleElementDiff diffElement) {
-		Node n = graph.createAndAddNode(diffElement.getUid().toString());
+	private Node createDiffNode(SharedRuleElementDiff diffElement) {
+		Node n = graph.createAndAddNode(diffElement.getUid().toString(), true);
 		nodesByUUID.put(diffElement.getUid().toString(), n);
 		graph.refreshEdges(edges);
 		return n;
