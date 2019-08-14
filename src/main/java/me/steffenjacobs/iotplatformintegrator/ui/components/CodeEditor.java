@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -13,6 +14,7 @@ import javax.swing.text.StyleContext;
 
 import org.apache.commons.lang3.StringUtils;
 
+import me.steffenjacobs.extern.TextLineNumber;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
@@ -51,7 +53,12 @@ public class CodeEditor extends JPanel {
 		};
 		tp.setToolTipText("test");
 		tp.setEditable(false);
-		super.add(tp, BorderLayout.CENTER);
+		
+
+		TextLineNumber tln = new TextLineNumber(tp);
+		JScrollPane sp = new JScrollPane(tp);
+		sp.setRowHeaderView(tln);
+		super.add(sp, BorderLayout.CENTER);
 		showHelpText();
 	}
 
