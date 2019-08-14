@@ -4,17 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import org.graphstream.graph.Node;
 import org.graphstream.ui.view.ViewerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
@@ -30,7 +34,7 @@ public class RuleGraphManager {
 	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
 
 	private final ClickableGraph graph;
-
+	
 	public RuleGraphManager() {
 		graph = createVisualization();
 
@@ -38,6 +42,18 @@ public class RuleGraphManager {
 		EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> clearRules());
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> visualizeRuleDiff(((RuleDiffChangeEvent) e).getDiffElement()));
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffAdded, e -> visualizeRuleDiff(((RuleDiffAddedEvent) e).getRuleDiffParts()));
+		EventBus.getInstance().addEventHandler(EventType.RemoteItemAdded, e -> graph.refreshEdges(edges));
+
+		JPopupMenu popup = new JPopupMenu();
+		JMenuItem refreshButton = new JMenuItem("Refresh");
+		refreshButton.addActionListener(e -> {
+			App.getRemoteRuleController().refreshRules();
+			EventBus.getInstance().fireEvent(new RefreshRuleDiffsEvent());
+		});
+
+		popup.add(refreshButton);
+
+		graph.getViewPanel().setComponentPopupMenu(popup);
 	}
 
 	private ClickableGraph createVisualization() {
@@ -136,6 +152,7 @@ public class RuleGraphManager {
 	private void clearRules() {
 		graph.clear();
 		edges.clear();
+		nodesByUUID.clear();
 	}
 
 	public JPanel getGraphPanel() {

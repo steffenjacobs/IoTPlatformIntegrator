@@ -48,6 +48,10 @@ public class RuleDiffManager {
 		});
 		
 		refreshRemoteDiffs();
+		
+		EventBus.getInstance().addEventHandler(EventType.RefreshRuleDiffs, e -> {
+			refreshRemoteDiffs();
+		});
 	}
 	
 	private void refreshRemoteDiffs() {

@@ -94,7 +94,7 @@ public class RemoteRuleController implements RuleAnalyzer {
 		}));
 	}
 
-	private void refreshRules() {
+	public void refreshRules() {
 		EventBus.getInstance().fireEvent(new ClearAllRemoteItemsEvent());
 		getItemsSync(i -> EventBus.getInstance().fireEvent(new RemoteItemAddedEvent(i)));
 

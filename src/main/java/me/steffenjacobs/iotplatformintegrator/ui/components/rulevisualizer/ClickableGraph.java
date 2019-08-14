@@ -3,6 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
@@ -25,6 +26,8 @@ public class ClickableGraph implements ViewerListener {
 	private ViewPanel view;
 	private ViewerListener listener;
 	private Graph graph;
+
+	private final ReentrantLock lock = new ReentrantLock(true);
 
 	public ClickableGraph(ViewerListener listener) {
 		System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
@@ -64,8 +67,10 @@ public class ClickableGraph implements ViewerListener {
 	}
 
 	public Node createAndAddNode(String nodeId) {
+		lock.lock();
 		Node n = graph.addNode(nodeId);
 		n.addAttribute("ui.label", n.getId());
+		lock.unlock();
 		return n;
 	}
 
@@ -89,10 +94,13 @@ public class ClickableGraph implements ViewerListener {
 	}
 
 	public void clear() {
+		lock.lock();
 		graph.clear();
+		lock.unlock();
 	}
 
-	public synchronized void refreshEdges(Set<Pair<String>> edges) {
+	public void refreshEdges(Set<Pair<String>> edges) {
+		lock.lock();
 		edges = new HashSet<Pair<String>>(edges);
 		LOG.info("Cleared edges.");
 		LOG.info("Available nodes: {}", graph.getNodeSet());
@@ -104,9 +112,10 @@ public class ClickableGraph implements ViewerListener {
 				LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
 			}
 		}
+		lock.unlock();
 	}
 
-	private synchronized void clearEdges() {
+	private void clearEdges() {
 		for (int i = 0; i < graph.getEdgeCount(); i++) {
 			graph.removeEdge(i);
 		}
