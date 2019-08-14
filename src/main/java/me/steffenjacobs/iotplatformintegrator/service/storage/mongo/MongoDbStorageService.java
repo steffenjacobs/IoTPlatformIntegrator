@@ -4,13 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import org.bson.BsonDocument;
-import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.reactivestreams.Publisher;
@@ -68,8 +63,10 @@ public class MongoDbStorageService {
 		this.settingService = settingService;
 	}
 
-	public void checkAndValidateConnection() throws IOException {
-
+	public synchronized void checkAndValidateConnection() throws IOException {
+		if(databaseConnectionObject!=null) {
+			return;
+		}
 		if (database == null) {
 			database = getDatabase();
 		}
@@ -408,8 +405,8 @@ public class MongoDbStorageService {
 	}
 
 	private ServerConnection createDatabaseConnectionObject() {
-		CompletableFuture<String> futureVersion = new CompletableFuture<>();
-		getDatabase().runCommand(new BsonDocument("buildinfo", new BsonString(""))).subscribe(new Subscriber<Document>() {
+		/*CompletableFuture<String> futureVersion = new CompletableFuture<>();
+		getDatabase().runCommand(new BsonDocument("buildInfo", new BsonInt32(1))).subscribe(new Subscriber<Document>() {
 
 			@Override
 			public void onSubscribe(Subscription s) {
@@ -438,7 +435,8 @@ public class MongoDbStorageService {
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			version = "";
 		}
-
+*/
+		String version = "";
 		URI uri = URI.create(settingService.getSetting(SettingKey.DATABASE_URI));
 		String instanceName = "MongoDB " + version;
 		String url = uri.getHost();
