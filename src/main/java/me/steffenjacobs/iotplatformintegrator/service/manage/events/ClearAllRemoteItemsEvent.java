@@ -6,7 +6,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class ClearAllRemoteItemsEvent extends Event {
 
 	public ClearAllRemoteItemsEvent() {
-		super(EventType.ClearAllRemoteItems);
+		super(EventType.CLEAR_ALL_REMOTE_ITEMS);
 	}
 
 }

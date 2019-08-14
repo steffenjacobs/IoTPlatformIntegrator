@@ -28,7 +28,7 @@ public class RuleElementRecommender {
 	public RuleElementRecommender(RuleComponentRegistry registry) {
 		this.registry = registry;
 
-		EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
+		EventBus.getInstance().addEventHandler(EventType.TARGET_CONNECTION_CHANGE, e -> {
 			ServerConnection c = ((TargetConnectionChangeEvent) e).getServerConnection();
 			if (c != null) {
 				targetItemDirectory = c.getItemDirectory();

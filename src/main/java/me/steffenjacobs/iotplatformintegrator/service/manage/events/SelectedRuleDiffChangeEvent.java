@@ -7,6 +7,6 @@ import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleEle
 public class SelectedRuleDiffChangeEvent extends WithRuleDiffEvent {
 
 	public SelectedRuleDiffChangeEvent(RuleDiffParts ruleDiffParts) {
-		super(EventType.SelectedRuleDiffChanged, ruleDiffParts);
+		super(EventType.SELECTED_RULE_DIFF_CHANGE, ruleDiffParts);
 	}
 }

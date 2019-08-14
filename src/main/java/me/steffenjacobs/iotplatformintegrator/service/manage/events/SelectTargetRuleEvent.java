@@ -6,7 +6,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class SelectTargetRuleEvent extends Event {
 
 	public SelectTargetRuleEvent() {
-		super(EventType.SelectTargetRule);
+		super(EventType.SELECT_TARGET_RULE);
 	}
 
 }

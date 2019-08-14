@@ -82,17 +82,17 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		this.ruleBuilder = ruleBuilder;
 		ruleBuilder.setRenderController(this);
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> renderRule(((WithSharedRuleEvent) e).getSelectedRule()));
-		EventBus.getInstance().addEventHandler(EventType.RemoteRuleChange, e -> renderRule(((WithSharedRuleEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SELECTED_RULE_CHANGE, e -> renderRule(((WithSharedRuleEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.REMOTE_RULE_CHANGE, e -> renderRule(((WithSharedRuleEvent) e).getSelectedRule()));
 
-		EventBus.getInstance().addEventHandler(EventType.RuleChange, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> {
 			RuleChangeEvent event = (RuleChangeEvent) e;
 			if (event.getSelectedRule() == rule) {
 				renderRule(rule);
 			}
 			ruleBuilder.onSelectedRuleChanged(event.getSelectedRule());
 		});
-		EventBus.getInstance().addEventHandler(EventType.RuleElementChange, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_CHANGE, e -> {
 			RuleElementChangeEvent event = (RuleElementChangeEvent) e;
 			if (event.getSelectedRule() == rule) {
 				SharedRuleElement elem = ruleElements.get(event.getSourceId());

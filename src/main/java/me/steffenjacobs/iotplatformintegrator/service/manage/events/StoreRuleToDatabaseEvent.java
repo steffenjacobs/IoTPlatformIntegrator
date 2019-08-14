@@ -10,7 +10,7 @@ public class StoreRuleToDatabaseEvent extends WithSharedRuleEvent {
 	private boolean uploadRule;
 
 	public StoreRuleToDatabaseEvent(SharedRule sharedRule, String newRuleName, boolean uploadRule) {
-		super(EventType.StoreRuleToDatabase, sharedRule);
+		super(EventType.STORE_RULE_TO_DATABASE, sharedRule);
 		this.newRuleName = newRuleName;
 		this.uploadRule = uploadRule;
 	}

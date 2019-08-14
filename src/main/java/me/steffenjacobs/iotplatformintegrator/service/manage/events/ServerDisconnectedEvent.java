@@ -7,6 +7,6 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class ServerDisconnectedEvent extends WithServerConnectionEvent {
 
 	public ServerDisconnectedEvent(ServerConnection serverConnection) {
-		super(EventType.ServerDisconnected, serverConnection);
+		super(EventType.SERVER_DISCONNECTED, serverConnection);
 	}
 }

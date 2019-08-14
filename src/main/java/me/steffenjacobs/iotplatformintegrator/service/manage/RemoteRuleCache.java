@@ -13,8 +13,8 @@ public class RemoteRuleCache {
 	private final Map<String, SharedRule> cache = new HashMap<>();
 
 	public RemoteRuleCache() {
-		EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> cache.clear());
-		EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded,
+		EventBus.getInstance().addEventHandler(EventType.CLEAR_ALL_REMOTE_RULES, e -> cache.clear());
+		EventBus.getInstance().addEventHandler(EventType.REMOTE_RULE_ADDED,
 				e -> cache.put(((RemoteRuleAddedEvent) e).getSelectedRule().getName(), ((RemoteRuleAddedEvent) e).getSelectedRule()));
 	}
 

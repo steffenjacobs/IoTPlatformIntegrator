@@ -16,11 +16,11 @@ public class RuleDiffCache {
 	private final Map<String, RuleDiffParts> cache = new HashMap<>();
 
 	public RuleDiffCache() {
-		EventBus.getInstance().addEventHandler(EventType.RuleDiffAdded,
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFF_ADDED,
 				e -> cache.put(((RuleDiffAddedEvent) e).getRuleDiffParts().getRuleDiff().getUid().toString(), ((RuleDiffAddedEvent) e).getRuleDiffParts()));
-		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent,
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFF_CHANGE,
 				e -> cache.put(((RuleDiffChangeEvent) e).getDiffElement().getUid().toString(), toParts(((RuleDiffChangeEvent) e).getDiffElement())));
-		EventBus.getInstance().addEventHandler(EventType.RefreshRuleDiffs, e -> cache.clear());
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFFS_REFRESH, e -> cache.clear());
 	}
 
 	public RuleDiffParts getRuleDiffParts(String id) {

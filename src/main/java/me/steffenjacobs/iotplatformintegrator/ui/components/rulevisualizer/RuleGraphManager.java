@@ -52,12 +52,12 @@ public class RuleGraphManager {
 	public RuleGraphManager() {
 		graph = createVisualization();
 
-		EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> visualizeRule(((WithSharedRuleEvent) e).getSelectedRule()));
-		EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteItems, e -> clear());
-		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> visualizeRuleDiff(((RuleDiffChangeEvent) e).getDiffElement()));
-		EventBus.getInstance().addEventHandler(EventType.RuleDiffAdded, e -> visualizeRuleDiff(((RuleDiffAddedEvent) e).getRuleDiffParts()));
-		EventBus.getInstance().addEventHandler(EventType.RemoteItemAdded, e -> graph.refreshEdges(edges));
-		EventBus.getInstance().addEventHandler(EventType.SelectTargetRule, e -> {
+		EventBus.getInstance().addEventHandler(EventType.REMOTE_RULE_ADDED, e -> visualizeRule(((WithSharedRuleEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.CLEAR_ALL_REMOTE_ITEMS, e -> clear());
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFF_CHANGE, e -> visualizeRuleDiff(((RuleDiffChangeEvent) e).getDiffElement()));
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFF_ADDED, e -> visualizeRuleDiff(((RuleDiffAddedEvent) e).getRuleDiffParts()));
+		EventBus.getInstance().addEventHandler(EventType.REMOTE_ITEM_ADDED, e -> graph.refreshEdges(edges));
+		EventBus.getInstance().addEventHandler(EventType.SELECT_TARGET_RULE, e -> {
 			nextSelectedRuleIsTarget.set(true);
 		});
 

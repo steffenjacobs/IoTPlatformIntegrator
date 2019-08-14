@@ -7,6 +7,6 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class TargetConnectionChangeEvent extends WithServerConnectionEvent {
 
 	public TargetConnectionChangeEvent(ServerConnection selectedServerConnection) {
-		super(EventType.TargetConnectionChanged, selectedServerConnection);
+		super(EventType.TARGET_CONNECTION_CHANGE, selectedServerConnection);
 	}
 }

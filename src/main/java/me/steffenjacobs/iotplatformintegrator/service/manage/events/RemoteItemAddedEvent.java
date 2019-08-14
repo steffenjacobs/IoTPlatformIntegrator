@@ -9,7 +9,7 @@ public class RemoteItemAddedEvent extends Event {
 	private final SharedItem item;
 
 	public RemoteItemAddedEvent(SharedItem item) {
-		super(EventType.RemoteItemAdded);
+		super(EventType.REMOTE_ITEM_ADDED);
 		this.item = item;
 	}
 

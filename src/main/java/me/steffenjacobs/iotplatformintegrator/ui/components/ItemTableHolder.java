@@ -25,17 +25,17 @@ public class ItemTableHolder {
 
 		switch (type) {
 		case Default:
-			EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+			EventBus.getInstance().addEventHandler(EventType.SELECTED_SERVER_CONNECTION_CHANGED, e -> {
 				updateItemsTable(((SelectedServerConnectionChangeEvent) e).getServerConnection());
 			});
 			break;
 		case Source:
-			EventBus.getInstance().addEventHandler(EventType.SourceConnectionChanged, e -> {
+			EventBus.getInstance().addEventHandler(EventType.SOURCE_CONNECTION_CHANGE, e -> {
 				updateItemsTable(((SourceConnectionChangeEvent) e).getServerConnection());
 			});
 			break;
 		case Target:
-			EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
+			EventBus.getInstance().addEventHandler(EventType.TARGET_CONNECTION_CHANGE, e -> {
 				updateItemsTable(((TargetConnectionChangeEvent) e).getServerConnection());
 			});
 			break;

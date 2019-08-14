@@ -7,6 +7,6 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class SelectedTargetRuleChangeEvent extends WithSharedRuleEvent {
 
 	public SelectedTargetRuleChangeEvent(SharedRule selectedRule) {
-		super(EventType.SelectedTargetRuleChanged, selectedRule);
+		super(EventType.SELECTED_TARGET_RULE_CHANGE, selectedRule);
 	}
 }

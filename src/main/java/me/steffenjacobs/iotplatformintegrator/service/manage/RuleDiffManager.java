@@ -25,7 +25,7 @@ public class RuleDiffManager {
 	public RuleDiffManager(MongoDbRuleDiffStorageService ruleDiffStorageService) {
 
 		this.ruleDiffStorageService = ruleDiffStorageService;
-		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFF_CHANGE, e -> {
 			RuleDiffChangeEvent event = (RuleDiffChangeEvent) e;
 			if (rule != event.getSelectedRule()) {
 				rule = event.getSelectedRule();
@@ -39,7 +39,7 @@ public class RuleDiffManager {
 			diffs.add(event.getDiffElement());
 		});
 
-		EventBus.getInstance().addEventHandler(EventType.StoreRuleToDatabase, e -> {
+		EventBus.getInstance().addEventHandler(EventType.STORE_RULE_TO_DATABASE, e -> {
 			if (!diffs.isEmpty()) {
 				diffs.get(diffs.size() - 1).setTargetRuleName(((StoreRuleToDatabaseEvent) e).getNewRuleName());
 			}
@@ -48,7 +48,7 @@ public class RuleDiffManager {
 			rule = null;
 		});
 
-		EventBus.getInstance().addEventHandler(EventType.RefreshRuleDiffs, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_DIFFS_REFRESH, e -> {
 			refreshRemoteDiffs();
 		});
 

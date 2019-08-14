@@ -51,7 +51,7 @@ public class RuleChangeEventStore {
 	private final RuleDiffService diffService = new RuleDiffService();
 
 	public RuleChangeEventStore(AuthenticationService authenticationService) {
-		EventBus.getInstance().addEventHandler(EventType.RuleChange, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> {
 			final RuleChangeEvent event = (RuleChangeEvent) e;
 			if (changedRule != event.getSelectedRule()) {
 				changedRule = event.getSelectedRule();
@@ -68,7 +68,7 @@ public class RuleChangeEventStore {
 			}
 		});
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleDiffChanged, e -> {
+		EventBus.getInstance().addEventHandler(EventType.SELECTED_RULE_DIFF_CHANGE, e -> {
 			final SharedRule rebuildRule = rebuildRule(((SelectedRuleDiffChangeEvent) e).getRuleDiffParts());
 			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(rebuildRule));
 

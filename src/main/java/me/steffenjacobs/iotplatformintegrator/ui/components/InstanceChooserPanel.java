@@ -35,8 +35,8 @@ public class InstanceChooserPanel extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.add(createChooserPanelPanel(chooseSourceServer, chooseTargetServer), BorderLayout.CENTER);
 
-		EventBus.getInstance().addEventHandler(EventType.ServerConnected, e -> addServerConnection(((ServerConnectedEvent) e).getServerConnection()));
-		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection()));
+		EventBus.getInstance().addEventHandler(EventType.SERVER_CONNECTED, e -> addServerConnection(((ServerConnectedEvent) e).getServerConnection()));
+		EventBus.getInstance().addEventHandler(EventType.SERVER_DISCONNECTED, e -> removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection()));
 
 		chooseSourceServer.addActionListener(e -> EventBus.getInstance().fireEvent(new SourceConnectionChangeEvent((ServerConnection) chooseSourceServer.getSelectedItem())));
 		chooseTargetServer.addActionListener(e -> EventBus.getInstance().fireEvent(new TargetConnectionChangeEvent((ServerConnection) chooseTargetServer.getSelectedItem())));

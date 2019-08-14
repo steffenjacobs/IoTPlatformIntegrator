@@ -11,7 +11,7 @@ public class RuleDiffChangeEvent extends WithSharedRuleEvent {
 	private final String creator;
 
 	public RuleDiffChangeEvent(SharedRule sharedRule, SharedRuleElementDiff diffElement, String creator) {
-		super(EventType.RuleDiffChangeEvent, sharedRule);
+		super(EventType.RULE_DIFF_CHANGE, sharedRule);
 		this.diffElement = diffElement;
 		this.creator = creator;
 	}

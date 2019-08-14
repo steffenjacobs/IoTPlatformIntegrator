@@ -9,7 +9,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicE
 public class RuleElementRemovedEvent extends WithRuleElementEvent {
 
 	public RuleElementRemovedEvent(ElementType elementType, UUID sourceId) {
-		super(EventType.RuleElementRemoved, elementType, sourceId);
+		super(EventType.RULE_ELEMENT_REMOVED, elementType, sourceId);
 	}
 
 }

@@ -23,8 +23,8 @@ public class RuleMutator {
 
 	public RuleMutator(RuleBuilderRenderController ruleBuilderController) {
 		this.ruleBuilderController = ruleBuilderController;
-		EventBus.getInstance().addEventHandler(EventType.RuleElementAdded, e -> addRuleElement(((RuleElementAddedEvent) e).getSourceId()));
-		EventBus.getInstance().addEventHandler(EventType.RuleElementRemoved, e -> removeRuleElement(((RuleElementRemovedEvent) e).getSourceId()));
+		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_ADDED, e -> addRuleElement(((RuleElementAddedEvent) e).getSourceId()));
+		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_REMOVED, e -> removeRuleElement(((RuleElementRemovedEvent) e).getSourceId()));
 	}
 
 	private void addRuleElement(UUID sourceId) {

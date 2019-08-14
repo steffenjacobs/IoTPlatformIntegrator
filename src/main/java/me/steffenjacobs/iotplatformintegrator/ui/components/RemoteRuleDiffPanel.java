@@ -76,8 +76,8 @@ public class RemoteRuleDiffPanel extends JPanel {
 		super.add(createHeaderPanel(), BorderLayout.NORTH);
 		super.add(tree, BorderLayout.CENTER);
 
-		EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> addRule(((RemoteRuleAddedEvent) e).getSelectedRule()));
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> onSelectedRuleChange(((WithSharedRuleEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.REMOTE_RULE_ADDED, e -> addRule(((RemoteRuleAddedEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SELECTED_RULE_CHANGE, e -> onSelectedRuleChange(((WithSharedRuleEvent) e).getSelectedRule()));
 	}
 
 	private void onSelectedRuleChange(SharedRule selectedRule) {

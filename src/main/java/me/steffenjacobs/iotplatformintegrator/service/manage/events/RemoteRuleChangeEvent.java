@@ -7,7 +7,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class RemoteRuleChangeEvent extends WithSharedRuleEvent {
 
 	public RemoteRuleChangeEvent(SharedRule sharedRule) {
-		super(EventType.RemoteRuleChange, sharedRule);
+		super(EventType.REMOTE_RULE_CHANGE, sharedRule);
 	}
 
 }

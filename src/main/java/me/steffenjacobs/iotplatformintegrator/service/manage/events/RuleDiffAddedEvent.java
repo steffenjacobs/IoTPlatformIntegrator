@@ -7,7 +7,7 @@ import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleEle
 public class RuleDiffAddedEvent extends WithRuleDiffEvent {
 
 	public RuleDiffAddedEvent(RuleDiffParts ruleDiffParts) {
-		super(EventType.RuleDiffAdded, ruleDiffParts);
+		super(EventType.RULE_DIFF_ADDED, ruleDiffParts);
 	}
 
 }

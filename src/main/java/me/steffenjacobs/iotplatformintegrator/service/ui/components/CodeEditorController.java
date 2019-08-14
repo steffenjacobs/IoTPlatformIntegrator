@@ -30,9 +30,9 @@ public class CodeEditorController {
 		this.codeEditor = codeEditor;
 		this.settingService = settingService;
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> renderPseudoCode(((SelectedRuleChangeEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SELECTED_RULE_CHANGE, e -> renderPseudoCode(((SelectedRuleChangeEvent) e).getSelectedRule()));
 
-		EventBus.getInstance().addEventHandler(EventType.RuleChange, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> {
 			RuleChangeEvent event = (RuleChangeEvent) e;
 			if (event.getSelectedRule() == rule) {
 				renderPseudoCode(event.getSelectedRule());

@@ -48,26 +48,26 @@ public class RuleTableHolder {
 
 		switch (type) {
 		case Default:
-			EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+			EventBus.getInstance().addEventHandler(EventType.SELECTED_SERVER_CONNECTION_CHANGED, e -> {
 				refreshRulesTable(((SelectedServerConnectionChangeEvent) e).getServerConnection());
 			});
 			break;
 		case Source:
-			EventBus.getInstance().addEventHandler(EventType.SourceConnectionChanged, e -> {
+			EventBus.getInstance().addEventHandler(EventType.SOURCE_CONNECTION_CHANGE, e -> {
 				refreshRulesTable(((SourceConnectionChangeEvent) e).getServerConnection());
 			});
 			break;
 		case Target:
-			EventBus.getInstance().addEventHandler(EventType.TargetConnectionChanged, e -> {
+			EventBus.getInstance().addEventHandler(EventType.TARGET_CONNECTION_CHANGE, e -> {
 				refreshRulesTable(((TargetConnectionChangeEvent) e).getServerConnection());
 			});
 			break;
 		case Remote:
-			EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> {
+			EventBus.getInstance().addEventHandler(EventType.REMOTE_RULE_ADDED, e -> {
 				((ArrayList<SharedRule>) lastRules).add(((RemoteRuleAddedEvent) e).getSelectedRule());
 				updateRuleTable(rulesTable, lastRules);
 			});
-			EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> {
+			EventBus.getInstance().addEventHandler(EventType.CLEAR_ALL_REMOTE_RULES, e -> {
 				lastRules = new ArrayList<>();
 				updateRuleTable(rulesTable, lastRules);
 			});

@@ -60,10 +60,10 @@ public class ServerConnectionManager {
 	public ServerConnectionManager(SettingService settingService) {
 		this.settingService = settingService;
 		ruleImporter = new HomeAssistantManualRuleImporter(settingService);
-		EventBus.getInstance().addEventHandler(EventType.SelectedServerConnectionChanged, e -> {
+		EventBus.getInstance().addEventHandler(EventType.SELECTED_SERVER_CONNECTION_CHANGED, e -> {
 			setSelectedServerConnection(((SelectedServerConnectionChangeEvent) e).getServerConnection());
 		});
-		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> {
+		EventBus.getInstance().addEventHandler(EventType.SERVER_DISCONNECTED, e -> {
 			removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection());
 		});
 	}

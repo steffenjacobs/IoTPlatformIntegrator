@@ -9,7 +9,7 @@ import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicE
 public class RuleElementAddedEvent extends WithRuleElementEvent {
 
 	public RuleElementAddedEvent(ElementType elementType, UUID sourceId) {
-		super(EventType.RuleElementAdded, elementType, sourceId);
+		super(EventType.RULE_ELEMENT_ADDED, elementType, sourceId);
 	}
 
 }

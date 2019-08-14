@@ -6,7 +6,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class ClearAllRemoteRulesEvent extends Event {
 
 	public ClearAllRemoteRulesEvent() {
-		super(EventType.ClearAllRemoteRules);
+		super(EventType.CLEAR_ALL_REMOTE_RULES);
 	}
 
 }

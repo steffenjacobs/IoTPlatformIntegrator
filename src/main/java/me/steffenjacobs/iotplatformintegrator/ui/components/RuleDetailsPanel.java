@@ -87,9 +87,9 @@ public class RuleDetailsPanel extends JPanel {
 
 		super.add(noRuleSelected, BorderLayout.NORTH);
 
-		EventBus.getInstance().addEventHandler(EventType.SelectedRuleChanged, e -> setDisplayedRule(((SelectedRuleChangeEvent) e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.SELECTED_RULE_CHANGE, e -> setDisplayedRule(((SelectedRuleChangeEvent) e).getSelectedRule()));
 
-		EventBus.getInstance().addEventHandler(EventType.RuleChange, e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> {
 			RuleChangeEvent event = (RuleChangeEvent) e;
 			if (rule == event.getSelectedRule()) {
 				setDisplayedRule(event.getSelectedRule());

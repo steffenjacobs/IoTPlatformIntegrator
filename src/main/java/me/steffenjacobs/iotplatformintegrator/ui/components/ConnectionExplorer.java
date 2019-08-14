@@ -72,8 +72,8 @@ public class ConnectionExplorer extends JPanel {
 
 		super.add(tree, BorderLayout.CENTER);
 
-		EventBus.getInstance().addEventHandler(EventType.ServerDisconnected, e -> removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection()));
-		EventBus.getInstance().addEventHandler(EventType.ServerConnected, e -> addServerConnection(((ServerConnectedEvent) e).getServerConnection()));
+		EventBus.getInstance().addEventHandler(EventType.SERVER_DISCONNECTED, e -> removeServerConnection(((ServerDisconnectedEvent) e).getServerConnection()));
+		EventBus.getInstance().addEventHandler(EventType.SERVER_CONNECTED, e -> addServerConnection(((ServerConnectedEvent) e).getServerConnection()));
 	}
 
 	private void addServerConnection(ServerConnection connection) {

@@ -19,12 +19,12 @@ public class EventBus {
 
 	public static enum EventType {
 		Test, //
-		SelectedServerConnectionChanged, ServerDisconnected, ServerConnected, SelectedRuleChanged, SourceConnectionChanged, TargetConnectionChanged, //
-		SelectedSourceRuleChanged, SelectedTargetRuleChanged, RuleElementAdded, RuleElementRemoved, RuleChange, RuleElementChange, //
-		RuleDiffChangeEvent, RefreshRuleDiffs, //
-		RemoteRuleAdded, ClearAllRemoteRules, RemoteRuleChange, RemoteItemAdded, ClearAllRemoteItems, //
-		RuleDiffAdded, SelectedRuleDiffChanged, //
-		StoreRuleToDatabase, ExportRuleToPlatform, SelectTargetRule;
+		SELECTED_SERVER_CONNECTION_CHANGED, SERVER_DISCONNECTED, SERVER_CONNECTED, SELECTED_RULE_CHANGE, SOURCE_CONNECTION_CHANGE, TARGET_CONNECTION_CHANGE, //
+		SELECTED_SOURCE_RULE_CHANGE, SELECTED_TARGET_RULE_CHANGE, RULE_ELEMENT_ADDED, RULE_ELEMENT_REMOVED, RULE_CHANGE, RULE_ELEMENT_CHANGE, //
+		RULE_DIFF_CHANGE, RULE_DIFFS_REFRESH, //
+		REMOTE_RULE_ADDED, CLEAR_ALL_REMOTE_RULES, REMOTE_RULE_CHANGE, REMOTE_ITEM_ADDED, CLEAR_ALL_REMOTE_ITEMS, //
+		RULE_DIFF_ADDED, SELECTED_RULE_DIFF_CHANGE, //
+		STORE_RULE_TO_DATABASE, EXPORT_RULE_TO_PLATFORM, SELECT_TARGET_RULE;
 	}
 
 	private EventBus() {

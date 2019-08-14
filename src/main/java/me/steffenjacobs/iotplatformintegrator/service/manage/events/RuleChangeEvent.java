@@ -11,7 +11,7 @@ public class RuleChangeEvent extends WithSharedRuleEvent {
 	private final SharedRuleElement oldElement;
 
 	public RuleChangeEvent(SharedRule sharedRule, SharedRuleElement newElement, SharedRuleElement oldElement) {
-		super(EventType.RuleChange, sharedRule);
+		super(EventType.RULE_CHANGE, sharedRule);
 		this.newElement = newElement;
 		this.oldElement = oldElement;
 	}

@@ -6,7 +6,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 public class RefreshRuleDiffsEvent extends Event {
 
 	public RefreshRuleDiffsEvent() {
-		super(EventType.RefreshRuleDiffs);
+		super(EventType.RULE_DIFFS_REFRESH);
 	}
 
 }
