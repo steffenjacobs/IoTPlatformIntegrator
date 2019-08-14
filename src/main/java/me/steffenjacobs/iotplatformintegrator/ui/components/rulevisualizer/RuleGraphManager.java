@@ -86,6 +86,11 @@ public class RuleGraphManager {
 				if (nextSelectedRuleIsTarget.getAndSet(false)) {
 					SharedRule clickedRule = App.getRemoteRuleCache().getRuleByName(id);
 					RuleDiffParts diff = App.getRuleDiffCache().getRuleDiffParts(lastSelectedNode.getId());
+					if(diff == null) {
+						JOptionPane.showMessageDialog(null, "You can only set a target when you are in a transformation state.",
+								"Rule cannot be matched to another rule.", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					SharedRule rebuiltRule = App.getRuleChangeEventStore().rebuildRule(diff);
 
 					List<String> warnings = App.getRuleChangeEventStore().checkRulesCompatible(clickedRule, rebuiltRule);
@@ -93,12 +98,15 @@ public class RuleGraphManager {
 						EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
 						edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), id));
 						graph.refreshEdges(edges);
+						selectNode(id, false);
 					} else {
 						JOptionPane.showMessageDialog(null, "Please select a rule that is compatible with your current transformation state:\n" + String.join("\n", warnings),
 								"Rule cannot be matched", JOptionPane.ERROR_MESSAGE);
 					}
 				}
-				selectNode(id, false);
+				else {
+					selectNode(id, false);
+				}
 			}
 
 			@Override
