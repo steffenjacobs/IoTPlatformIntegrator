@@ -53,7 +53,7 @@ public class RuleGraphManager {
 		graph = createVisualization();
 
 		EventBus.getInstance().addEventHandler(EventType.RemoteRuleAdded, e -> visualizeRule(((WithSharedRuleEvent) e).getSelectedRule()));
-		EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteRules, e -> clearRules());
+		EventBus.getInstance().addEventHandler(EventType.ClearAllRemoteItems, e -> clear());
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> visualizeRuleDiff(((RuleDiffChangeEvent) e).getDiffElement()));
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffAdded, e -> visualizeRuleDiff(((RuleDiffAddedEvent) e).getRuleDiffParts()));
 		EventBus.getInstance().addEventHandler(EventType.RemoteItemAdded, e -> graph.refreshEdges(edges));
@@ -195,7 +195,7 @@ public class RuleGraphManager {
 		return n;
 	}
 
-	private void clearRules() {
+	private void clear() {
 		graph.clear();
 		edges.clear();
 		nodesByUUID.clear();

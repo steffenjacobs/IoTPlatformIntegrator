@@ -14,6 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ClearAllRemoteItemsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ClearAllRemoteRulesEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteItemAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
@@ -102,5 +103,7 @@ public class RemoteRuleController implements RuleAnalyzer {
 
 		EventBus.getInstance().fireEvent(new ClearAllRemoteRulesEvent());
 		getRules(r -> EventBus.getInstance().fireEvent(new RemoteRuleAddedEvent(r)));
+		
+		EventBus.getInstance().fireEvent(new RefreshRuleDiffsEvent());
 	}
 }
