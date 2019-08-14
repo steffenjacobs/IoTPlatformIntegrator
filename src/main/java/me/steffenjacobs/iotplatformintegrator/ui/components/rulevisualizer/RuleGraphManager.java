@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -22,6 +23,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectTargetRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
@@ -42,6 +44,7 @@ public class RuleGraphManager {
 	private Node lastSelectedNode = null;
 
 	private final AtomicBoolean nextSelectedRuleIsTarget = new AtomicBoolean(false);
+	private final AtomicReference<String> nextSelectedRuleIsTargetId = new AtomicReference<>("");
 
 	private final ClickableGraph graph;
 
@@ -53,7 +56,9 @@ public class RuleGraphManager {
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> visualizeRuleDiff(((RuleDiffChangeEvent) e).getDiffElement()));
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffAdded, e -> visualizeRuleDiff(((RuleDiffAddedEvent) e).getRuleDiffParts()));
 		EventBus.getInstance().addEventHandler(EventType.RemoteItemAdded, e -> graph.refreshEdges(edges));
-		EventBus.getInstance().addEventHandler(EventType.SelectTargetRule, e -> nextSelectedRuleIsTarget.set(true));
+		EventBus.getInstance().addEventHandler(EventType.SelectTargetRule, e -> {
+			nextSelectedRuleIsTarget.set(true);
+		});
 
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem refreshButton = new JMenuItem("Refresh");
@@ -79,6 +84,8 @@ public class RuleGraphManager {
 			public void buttonReleased(String id) {
 				if (nextSelectedRuleIsTarget.getAndSet(false)) {
 					EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
+					edges.add(Pair.of(nextSelectedRuleIsTargetId.getAndSet(""), id));
+					graph.refreshEdges(edges);
 				}
 				// de-select old node if present
 				if (lastSelectedNode != null) {
@@ -141,6 +148,7 @@ public class RuleGraphManager {
 	}
 
 	private void visualizeRuleDiff(SharedRuleElementDiff diffElement) {
+		nextSelectedRuleIsTargetId.set(diffElement.getUid().toString());
 		String sourceRuleName;
 		if (diffElement.getSourceRule().isPresent()) {
 			sourceRuleName = diffElement.getSourceRule().get().getName();
