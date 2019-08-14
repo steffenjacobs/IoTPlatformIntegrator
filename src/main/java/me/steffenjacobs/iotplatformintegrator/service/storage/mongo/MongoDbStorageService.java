@@ -368,6 +368,7 @@ public class MongoDbStorageService {
 			@Override
 			public void onError(Throwable t) {
 				LOG.error("MongoDB Error: {} ", t.getMessage());
+				callback.onError(t);
 			}
 		});
 	}

@@ -78,6 +78,7 @@ public class RemoteRuleController implements RuleAnalyzer {
 			@Override
 			public void onError(Throwable t) {
 				t.printStackTrace();
+				complete.completeExceptionally(t);
 			}
 		});
 		try {
