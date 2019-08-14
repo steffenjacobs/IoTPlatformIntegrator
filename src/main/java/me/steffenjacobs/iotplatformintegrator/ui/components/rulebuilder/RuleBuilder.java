@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectTargetRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
 
@@ -49,10 +50,16 @@ public class RuleBuilder extends JPanel {
 		final JButton exportToDatabaseButton = new JButton("Store rule to Database");
 		exportToDatabaseButton.addActionListener(e -> {
 			String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
-			EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(controller.getDisplayedRule().get(), name));
+			EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(controller.getDisplayedRule().get(), name, true));
 		});
-
 		buttonBar.add(exportToDatabaseButton);
+		
+		final JButton selectTargetRuleButton = new JButton("Select Target Rule");
+		selectTargetRuleButton.addActionListener(e -> {
+			EventBus.getInstance().fireEvent(new SelectTargetRuleEvent());
+		});
+		
+		buttonBar.add(selectTargetRuleButton);
 		buttonBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		this.add(buttonBar, BorderLayout.SOUTH);
 		buttonBar.setEnabled(false);

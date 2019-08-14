@@ -24,7 +24,7 @@ public class EventBus {
 		RuleDiffChangeEvent, RefreshRuleDiffs, //
 		RemoteRuleAdded, ClearAllRemoteRules, RemoteRuleChange, RemoteItemAdded, ClearAllRemoteItems, //
 		RuleDiffAdded, //
-		StoreRuleToDatabase, ExportRuleToPlatform;
+		StoreRuleToDatabase, ExportRuleToPlatform, SelectTargetRule;
 	}
 
 	private EventBus() {

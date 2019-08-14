@@ -37,8 +37,10 @@ public class RemoteRuleController implements RuleAnalyzer {
 
 		EventBus.getInstance().addEventHandler(EventType.StoreRuleToDatabase, e -> {
 			StoreRuleToDatabaseEvent event = (StoreRuleToDatabaseEvent) e;
-			SharedRule rule = new SharedRule(event.getNewRuleName(), event.getSelectedRule());
-			uploadRule(rule);
+			if(event.isUploadRule()) {
+				SharedRule rule = new SharedRule(event.getNewRuleName(), event.getSelectedRule());
+				uploadRule(rule);
+			}
 		});
 
 		refreshRules();

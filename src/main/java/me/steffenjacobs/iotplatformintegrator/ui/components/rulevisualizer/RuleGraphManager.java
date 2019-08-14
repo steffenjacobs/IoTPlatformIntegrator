@@ -3,6 +3,7 @@ package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -22,6 +23,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleD
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
@@ -37,6 +39,8 @@ public class RuleGraphManager {
 	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
 
 	private Node lastSelectedNode = null;
+	
+	private final AtomicBoolean nextSelectedRuleIsTarget = new AtomicBoolean(false);
 
 	private final ClickableGraph graph;
 
@@ -48,6 +52,7 @@ public class RuleGraphManager {
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffChangeEvent, e -> visualizeRuleDiff(((RuleDiffChangeEvent) e).getDiffElement()));
 		EventBus.getInstance().addEventHandler(EventType.RuleDiffAdded, e -> visualizeRuleDiff(((RuleDiffAddedEvent) e).getRuleDiffParts()));
 		EventBus.getInstance().addEventHandler(EventType.RemoteItemAdded, e -> graph.refreshEdges(edges));
+		EventBus.getInstance().addEventHandler(EventType.SelectTargetRule, e -> nextSelectedRuleIsTarget.set(true));
 
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem refreshButton = new JMenuItem("Refresh");
@@ -71,6 +76,9 @@ public class RuleGraphManager {
 
 			@Override
 			public void buttonReleased(String id) {
+				if(nextSelectedRuleIsTarget.getAndSet(false)) {
+					EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
+				}
 				// de-select old node if present
 				if (lastSelectedNode != null) {
 					final Boolean nodeType = nodeWithType.get(lastSelectedNode);
