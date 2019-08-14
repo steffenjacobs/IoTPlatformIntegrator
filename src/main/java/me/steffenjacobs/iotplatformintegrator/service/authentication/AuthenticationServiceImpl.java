@@ -46,7 +46,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 	}
 
-
 	@Override
 	public User getCurrentUser() {
 		UUID userid;

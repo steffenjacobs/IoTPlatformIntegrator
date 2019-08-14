@@ -37,17 +37,18 @@ public class HomeAssistantManualRuleImporter {
 
 	public HomeAssistantManualRuleImporter(SettingService settingService) {
 		this.settingService = settingService;
-		
+
 	}
+
 	public List<SharedRule> importRules(ItemDirectory itemDirectory) {
 		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Empty rules detected. Do you want to import data for the missing rules?", "Warning",
 				JOptionPane.YES_NO_OPTION)) {
 
 		}
-		
+
 		File loadedFile = new File(settingService.getSetting(SettingKey.HOMEASSISTANT_FILE_URI));
-		if(loadedFile.exists()) {
-			return importRules(loadedFile, itemDirectory);			
+		if (loadedFile.exists()) {
+			return importRules(loadedFile, itemDirectory);
 		}
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -89,7 +90,7 @@ public class HomeAssistantManualRuleImporter {
 				}
 				@SuppressWarnings("unchecked")
 				Map<String, Object> map = (Map<String, Object>) o;
-				
+
 				int triggerCount = 0, conditionCount = 0, actionCount = 0;
 				for (Entry<String, Object> e : map.entrySet()) {
 					switch (e.getKey()) {
@@ -150,7 +151,8 @@ public class HomeAssistantManualRuleImporter {
 		return rules;
 	}
 
-	private void handleTriggerParsingAndResultExtraction(ItemDirectory itemDirectory, Set<SharedTrigger> triggers, Set<SharedCondition> conditions, Object e, int relativeElementId) {
+	private void handleTriggerParsingAndResultExtraction(ItemDirectory itemDirectory, Set<SharedTrigger> triggers, Set<SharedCondition> conditions, Object e,
+			int relativeElementId) {
 		Pair<SharedTrigger, Set<SharedCondition>> triggerWithConditions = triggerTransformer.parseTrigger(e, itemDirectory, relativeElementId);
 		if (triggerWithConditions != null) {
 			triggers.add(triggerWithConditions.getLeft());

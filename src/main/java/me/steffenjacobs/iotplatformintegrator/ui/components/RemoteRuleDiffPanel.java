@@ -127,7 +127,7 @@ public class RemoteRuleDiffPanel extends JPanel {
 			}
 			DefaultMutableTreeNode diffNode = new DefaultMutableTreeNode(sb.toString(), true);
 			node.add(diffNode);
-			
+
 			model.nodeStructureChanged(node);
 		});
 

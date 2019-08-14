@@ -18,10 +18,10 @@ public interface SimplifiedSubscriber<T> extends Subscriber<T> {
 	@Override
 	default void onComplete() {
 	}
-	
+
 	@Override
 	default void onError(Throwable t) {
-		
+
 	}
 
 }

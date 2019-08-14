@@ -64,7 +64,7 @@ public class MongoDbStorageService {
 	}
 
 	public synchronized void checkAndValidateConnection() throws IOException {
-		if(databaseConnectionObject!=null) {
+		if (databaseConnectionObject != null) {
 			return;
 		}
 		if (database == null) {
@@ -192,6 +192,7 @@ public class MongoDbStorageService {
 			}
 		});
 	}
+
 	private void upsert(MongoCollection<Document> collection, Bson filter, Document document, Runnable callWhenDone) {
 		Publisher<UpdateResult> publisher = collection.replaceOne(filter, document, new ReplaceOptions().upsert(true));
 		publisher.subscribe(new Subscriber<UpdateResult>() {
@@ -199,18 +200,18 @@ public class MongoDbStorageService {
 			public void onSubscribe(final Subscription s) {
 				s.request(1);
 			}
-			
+
 			@Override
 			public void onNext(final UpdateResult success) {
 				LOG.info("Upserted document into {}: {}", collection.getNamespace(), document.toJson());
 			}
-			
+
 			@Override
 			public void onError(final Throwable t) {
 				LOG.error("Could not upsert document into {}: {} ", collection.getNamespace(), t.getMessage());
 				callWhenDone.run();
 			}
-			
+
 			@Override
 			public void onComplete() {
 				LOG.info("Upserted document into {}: {} complete", collection.getNamespace(), document.toJson());
@@ -405,37 +406,23 @@ public class MongoDbStorageService {
 	}
 
 	private ServerConnection createDatabaseConnectionObject() {
-		/*CompletableFuture<String> futureVersion = new CompletableFuture<>();
-		getDatabase().runCommand(new BsonDocument("buildInfo", new BsonInt32(1))).subscribe(new Subscriber<Document>() {
-
-			@Override
-			public void onSubscribe(Subscription s) {
-			}
-
-			@Override
-			public void onNext(Document t) {
-				futureVersion.complete((String) t.get("version"));
-			}
-
-			@Override
-			public void onError(Throwable t) {
-				futureVersion.complete("");
-			}
-
-			@Override
-			public void onComplete() {
-				if (!futureVersion.isDone()) {
-					futureVersion.complete("");
-				}
-			}
-		});
-		String version;
-		try {
-			version = futureVersion.get(5, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			version = "";
-		}
-*/
+		/*
+		 * CompletableFuture<String> futureVersion = new CompletableFuture<>();
+		 * getDatabase().runCommand(new BsonDocument("buildInfo", new
+		 * BsonInt32(1))).subscribe(new Subscriber<Document>() {
+		 * 
+		 * @Override public void onSubscribe(Subscription s) { }
+		 * 
+		 * @Override public void onNext(Document t) { futureVersion.complete((String)
+		 * t.get("version")); }
+		 * 
+		 * @Override public void onError(Throwable t) { futureVersion.complete(""); }
+		 * 
+		 * @Override public void onComplete() { if (!futureVersion.isDone()) {
+		 * futureVersion.complete(""); } } }); String version; try { version =
+		 * futureVersion.get(5, TimeUnit.SECONDS); } catch (InterruptedException |
+		 * ExecutionException | TimeoutException e) { version = ""; }
+		 */
 		String version = "";
 		URI uri = URI.create(settingService.getSetting(SettingKey.DATABASE_URI));
 		String instanceName = "MongoDB " + version;
@@ -447,7 +434,7 @@ public class MongoDbStorageService {
 	}
 
 	public void insertItem(Document document, Runnable callWhenDone) {
-		upsert(getItemCollection(),Filters.and(Filters.eq("name", document.get("name")), Filters.eq("type", document.get("type"))),  document, callWhenDone);
+		upsert(getItemCollection(), Filters.and(Filters.eq("name", document.get("name")), Filters.eq("type", document.get("type"))), document, callWhenDone);
 	}
 
 	public void getAllRules(Subscriber<SharedRule> subscriber, Function<Document, SharedRule> transformation, MongoDbStorageService storageService) {

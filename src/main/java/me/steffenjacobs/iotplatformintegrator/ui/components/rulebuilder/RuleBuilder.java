@@ -40,9 +40,9 @@ public class RuleBuilder extends JPanel {
 		final JButton exportToPlatformButton = new JButton("Export to Platform");
 		exportToPlatformButton.addActionListener(e -> {
 			boolean result = controller.validateForPlatformExport();
-			if(result) {
+			if (result) {
 				String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
-				//TODO: export to platform
+				// TODO: export to platform
 			}
 		});
 		buttonBar.add(exportToPlatformButton);
@@ -53,12 +53,12 @@ public class RuleBuilder extends JPanel {
 			EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(controller.getDisplayedRule().get(), name, true));
 		});
 		buttonBar.add(exportToDatabaseButton);
-		
+
 		final JButton selectTargetRuleButton = new JButton("Select Target Rule");
 		selectTargetRuleButton.addActionListener(e -> {
 			EventBus.getInstance().fireEvent(new SelectTargetRuleEvent());
 		});
-		
+
 		buttonBar.add(selectTargetRuleButton);
 		buttonBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		this.add(buttonBar, BorderLayout.SOUTH);
@@ -66,7 +66,7 @@ public class RuleBuilder extends JPanel {
 
 		new RuleBuilderRenderController(this);
 	}
-	
+
 	public void onSelectedRuleChanged(SharedRule rule) {
 		buttonBar.setEnabled(rule != null);
 	}

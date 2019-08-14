@@ -70,12 +70,10 @@ public class ServerConnectionManager {
 
 	public void loadOpenHABRules(ServerConnection serverConnection) throws IOException {
 		serverConnection.getRules().clear();
-		final List<ExperimentalRule> retrievedRules = ruleService
-				.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI));
+		final List<ExperimentalRule> retrievedRules = ruleService.requestAllRules(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} rules.", retrievedRules.size());
 		for (ExperimentalRule rule : retrievedRules) {
-			serverConnection.getRules().add(transformer.getRuleTransformer().transformRule(rule,
-					serverConnection.getItemDirectory(), new OpenHabCommandParser()));
+			serverConnection.getRules().add(transformer.getRuleTransformer().transformRule(rule, serverConnection.getItemDirectory(), new OpenHabCommandParser()));
 		}
 
 		// avoid generating rule code with stale items
@@ -85,8 +83,7 @@ public class ServerConnectionManager {
 	public void loadOpenHABItems(ServerConnection serverConnection) throws IOException {
 
 		serverConnection.getItemDirectory().clearItems();
-		final List<ItemDTO> retrievedItems = itemService
-				.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI));
+		final List<ItemDTO> retrievedItems = itemService.requestItems(settingService.getSetting(SettingKey.OPENHAB_URI));
 		LOG.info("Retrieved {} items.", retrievedItems.size());
 		for (ItemDTO item : retrievedItems) {
 			SharedItem transformedItem = transformer.getItemTransformer().transformItem(item);
@@ -108,16 +105,14 @@ public class ServerConnectionManager {
 
 		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
 
-		ServerConnection serverConnection = new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT,
-				versionInfo.getVersion(), versionInfo.getLocationName(), parsedUrlAndPort.getLeft(),
-				parsedUrlAndPort.getRight());
+		ServerConnection serverConnection = new ServerConnection(ServerConnection.PlatformType.HOMEASSISTANT, versionInfo.getVersion(), versionInfo.getLocationName(),
+				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
 		ItemDirectoryHolder.getInstance().add(serverConnection);
 		currentConnections.add(serverConnection);
 		EventBus.getInstance().fireEvent(new ServerConnectedEvent(serverConnection));
 
 		Pair<List<SharedItem>, List<SharedRule>> itemsAndRules = haItemTransformationService
-				.transformItemsAndRules(homeAssistantApiService.getAllState(urlWithPort,
-						settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
+				.transformItemsAndRules(homeAssistantApiService.getAllState(urlWithPort, settingService.getSetting(SettingKey.HOMEASSISTANT_API_TOKEN)));
 
 		serverConnection.getItemDirectory().addItems(itemsAndRules.getLeft());
 		if (ruleValidator.containsEmptyRules(itemsAndRules.getRight())) {
@@ -139,9 +134,8 @@ public class ServerConnectionManager {
 
 		String urlWithPort = settingService.getSetting(SettingKey.OPENHAB_URI);
 		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
-		ServerConnection connection = new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(),
-				"Open Hab Instance on port: " + parsedUrlAndPort.getRight(), parsedUrlAndPort.getLeft(),
-				parsedUrlAndPort.getRight());
+		ServerConnection connection = new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(), "Open Hab Instance on port: " + parsedUrlAndPort.getRight(),
+				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
 		ItemDirectoryHolder.getInstance().add(connection);
 		currentConnections.add(connection);
 

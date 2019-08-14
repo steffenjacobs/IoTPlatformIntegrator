@@ -36,10 +36,10 @@ public class MongoDbUserStorageService {
 				User storedUser = userTransformer.fromJSON(documentTransformer.toJSON(t));
 				callback.complete(isValid(storedUser));
 			}
-			
+
 			@Override
 			public void onComplete() {
-				if(!callback.isDone()) {
+				if (!callback.isDone()) {
 					callback.complete(false);
 				}
 			}

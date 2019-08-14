@@ -23,7 +23,6 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectTargetRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;

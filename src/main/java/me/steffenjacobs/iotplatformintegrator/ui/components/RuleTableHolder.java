@@ -35,13 +35,13 @@ public class RuleTableHolder {
 	public RuleTableHolder(RuleTableHolderType type) {
 		this(type, null);
 	}
-	
+
 	public RuleTableHolder(RuleTableHolderType type, ServerConnection databaseConnection) {
 		ruleController = new RuleController(type);
-		if(databaseConnection != null) {
+		if (databaseConnection != null) {
 			ruleController.setMockConnection(databaseConnection);
 		}
-				
+
 		this.type = type;
 		rulesTable = createRulesTable();
 		setupRulesTable();
@@ -94,7 +94,7 @@ public class RuleTableHolder {
 				EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(rule));
 				break;
 			case Remote:
-				EventBus.getInstance().fireEvent(new RemoteRuleChangeEvent(rule));			
+				EventBus.getInstance().fireEvent(new RemoteRuleChangeEvent(rule));
 				break;
 			}
 		});
@@ -112,14 +112,14 @@ public class RuleTableHolder {
 			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(null));
 			break;
 		case Source:
-			EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(null));		
+			EventBus.getInstance().fireEvent(new SelectedSourceRuleChangeEvent(null));
 			break;
 		case Target:
-			EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(null));		
+			EventBus.getInstance().fireEvent(new SelectedTargetRuleChangeEvent(null));
 			break;
 		case Remote:
-			EventBus.getInstance().fireEvent(new RemoteRuleChangeEvent(null));				
-			break;	
+			EventBus.getInstance().fireEvent(new RemoteRuleChangeEvent(null));
+			break;
 		}
 	}
 

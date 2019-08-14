@@ -32,33 +32,33 @@ public class RuleDiffManager {
 				creator = event.getCreator();
 			}
 			event.getDiffElement().setSourceRule(rule);
-			if(!diffs.isEmpty()) {
-				event.getDiffElement().setPrevDiff(diffs.get(diffs.size()-1));
+			if (!diffs.isEmpty()) {
+				event.getDiffElement().setPrevDiff(diffs.get(diffs.size() - 1));
 			}
 			diffs.add(event.getDiffElement());
 		});
 
 		EventBus.getInstance().addEventHandler(EventType.StoreRuleToDatabase, e -> {
-			if(!diffs.isEmpty()) {
+			if (!diffs.isEmpty()) {
 				diffs.get(diffs.size() - 1).setTargetRuleName(((StoreRuleToDatabaseEvent) e).getNewRuleName());
 			}
 			diffs.forEach(d -> ruleDiffStorageService.store(d, rule, creator));
 			diffs.clear();
 			rule = null;
 		});
-		
+
 		refreshRemoteDiffs();
-		
+
 		EventBus.getInstance().addEventHandler(EventType.RefreshRuleDiffs, e -> {
 			refreshRemoteDiffs();
 		});
 	}
-	
+
 	private void refreshRemoteDiffs() {
-		 ruleDiffStorageService.getAllDiffs(new SimplifiedSubscriber<RuleDiffParts>() {
-			 @Override
+		ruleDiffStorageService.getAllDiffs(new SimplifiedSubscriber<RuleDiffParts>() {
+			@Override
 			public void onNext(RuleDiffParts parts) {
-				 EventBus.getInstance().fireEvent(new RuleDiffAddedEvent(parts));
+				EventBus.getInstance().fireEvent(new RuleDiffAddedEvent(parts));
 			}
 		});
 	}

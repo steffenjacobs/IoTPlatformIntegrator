@@ -69,18 +69,21 @@ public class RuleMutator {
 	private SharedTrigger copy(SharedTrigger trigger) {
 		Map<String, Object> properties = new HashMap<>();
 		trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties, trigger.getDescription(), trigger.getLabel() + " - Copy", trigger.getRelativeElementId() + 10000);
+		return new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties, trigger.getDescription(), trigger.getLabel() + " - Copy",
+				trigger.getRelativeElementId() + 10000);
 	}
 
 	private SharedCondition copy(SharedCondition condition) {
 		Map<String, Object> properties = new HashMap<>();
 		condition.getConditionTypeContainer().getConditionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedCondition(condition.getConditionTypeContainer().getConditionType(), properties, condition.getDescription(), condition.getLabel() + " - Copy", condition.getRelativeElementId() + 10000);
+		return new SharedCondition(condition.getConditionTypeContainer().getConditionType(), properties, condition.getDescription(), condition.getLabel() + " - Copy",
+				condition.getRelativeElementId() + 10000);
 	}
 
 	private SharedAction copy(SharedAction action) {
 		Map<String, Object> properties = new HashMap<>();
 		action.getActionTypeContainer().getActionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedAction(action.getActionTypeContainer().getActionType(), properties, action.getDescription(), action.getLabel() + " - Copy", action.getRelativeElementId() + 10000);
+		return new SharedAction(action.getActionTypeContainer().getActionType(), properties, action.getDescription(), action.getLabel() + " - Copy",
+				action.getRelativeElementId() + 10000);
 	}
 }

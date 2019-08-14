@@ -70,10 +70,10 @@ public class ClickableGraph implements ViewerListener {
 	public Node createAndAddNode(String nodeId, boolean isDiff) {
 		lock.lock();
 		Node n = graph.addNode(nodeId);
-		if(isDiff) {
-		    n.addAttribute("ui.style", "fill-color: #8bb0c4;");
-		    n.addAttribute("ui.style", "size: 8px;");
-		}else {
+		if (isDiff) {
+			n.addAttribute("ui.style", "fill-color: #8bb0c4;");
+			n.addAttribute("ui.style", "size: 8px;");
+		} else {
 			n.addAttribute("ui.label", n.getId());
 			n.addAttribute("ui.style", "fill-color: #23729e;");
 			n.addAttribute("ui.style", "size: 15px;");

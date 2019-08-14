@@ -81,7 +81,8 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.getName() : ""));
 		itemModel.addElement(item);
 		chooseItem.setSelectedItem(item);
-		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s), Source: %s", TokenType.ITEM, item.getName(), item.getLabel(), ItemDirectoryHolder.getInstance().getServerConnection(item).getInstanceName()));
+		chooseItem.setToolTipText(String.format("Type: %s, Name: %s (%s), Source: %s", TokenType.ITEM, item.getName(), item.getLabel(),
+				ItemDirectoryHolder.getInstance().getServerConnection(item).getInstanceName()));
 		registry.addAnnotatedComponent(chooseItem, key, -1);
 		return chooseItem;
 	}

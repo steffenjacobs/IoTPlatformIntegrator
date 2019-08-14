@@ -18,7 +18,7 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 /** @author Steffen Jacobs */
 public class TestHomeAssistantManualRuleImporter {
-	
+
 	@Test
 	public void testImportRules() throws ClientProtocolException, IOException {
 		SettingService settingService = new SettingService("./settings.config");

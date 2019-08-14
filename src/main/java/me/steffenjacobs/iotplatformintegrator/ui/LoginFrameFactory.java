@@ -65,7 +65,7 @@ public class LoginFrameFactory {
 			settingService.setSetting(SettingKey.PASSWORD, user.getPassword());
 			frame.setVisible(false);
 		});
-		
+
 		frame.setModal(true);
 		return frame;
 	}

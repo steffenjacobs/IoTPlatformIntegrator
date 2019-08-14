@@ -18,7 +18,7 @@ public class StoreRuleToDatabaseEvent extends WithSharedRuleEvent {
 	public String getNewRuleName() {
 		return newRuleName;
 	}
-	
+
 	public boolean isUploadRule() {
 		return uploadRule;
 	}

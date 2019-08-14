@@ -26,13 +26,10 @@ public class RuleDiffServiceTest {
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 0);
-		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, new HashMap<>(properties),
-				"Hello World2", "Some Label", 1);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 0);
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, new HashMap<>(properties), "Hello World2", "Some Label", 1);
 
-		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger,
-				sharedTrigger2);
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
 
 		Assert.assertNull(diffSharedRuleElement.getLabel());
 		Assert.assertNotNull(diffSharedRuleElement.getDescription());
@@ -50,13 +47,10 @@ public class RuleDiffServiceTest {
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 0);
-		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, new HashMap<>(properties),
-				"Hello World", "Some Label2", 1);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 0);
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, new HashMap<>(properties), "Hello World", "Some Label2", 1);
 
-		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger,
-				sharedTrigger2);
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
 
 		Assert.assertNotNull(diffSharedRuleElement.getLabel());
 		Assert.assertEquals("Some Label2", diffSharedRuleElement.getLabel());
@@ -73,16 +67,12 @@ public class RuleDiffServiceTest {
 		RuleDiffService diffService = new RuleDiffService();
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
-		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(
-				TriggerType.ItemStateChanged);
+		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateChanged);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 0);
-		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateChanged, properties2, "Hello World",
-				"Some Label", 1);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 0);
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateChanged, properties2, "Hello World", "Some Label", 1);
 
-		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger,
-				sharedTrigger2);
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
 
 		Assert.assertNull(diffSharedRuleElement.getLabel());
 		Assert.assertNull(diffSharedRuleElement.getDescription());
@@ -90,8 +80,7 @@ public class RuleDiffServiceTest {
 		Assert.assertEquals(TriggerType.ItemStateChanged, diffSharedRuleElement.getElementType());
 		Assert.assertFalse(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesAdded().size());
-		Assert.assertEquals(Command.Off,
-				diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
+		Assert.assertEquals(Command.Off, diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
 		Assert.assertFalse(diffSharedRuleElement.isNegative());
@@ -102,16 +91,12 @@ public class RuleDiffServiceTest {
 		RuleDiffService diffService = new RuleDiffService();
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
-		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(
-				TriggerType.ItemStateChanged);
+		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateChanged);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateChanged, properties2, "Hello World",
-				"Some Label", 0);
-		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 1);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateChanged, properties2, "Hello World", "Some Label", 0);
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 1);
 
-		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger,
-				sharedTrigger2);
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
 
 		Assert.assertNull(diffSharedRuleElement.getLabel());
 		Assert.assertNull(diffSharedRuleElement.getDescription());
@@ -119,8 +104,7 @@ public class RuleDiffServiceTest {
 		Assert.assertEquals(TriggerType.ItemStateUpdated, diffSharedRuleElement.getElementType());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesRemoved().size());
-		Assert.assertEquals(Command.Off,
-				diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
+		Assert.assertEquals(Command.Off, diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.PreviousState.getKeyString()));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
 		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
@@ -130,19 +114,15 @@ public class RuleDiffServiceTest {
 		RuleDiffService diffService = new RuleDiffService();
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
-		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(
-				TriggerType.ItemStateUpdated);
+		final Map<String, Object> properties2 = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
 
 		final SharedItem item2 = new SharedItem("testSwitch2", "testLabel", ItemType.Switch);
 		properties2.put(TriggerTypeSpecificKey.ItemName.getKeyString(), item2);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 0);
-		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, properties2, "Hello World",
-				"Some Label", 1);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 0);
+		SharedTrigger sharedTrigger2 = new SharedTrigger(TriggerType.ItemStateUpdated, properties2, "Hello World", "Some Label", 1);
 
-		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger,
-				sharedTrigger2);
+		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, sharedTrigger2);
 
 		Assert.assertNull(diffSharedRuleElement.getLabel());
 		Assert.assertNull(diffSharedRuleElement.getDescription());
@@ -150,8 +130,7 @@ public class RuleDiffServiceTest {
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertEquals(1, diffSharedRuleElement.getPropertiesUpdated().size());
-		Assert.assertEquals(item2,
-				diffSharedRuleElement.getPropertiesUpdated().get(TriggerTypeSpecificKey.ItemName.getKeyString()));
+		Assert.assertEquals(item2, diffSharedRuleElement.getPropertiesUpdated().get(TriggerTypeSpecificKey.ItemName.getKeyString()));
 		Assert.assertFalse(diffSharedRuleElement.isNegative());
 	}
 
@@ -161,8 +140,7 @@ public class RuleDiffServiceTest {
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 0);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 0);
 
 		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(null, sharedTrigger);
 
@@ -173,10 +151,9 @@ public class RuleDiffServiceTest {
 		Assert.assertNotNull(diffSharedRuleElement.getElementType());
 		Assert.assertEquals(TriggerType.ItemStateUpdated, diffSharedRuleElement.getElementType());
 		Assert.assertEquals(2, diffSharedRuleElement.getPropertiesAdded().size());
-		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.ItemName.getKeyString())
-				.equals(new SharedItem("testSwitch", "testLabel", ItemType.Switch)));
-		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.State.getKeyString())
-				.equals(Command.On));
+		Assert.assertTrue(
+				diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.ItemName.getKeyString()).equals(new SharedItem("testSwitch", "testLabel", ItemType.Switch)));
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().get(TriggerTypeSpecificKey.State.getKeyString()).equals(Command.On));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
 		Assert.assertFalse(diffSharedRuleElement.isNegative());
@@ -188,8 +165,7 @@ public class RuleDiffServiceTest {
 
 		final Map<String, Object> properties = createPropertiesForItemStateUpdatedExample(TriggerType.ItemStateUpdated);
 
-		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World",
-				"Some Label", 0);
+		SharedTrigger sharedTrigger = new SharedTrigger(TriggerType.ItemStateUpdated, properties, "Hello World", "Some Label", 0);
 
 		SharedRuleElementDiff diffSharedRuleElement = diffService.getDiffSharedRuleElement(sharedTrigger, null);
 
@@ -201,11 +177,9 @@ public class RuleDiffServiceTest {
 		Assert.assertEquals(TriggerType.ItemStateUpdated, diffSharedRuleElement.getElementType());
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesAdded().isEmpty());
 		Assert.assertEquals(2, diffSharedRuleElement.getPropertiesRemoved().size());
-		Assert.assertTrue(
-				diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.ItemName.getKeyString())
-						.equals(new SharedItem("testSwitch", "testLabel", ItemType.Switch)));
-		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.State.getKeyString())
-				.equals(Command.On));
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.ItemName.getKeyString())
+				.equals(new SharedItem("testSwitch", "testLabel", ItemType.Switch)));
+		Assert.assertTrue(diffSharedRuleElement.getPropertiesRemoved().get(TriggerTypeSpecificKey.State.getKeyString()).equals(Command.On));
 		Assert.assertTrue(diffSharedRuleElement.getPropertiesUpdated().isEmpty());
 		Assert.assertTrue(diffSharedRuleElement.isNegative());
 	}
@@ -224,8 +198,7 @@ public class RuleDiffServiceTest {
 			properties.put(TriggerTypeSpecificKey.State.getKeyString(), Command.On);
 		} else if (type == TriggerType.ItemStateChanged) {
 			for (TriggerTypeSpecificKey key : type.getTypeSpecificKeys()) {
-				if (key != TriggerTypeSpecificKey.ItemName && key != TriggerTypeSpecificKey.State
-						&& key != TriggerTypeSpecificKey.PreviousState) {
+				if (key != TriggerTypeSpecificKey.ItemName && key != TriggerTypeSpecificKey.State && key != TriggerTypeSpecificKey.PreviousState) {
 					fail("Unexpected TriggerTypeSpecific key: " + key.name());
 				}
 			}

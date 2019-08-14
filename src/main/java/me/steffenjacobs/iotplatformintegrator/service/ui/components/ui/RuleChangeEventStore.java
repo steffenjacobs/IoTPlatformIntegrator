@@ -78,7 +78,7 @@ public class RuleChangeEventStore {
 		if (parts.getPrevDiffId() == null) {
 			final SharedRule ruleByName = App.getRemoteRuleCache().getRuleByName(parts.getSourceRuleName());
 			final SharedRule sharedRuleCopy = new SharedRule(ruleByName.getName(), ruleByName);
-			
+
 			applyDiff(sharedRuleCopy, parts.getRuleDiff(), App.getDatabaseConnectionObject().getItemDirectory());
 			return sharedRuleCopy;
 		} else {
@@ -87,13 +87,11 @@ public class RuleChangeEventStore {
 			return rule;
 		}
 	}
-	
-
 
 	private void transformObjectsInMap(Map<String, Object> map, ItemDirectory itemDirectory) {
 		map.computeIfPresent(ActionTypeSpecificKey.Command.getKeyString(), (k, c) -> Command.valueOf(c.toString()));
 		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k, o) -> Operation.valueOf(o.toString()));
-		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) ->  i instanceof SharedItem ? i: itemDirectory.getItemByName(i.toString()));
+		map.computeIfPresent(TriggerTypeSpecificKey.ItemName.getKeyString(), (k, i) -> i instanceof SharedItem ? i : itemDirectory.getItemByName(i.toString()));
 	}
 
 	public void applyDiff(SharedRule rule, SharedRuleElementDiff diff, ItemDirectory itemDirectory) {
@@ -112,7 +110,7 @@ public class RuleChangeEventStore {
 			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
 
 			SharedTrigger newTrigger = new SharedTrigger((TriggerType) diff.getElementType(), properties, description, label, trigger.getRelativeElementId());
-			
+
 			rule.getTriggers().add(newTrigger);
 
 		} else if (diff.getElementType() instanceof ConditionType) {
