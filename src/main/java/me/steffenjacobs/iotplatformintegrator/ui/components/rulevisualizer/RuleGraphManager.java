@@ -86,49 +86,9 @@ public class RuleGraphManager {
 					edges.add(Pair.of(nextSelectedRuleIsTargetId.getAndSet(""), id));
 					graph.refreshEdges(edges);
 				}
-				// de-select old node if present
-				if (lastSelectedNode != null) {
-					final Boolean nodeType = nodeWithType.get(lastSelectedNode);
-					lastSelectedNode.addAttribute("ui.style", "stroke-mode: none;");
-					lastSelectedNode.removeAttribute("ui.style");
-					if (nodeType == null) {
-
-					} else if (nodeType == true) {
-						lastSelectedNode.addAttribute("ui.style", "fill-color: #8bb0c4;");
-						lastSelectedNode.addAttribute("ui.style", "size: 8px;");
-					} else if (nodeType == false) {
-						lastSelectedNode.addAttribute("ui.style", "fill-color: #23729e;");
-						lastSelectedNode.addAttribute("ui.style", "size: 15px;");
 					}
 				}
-
-				// select new node
-				if (nodesByUUID.containsKey(id)) {
-					final Node node = nodesByUUID.get(id);
-					final Boolean nodeType = nodeWithType.get(node);
-
-					node.removeAttribute("ui.style");
-					if (nodeType == null) {
-
-					} else if (nodeType == true) {
-						node.addAttribute("ui.style", "stroke-mode: plain;");
-						node.addAttribute("ui.style", "stroke-color: #627782;");
-						node.addAttribute("ui.style", "stroke-width: 3px;");
-						node.addAttribute("ui.style", "size: 13px;");
-						EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
-						lastSelectedNode = node;
-
-					} else if (nodeType == false) {
-						EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
-						node.addAttribute("ui.style", "size: 20px;");
-						node.addAttribute("ui.style", "stroke-mode: plain;");
-						node.addAttribute("ui.style", "stroke-color: #0b283d;");
-						node.addAttribute("ui.style", "stroke-width: 3px;");
-						lastSelectedNode = node;
-					}
-				}
-
-				// TODO click on diff
+				selectNode(id, false);
 			}
 
 			@Override
@@ -161,10 +121,10 @@ public class RuleGraphManager {
 		} else {
 			prevDiffUid = null;
 		}
-		visualizeRuleDiff(diffElement, prevDiffUid, diffElement.getTargetRule().orElse(null), sourceRuleName);
+		visualizeRuleDiff(diffElement, prevDiffUid, diffElement.getTargetRule().orElse(null), sourceRuleName, true);
 	}
 
-	private void visualizeRuleDiff(SharedRuleElementDiff diffElement, String prevDiffUid, String targetRuleName, String sourceRuleName) {
+	private void visualizeRuleDiff(SharedRuleElementDiff diffElement, String prevDiffUid, String targetRuleName, String sourceRuleName, boolean silentAutoselect) {
 		final Node anchor;
 
 		if (prevDiffUid != null) {
@@ -180,37 +140,40 @@ public class RuleGraphManager {
 		if (prevDiffUid != null) {
 			anchor = nodesByUUID.get(prevDiffUid);
 			if (anchor == null) {
-				createDiffNode(diffElement);
+				createDiffNode(diffElement, silentAutoselect);
 				LOG.warn("Could not find diff anchor node {}.", prevDiffUid);
 				return;
 			}
 		} else {
 
 			if (sourceRuleName != null) {
-				createDiffNode(diffElement);
+				createDiffNode(diffElement, silentAutoselect);
 				LOG.warn("Could not find source rule for diff {}.", sourceRuleName);
 				return;
 			}
 			anchor = nodesByUUID.get(sourceRuleName);
 			if (anchor == null) {
-				createDiffNode(diffElement);
+				createDiffNode(diffElement, silentAutoselect);
 				LOG.warn("Could not find source rule node {}.", sourceRuleName);
 				return;
 			}
 		}
 
-		createDiffNode(diffElement);
+		createDiffNode(diffElement, silentAutoselect);
 	}
 
 	private void visualizeRuleDiff(RuleDiffParts ruleDiffParts) {
-		visualizeRuleDiff(ruleDiffParts.getRuleDiff(), ruleDiffParts.getPrevDiffId(), ruleDiffParts.getTargetRuleName(), ruleDiffParts.getSourceRuleName());
+		visualizeRuleDiff(ruleDiffParts.getRuleDiff(), ruleDiffParts.getPrevDiffId(), ruleDiffParts.getTargetRuleName(), ruleDiffParts.getSourceRuleName(), false);
 	}
 
-	private Node createDiffNode(SharedRuleElementDiff diffElement) {
+	private Node createDiffNode(SharedRuleElementDiff diffElement, boolean silentAutoselect) {
 		Node n = graph.createAndAddNode(diffElement.getUid().toString(), true);
 		nodesByUUID.put(diffElement.getUid().toString(), n);
 		nodeWithType.put(n, true);
 		graph.refreshEdges(edges);
+		if (silentAutoselect) {
+			selectNode(n.getId(), true);
+		}
 		return n;
 	}
 
@@ -224,5 +187,53 @@ public class RuleGraphManager {
 
 	public JPanel getGraphPanel() {
 		return graph.getViewPanel();
+	}
+
+	private void selectNode(String id, boolean suppressEvents) {
+		// de-select old node if present
+		if (lastSelectedNode != null) {
+			final Boolean nodeType = nodeWithType.get(lastSelectedNode);
+			lastSelectedNode.addAttribute("ui.style", "stroke-mode: none;");
+			lastSelectedNode.removeAttribute("ui.style");
+			if (nodeType == null) {
+
+			} else if (nodeType == true) {
+				lastSelectedNode.addAttribute("ui.style", "fill-color: #8bb0c4;");
+				lastSelectedNode.addAttribute("ui.style", "size: 8px;");
+			} else if (nodeType == false) {
+				lastSelectedNode.addAttribute("ui.style", "fill-color: #23729e;");
+				lastSelectedNode.addAttribute("ui.style", "size: 15px;");
+			}
+		}
+
+		// select new node
+		if (nodesByUUID.containsKey(id)) {
+			final Node node = nodesByUUID.get(id);
+			final Boolean nodeType = nodeWithType.get(node);
+
+			node.removeAttribute("ui.style");
+			if (nodeType == null) {
+
+			} else if (nodeType == true) {
+				node.addAttribute("ui.style", "stroke-mode: plain;");
+				node.addAttribute("ui.style", "stroke-color: #627782;");
+				node.addAttribute("ui.style", "stroke-width: 3px;");
+				node.addAttribute("ui.style", "size: 13px;");
+				if (!suppressEvents) {
+					EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
+				}
+				lastSelectedNode = node;
+
+			} else if (nodeType == false) {
+				node.addAttribute("ui.style", "size: 20px;");
+				node.addAttribute("ui.style", "stroke-mode: plain;");
+				node.addAttribute("ui.style", "stroke-color: #0b283d;");
+				node.addAttribute("ui.style", "stroke-width: 3px;");
+				if (!suppressEvents) {
+					EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
+				}
+				lastSelectedNode = node;
+			}
+		}
 	}
 }
