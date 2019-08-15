@@ -1,10 +1,11 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -14,7 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.ListCellRenderer;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
@@ -22,7 +24,6 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectTargetRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
-import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
 
 /** @author Steffen Jacobs */
@@ -50,7 +51,6 @@ public class RuleBuilder extends JPanel {
 		exportToPlatformButton.addActionListener(e -> {
 			Set<ServerConnection> connections = App.getServerConnectionCache().getConnections();
 			final JComboBox<ServerConnection> jcb = new JComboBox<>(connections.toArray(new ServerConnection[connections.size()]));
-			jcb.setRenderer(new ItemRenderer<ServerConnection>());
 			jcb.setEditable(true);
 			JOptionPane.showMessageDialog(null, jcb, "select or type a value", JOptionPane.QUESTION_MESSAGE);
 
@@ -81,20 +81,7 @@ public class RuleBuilder extends JPanel {
 
 		new RuleBuilderRenderController(this);
 	}
-
-	class ItemRenderer<T extends ServerConnection> extends BasicComboBoxRenderer {
-		private static final long serialVersionUID = -7027425358714392874L;
-
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-			ServerConnection item = (ServerConnection) value;
-
-			setText(item.getInstanceName());
-			return this;
-		}
-	}
-
+	
 	public void onSelectedRuleChanged(SharedRule rule) {
 		buttonBar.setEnabled(rule != null);
 	}

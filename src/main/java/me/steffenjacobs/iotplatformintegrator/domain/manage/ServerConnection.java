@@ -59,4 +59,9 @@ public class ServerConnection {
 		return rules;
 	}
 
+	@Override
+	public String toString() {
+		return instanceName;
+	}
+
 }
