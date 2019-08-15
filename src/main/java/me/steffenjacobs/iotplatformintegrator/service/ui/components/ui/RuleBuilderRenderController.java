@@ -27,8 +27,8 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRuleElement;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.ActionType.ActionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.action.SharedAction;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
@@ -37,11 +37,13 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.VisualRenderingStrategy;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.RuleAnalyzer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ActionElement;
@@ -439,7 +441,57 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		}
 	}
 
-	public boolean validateForPlatformExport() {
+	private void autoMapItemElementsToDifferentRepositoryByName(SharedRule rule, ItemDirectory targetDirectory) {
+		// map actions
+		rule.getActions().forEach(a -> {
+			final Map<ActionTypeSpecificKey, SharedItem> itemsToReplace = new HashMap<>();
+			a.getActionTypeContainer().getActionTypeSpecificValues().entrySet().forEach(e -> {
+				if (e.getValue() instanceof SharedItem) {
+					final String itemName = ((SharedItem) e.getValue()).getName();
+					SharedItem item = targetDirectory.getItemByName(itemName);
+					if (itemName != null) {
+						itemsToReplace.put(e.getKey(), item);
+					}
+				}
+			});
+			a.getActionTypeContainer().getActionTypeSpecificValues().putAll(itemsToReplace);
+		});
+
+		// map conditions
+		rule.getConditions().forEach(a -> {
+			final Map<ConditionTypeSpecificKey, SharedItem> itemsToReplace = new HashMap<>();
+			a.getConditionTypeContainer().getConditionTypeSpecificValues().entrySet().forEach(e -> {
+				if (e.getValue() instanceof SharedItem) {
+					final String itemName = ((SharedItem) e.getValue()).getName();
+					SharedItem item = targetDirectory.getItemByName(itemName);
+					if (itemName != null) {
+						itemsToReplace.put(e.getKey(), item);
+					}
+				}
+			});
+			a.getConditionTypeContainer().getConditionTypeSpecificValues().putAll(itemsToReplace);
+		});
+
+		// map triggers
+		rule.getTriggers().forEach(a -> {
+			final Map<TriggerTypeSpecificKey, SharedItem> itemsToReplace = new HashMap<>();
+			a.getTriggerTypeContainer().getTriggerTypeSpecificValues().entrySet().forEach(e -> {
+				if (e.getValue() instanceof SharedItem) {
+					final String itemName = ((SharedItem) e.getValue()).getName();
+					SharedItem item = targetDirectory.getItemByName(itemName);
+					if (itemName != null) {
+						itemsToReplace.put(e.getKey(), item);
+					}
+				}
+			});
+			a.getTriggerTypeContainer().getTriggerTypeSpecificValues().putAll(itemsToReplace);
+		});
+
+		EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(rule));
+	}
+
+	public boolean validateForPlatformExport(ItemDirectory targetItemDirectory) {
+		autoMapItemElementsToDifferentRepositoryByName(rule, targetItemDirectory);
 		final Iterable<SharedItem> items = aggregateItemsFromRuleWithDuplicates(rule);
 		boolean result = true;
 		for (SharedItem item : items) {

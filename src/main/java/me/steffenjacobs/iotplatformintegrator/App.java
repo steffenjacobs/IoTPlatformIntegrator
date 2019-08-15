@@ -13,6 +13,7 @@ import me.steffenjacobs.iotplatformintegrator.service.authentication.Authenticat
 import me.steffenjacobs.iotplatformintegrator.service.manage.RemoteRuleCache;
 import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffCache;
 import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffManager;
+import me.steffenjacobs.iotplatformintegrator.service.manage.ServerConnectionCache;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedItemStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedRuleStorageService;
@@ -46,11 +47,14 @@ public class App {
 
 	private static RuleDiffManager ruleDiffManager;
 
+	private static ServerConnectionCache serverConnectionCache;
+
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		final SettingService settingService = new SettingService("./settings.config");
 		ruleDiffCache = new RuleDiffCache();
 		remoteRuleCache = new RemoteRuleCache();
+		serverConnectionCache = new ServerConnectionCache();
 		storageService = new MongoDbStorageService(settingService);
 		try {
 			mongoDbRuleDiffStorageService = new MongoDbRuleDiffStorageService(storageService);
@@ -112,13 +116,17 @@ public class App {
 	public static RemoteRuleCache getRemoteRuleCache() {
 		return remoteRuleCache;
 	}
-	
+
 	public static RuleChangeEventStore getRuleChangeEventStore() {
 		return ruleChangeEventStore;
 	}
-	
+
 	public static RuleDiffManager getRuleDiffManager() {
 		return ruleDiffManager;
+	}
+
+	public static ServerConnectionCache getServerConnectionCache() {
+		return serverConnectionCache;
 	}
 
 }
