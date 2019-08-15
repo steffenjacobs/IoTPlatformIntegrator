@@ -108,12 +108,20 @@ public class RuleChangeEventStore {
 			final String description = diff.getDescription() == null ? trigger.getDescription() : diff.getDescription();
 			final String label = diff.getLabel() == null ? trigger.getLabel() : diff.getLabel();
 
-			final Map<TriggerTypeSpecificKey, Object> triggerTypeSpecificValues = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues();
+			final Map<TriggerTypeSpecificKey, Object> triggerTypeSpecificValues;
+			final Map<String, Object> properties;
 
-			final Map<String, Object> properties = generalize(triggerTypeSpecificValues);
-			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			if (trigger != null) {
+				triggerTypeSpecificValues = trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues();
+				properties = generalize(triggerTypeSpecificValues);
+				updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			} else {
+				triggerTypeSpecificValues = new HashMap<TriggerTypeSpecificKey, Object>();
+				properties = generalize(triggerTypeSpecificValues);
+				updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			}
 
-			SharedTrigger newTrigger = new SharedTrigger((TriggerType) diff.getElementType(), properties, description, label, trigger.getRelativeElementId());
+			SharedTrigger newTrigger = new SharedTrigger((TriggerType) diff.getElementType(), properties, description, label, diff.getRelativeElementId());
 
 			rule.getTriggers().add(newTrigger);
 
@@ -123,14 +131,23 @@ public class RuleChangeEventStore {
 			if (diff.isNegative()) {
 				return;
 			}
+
 			final String description = diff.getDescription() == null ? condition.getDescription() : diff.getDescription();
 			final String label = diff.getLabel() == null ? condition.getLabel() : diff.getLabel();
 
-			final Map<ConditionTypeSpecificKey, Object> conditionTypeSpecificValues = condition.getConditionTypeContainer().getConditionTypeSpecificValues();
-			final Map<String, Object> properties = generalize(conditionTypeSpecificValues);
-			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			final Map<ConditionTypeSpecificKey, Object> conditionTypeSpecificValues;
+			final Map<String, Object> properties;
+			if (condition != null) {
+				conditionTypeSpecificValues = condition.getConditionTypeContainer().getConditionTypeSpecificValues();
+				properties = generalize(conditionTypeSpecificValues);
+				updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			} else {
+				conditionTypeSpecificValues = new HashMap<ConditionTypeSpecificKey, Object>();
+				properties = generalize(conditionTypeSpecificValues);
+				updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			}
 
-			SharedCondition newCondition = new SharedCondition((ConditionType) diff.getElementType(), properties, description, label, condition.getRelativeElementId());
+			SharedCondition newCondition = new SharedCondition((ConditionType) diff.getElementType(), properties, description, label, diff.getRelativeElementId());
 			rule.getConditions().add(newCondition);
 		} else if (diff.getElementType() instanceof ActionType) {
 			SharedAction action = getActionByRelativeId(rule, diff.getRelativeElementId());
@@ -141,11 +158,19 @@ public class RuleChangeEventStore {
 			final String description = diff.getDescription() == null ? action.getDescription() : diff.getDescription();
 			final String label = diff.getLabel() == null ? action.getLabel() : diff.getLabel();
 
-			final Map<ActionTypeSpecificKey, Object> actionTypeSpecificValues = action.getActionTypeContainer().getActionTypeSpecificValues();
-			final Map<String, Object> properties = generalize(actionTypeSpecificValues);
-			updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			final Map<ActionTypeSpecificKey, Object> actionTypeSpecificValues;
+			final Map<String, Object> properties;
+			if (action != null) {
+				actionTypeSpecificValues = action.getActionTypeContainer().getActionTypeSpecificValues();
+				properties = generalize(actionTypeSpecificValues);
+				updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			} else {
+				actionTypeSpecificValues = new HashMap<ActionTypeSpecificKey, Object>();
+				properties = generalize(actionTypeSpecificValues);
+				updateMap(properties, diff.getPropertiesAdded(), diff.getPropertiesRemoved(), diff.getPropertiesUpdated(), itemDirectory);
+			}
 
-			SharedAction newAction = new SharedAction((ActionType) diff.getElementType(), properties, description, label, action.getRelativeElementId());
+			SharedAction newAction = new SharedAction((ActionType) diff.getElementType(), properties, description, label, diff.getRelativeElementId());
 			rule.getActions().add(newAction);
 		} else {
 			LOG.error("invalid element type {}", diff.getElementType().getClass().getName());

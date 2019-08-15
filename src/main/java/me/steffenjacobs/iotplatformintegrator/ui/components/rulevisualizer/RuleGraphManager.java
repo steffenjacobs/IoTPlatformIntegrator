@@ -112,9 +112,11 @@ public class RuleGraphManager {
 
 	private void visualizeRule(SharedRule rule) {
 		Node n = graph.createAndAddNode(rule.getName(), false);
-		nodesByUUID.put(rule.getName(), n);
-		ruleByUUID.put(rule.getName(), rule);
-		graph.refreshEdges(edges);
+		if (n != null) {
+			nodesByUUID.put(rule.getName(), n);
+			ruleByUUID.put(rule.getName(), rule);
+			graph.refreshEdges(edges);
+		}
 	}
 
 	private void visualizeRuleDiff(SharedRuleElementDiff diffElement) {
@@ -183,14 +185,15 @@ public class RuleGraphManager {
 		visualizeRuleDiff(ruleDiffParts.getRuleDiff(), ruleDiffParts.getPrevDiffId(), ruleDiffParts.getTargetRuleName(), ruleDiffParts.getSourceRuleName(), false);
 	}
 
-	private Node createDiffNode(SharedRuleElementDiff diffElement, boolean silentAutoselect) {
+	private void createDiffNode(SharedRuleElementDiff diffElement, boolean silentAutoselect) {
 		Node n = graph.createAndAddNode(diffElement.getUid().toString(), true);
-		nodesByUUID.put(diffElement.getUid().toString(), n);
-		graph.refreshEdges(edges);
-		if (silentAutoselect) {
-			graph.selectNode(n.getId(), true, nodesByUUID, ruleByUUID);
+		if (n != null) {
+			nodesByUUID.put(diffElement.getUid().toString(), n);
+			graph.refreshEdges(edges);
+			if (silentAutoselect) {
+				graph.selectNode(n.getId(), true, nodesByUUID, ruleByUUID);
+			}
 		}
-		return n;
 	}
 
 	private void clear() {

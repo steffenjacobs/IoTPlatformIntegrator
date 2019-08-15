@@ -63,7 +63,7 @@ public class ClickableGraph implements ViewerListener {
 				try {
 					fromViewer.pump();
 				} catch (Exception e) {
-					LOG.error(e.getMessage());
+					LOG.error(e.getMessage(), e);
 				}
 				lock.unlock();
 			}
@@ -173,23 +173,28 @@ public class ClickableGraph implements ViewerListener {
 				node.addAttribute("ui.style", "stroke-color: #627782;");
 				node.addAttribute("ui.style", "stroke-width: 3px;");
 				node.addAttribute("ui.style", "size: 13px;");
+				lastSelectedNode = node;
+				lock.unlock();
 				if (!suppressEvents) {
 					EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
 				}
-				lastSelectedNode = node;
 
 			} else if (nodeType == false) {
 				node.addAttribute("ui.style", "size: 20px;");
 				node.addAttribute("ui.style", "stroke-mode: plain;");
 				node.addAttribute("ui.style", "stroke-color: #0b283d;");
 				node.addAttribute("ui.style", "stroke-width: 3px;");
+				lastSelectedNode = node;
+				lock.unlock();
 				if (!suppressEvents) {
 					EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
 				}
-				lastSelectedNode = node;
+			} else {
+				lock.unlock();
 			}
+		} else {
+			lock.unlock();
 		}
-		lock.unlock();
 	}
 
 	public Node getLastSelectedNode() {
