@@ -22,6 +22,7 @@ import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ExportRuleToPlatformEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectTargetRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
@@ -57,7 +58,7 @@ public class RuleBuilder extends JPanel {
 			boolean result = controller.validateForPlatformExport(((ServerConnection) jcb.getSelectedItem()).getItemDirectory());
 			if (result) {
 				String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
-				// TODO: export to platform
+				EventBus.getInstance().fireEvent(new ExportRuleToPlatformEvent((ServerConnection) jcb.getSelectedItem(), controller.getDisplayedRule().get(), name));
 			}
 		});
 		buttonBar.add(exportToPlatformButton);
@@ -81,7 +82,7 @@ public class RuleBuilder extends JPanel {
 
 		new RuleBuilderRenderController(this);
 	}
-	
+
 	public void onSelectedRuleChanged(SharedRule rule) {
 		buttonBar.setEnabled(rule != null);
 	}

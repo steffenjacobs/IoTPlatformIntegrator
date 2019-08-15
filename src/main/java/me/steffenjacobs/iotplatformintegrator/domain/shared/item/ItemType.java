@@ -250,8 +250,32 @@ public enum ItemType {
 			}
 		}
 
+		public static String toExportString(Operation op) {
+			switch (op) {
+			case EQUAL:
+				return "=";
+			case SMALLER_EQUAL:
+				return "<=";
+			case SMALLER:
+				return "<";
+			case BIGGER:
+				return ">";
+			case BIGGER_EQUAL:
+				return ">=";
+			case NOT_EQUAL:
+				return "!=";
+			case OR:
+				return "or";
+			case AND:
+				return "and";
+			default:
+				System.err.println("Invalid operation: " + op);
+				return " ";
+			}
+		}
+
 		public static Operation[] getKnownSubstitutes(Operation operation) {
-			if(operation == null) {
+			if (operation == null) {
 				return Operation.values();
 			}
 			switch (operation) {

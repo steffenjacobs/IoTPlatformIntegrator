@@ -13,6 +13,7 @@ import me.steffenjacobs.iotplatformintegrator.service.authentication.Authenticat
 import me.steffenjacobs.iotplatformintegrator.service.manage.RemoteRuleCache;
 import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffCache;
 import me.steffenjacobs.iotplatformintegrator.service.manage.RuleDiffManager;
+import me.steffenjacobs.iotplatformintegrator.service.manage.RuleToPlatformExporter;
 import me.steffenjacobs.iotplatformintegrator.service.manage.ServerConnectionCache;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbRuleDiffStorageService;
 import me.steffenjacobs.iotplatformintegrator.service.storage.mongo.MongoDbSharedItemStorageService;
@@ -65,12 +66,14 @@ public class App {
 			authenticationService = new AuthenticationServiceImpl(settingService);
 			ruleGraphManager = new RuleGraphManager();
 
+			new RuleToPlatformExporter();
 			new UiEntrypoint(settingService, authenticationService).createAndShowGUIAsync();
 			ruleChangeEventStore = new RuleChangeEventStore(authenticationService);
 
 			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
 
 			ruleDiffManager = new RuleDiffManager(mongoDbRuleDiffStorageService);
+			
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
