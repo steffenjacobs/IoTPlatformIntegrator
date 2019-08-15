@@ -264,7 +264,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		elem.setToolTipText(String.format("%s: %s", label, description));
 
 		Collection<Component> strategyElements = triggerRenderer.renderTrigger(trigger);
-		addComponentListeners(uuid, strategyElements, ElementType.Condition);
+		addComponentListeners(uuid, strategyElements, ElementType.CONDITION);
 		recommender.addRecommendations(strategyElements);
 		validator.addValidation(strategyElements);
 		elem.setStrategyElements(strategyElements);
@@ -300,7 +300,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		String description = action.getDescription();
 		elem.setToolTipText(String.format("%s: %s", label, description));
 		Collection<Component> strategyElements = actionRenderer.renderAction(action);
-		addComponentListeners(uuid, strategyElements, ElementType.Action);
+		addComponentListeners(uuid, strategyElements, ElementType.ACTION);
 		recommender.addRecommendations(strategyElements);
 		validator.addValidation(strategyElements);
 		elem.setStrategyElements(strategyElements);
@@ -337,7 +337,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		elem.setToolTipText(String.format("%s: %s", label, description));
 		Collection<Component> strategyElements = conditionRenderer.renderCondition(condition);
 
-		addComponentListeners(uuid, strategyElements, ElementType.Condition);
+		addComponentListeners(uuid, strategyElements, ElementType.CONDITION);
 		recommender.addRecommendations(strategyElements);
 		validator.addValidation(strategyElements);
 

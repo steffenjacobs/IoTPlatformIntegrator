@@ -9,7 +9,7 @@ public class TriggerElement extends DynamicElement {
 	private static final long serialVersionUID = 16080274137145616L;
 
 	public TriggerElement(UUID uuid) {
-		super(ElementType.Trigger, uuid);
+		super(ElementType.TRIGGER, uuid);
 
 		super.setColors(RuleColors.TRIGGER_STRATEGY_PANEL_COLOR, RuleColors.TRIGGER_HEADER_COLOR, RuleColors.TRIGGER_COLOR, RuleColors.TRIGGER_BORDER_COLOR);
 	}

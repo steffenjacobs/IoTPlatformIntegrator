@@ -40,24 +40,24 @@ public class RuleMutator {
 		Optional<SharedRule> oRule = ruleBuilderController.getDisplayedRule();
 		oRule.ifPresent(selectedRule -> {
 			switch (elementType) {
-			case Trigger:
+			case TRIGGER:
 				final Map<String, Object> properties = new HashMap<String, Object>();
 				int relativeElementId = findHighestId(selectedRule.getTriggers()) + 1;
-				final SharedTrigger trigger = new SharedTrigger((TriggerType) sharedElementType, properties, "Trigger-" + relativeElementId, "-", relativeElementId);
+				final SharedTrigger trigger = new SharedTrigger((TriggerType) sharedElementType, properties, "TRIGGER-" + relativeElementId, "-", relativeElementId);
 				selectedRule.getTriggers().add(trigger);
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(selectedRule, trigger, null));
 				break;
-			case Condition:
+			case CONDITION:
 				final Map<String, Object> properties2 = new HashMap<String, Object>();
 				int relativeElementId2 = findHighestId(selectedRule.getConditions()) + 1;
-				final SharedCondition condition = new SharedCondition((ConditionType) sharedElementType, properties2, "Condition-" + relativeElementId2, "-", relativeElementId2);
+				final SharedCondition condition = new SharedCondition((ConditionType) sharedElementType, properties2, "CONDITION-" + relativeElementId2, "-", relativeElementId2);
 				selectedRule.getConditions().add(condition);
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(selectedRule, condition, null));
 				break;
-			case Action:
+			case ACTION:
 				final Map<String, Object> properties3 = new HashMap<String, Object>();
 				int relativeElementId3 = findHighestId(selectedRule.getActions()) + 1;
-				final SharedAction action = new SharedAction((ActionType) sharedElementType, properties3, "Action-" + relativeElementId3, "-", relativeElementId3);
+				final SharedAction action = new SharedAction((ActionType) sharedElementType, properties3, "ACTION-" + relativeElementId3, "-", relativeElementId3);
 				selectedRule.getActions().add(action);
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(selectedRule, action, null));
 				break;

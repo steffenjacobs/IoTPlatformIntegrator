@@ -9,7 +9,7 @@ public class ActionElement extends DynamicElement {
 	private static final long serialVersionUID = 26080274137145616L;
 
 	public ActionElement(UUID uuid) {
-		super(ElementType.Action, uuid);
+		super(ElementType.ACTION, uuid);
 
 		super.setColors(RuleColors.ACTION_STRATEGY_PANEL_COLOR, RuleColors.ACTION_HEADER_COLOR, RuleColors.ACTION_COLOR, RuleColors.ACTION_BORDER_COLOR);
 	}

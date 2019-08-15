@@ -35,7 +35,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 
 		TriggerType triggerType = parseTriggerType("" + map.get("platform"));
 		if (triggerType == null) {
-			LOG.error("Trigger type not found! platform attribute missing");
+			LOG.error("TRIGGER type not found! platform attribute missing");
 			return null;
 		}
 

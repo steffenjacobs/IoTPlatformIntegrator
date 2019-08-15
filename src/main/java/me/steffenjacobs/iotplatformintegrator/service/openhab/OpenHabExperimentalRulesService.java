@@ -168,7 +168,7 @@ public class OpenHabExperimentalRulesService {
 	/**
 	 * Sends a HTTP GET request to
 	 * {@link openHabUrlWithPort}/rules/{@link uid}/triggers to get the
-	 * {@link Trigger} elements associated with the rule with the given uid.
+	 * {@link TRIGGER} elements associated with the rule with the given uid.
 	 * 
 	 * @return the triggers corresponding to the rule with the given uid.
 	 * 

@@ -38,7 +38,7 @@ public abstract class DynamicElement extends JPanel {
 	private static final long serialVersionUID = 162937647608306926L;
 
 	public enum ElementType {
-		Trigger("Trigger"), Condition("Condition"), Action("Action");
+		TRIGGER("TRIGGER"), CONDITION("CONDITION"), ACTION("ACTION");
 
 		private final String displayString;
 
@@ -74,7 +74,7 @@ public abstract class DynamicElement extends JPanel {
 		subType = new JLabel();
 		subType.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		JPopupMenu popupSubType = new JPopupMenu();
-		if (type == ElementType.Trigger) {
+		if (type == ElementType.TRIGGER) {
 		}
 		this.add(popupSubType);
 		setHeaderStyle(subType, popupSubType);
@@ -132,7 +132,7 @@ public abstract class DynamicElement extends JPanel {
 		selectionPopup.add(new JLabel("Triggers"));
 		for (TriggerType triggerType : TriggerType.values()) {
 			final JMenuItem menu = new JMenuItem(triggerType.name());
-			menu.addActionListener(l -> fireCreationEvent(ElementType.Trigger, triggerType, selectionPopup));
+			menu.addActionListener(l -> fireCreationEvent(ElementType.TRIGGER, triggerType, selectionPopup));
 			selectionPopup.add(menu);
 		}
 
@@ -140,7 +140,7 @@ public abstract class DynamicElement extends JPanel {
 		selectionPopup.add(new JLabel("Conditions"));
 		for (ConditionType conditionType : ConditionType.values()) {
 			final JMenuItem menu = new JMenuItem(conditionType.name());
-			menu.addActionListener(l -> fireCreationEvent(ElementType.Condition, conditionType, selectionPopup));
+			menu.addActionListener(l -> fireCreationEvent(ElementType.CONDITION, conditionType, selectionPopup));
 			selectionPopup.add(menu);
 		}
 
@@ -148,7 +148,7 @@ public abstract class DynamicElement extends JPanel {
 		selectionPopup.add(new JLabel("Actions"));
 		for (ActionType actionType : ActionType.values()) {
 			final JMenuItem menu = new JMenuItem(actionType.name());
-			menu.addActionListener(l -> fireCreationEvent(ElementType.Action, actionType, selectionPopup));
+			menu.addActionListener(l -> fireCreationEvent(ElementType.ACTION, actionType, selectionPopup));
 			selectionPopup.add(menu);
 		}
 

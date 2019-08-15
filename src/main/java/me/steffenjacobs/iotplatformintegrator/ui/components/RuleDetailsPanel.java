@@ -141,7 +141,7 @@ public class RuleDetailsPanel extends JPanel {
 		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Condition"));
+		panel.setBorder(BorderFactory.createTitledBorder("CONDITION"));
 		panel.add(new JLabel(sc.getDescription()));
 		panel.add(Box.createVerticalStrut(10));
 		panel.add(form);
@@ -168,7 +168,7 @@ public class RuleDetailsPanel extends JPanel {
 		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Trigger"));
+		panel.setBorder(BorderFactory.createTitledBorder("TRIGGER"));
 		panel.add(new JLabel(st.getDescription()));
 		panel.add(Box.createVerticalStrut(10));
 		panel.add(form);
@@ -195,7 +195,7 @@ public class RuleDetailsPanel extends JPanel {
 		}
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Action"));
+		panel.setBorder(BorderFactory.createTitledBorder("ACTION"));
 		panel.add(new JLabel(sa.getDescription()));
 		panel.add(Box.createVerticalStrut(10));
 		panel.add(form);
