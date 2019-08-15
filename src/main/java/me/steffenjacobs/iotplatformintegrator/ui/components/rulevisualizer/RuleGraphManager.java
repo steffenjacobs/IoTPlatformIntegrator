@@ -25,8 +25,6 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleDiffChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
@@ -37,12 +35,9 @@ public class RuleGraphManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RuleGraphManager.class);
 
-	private final Map<Node, Boolean> nodeWithType = new HashMap<>();
 	private final Map<String, Node> nodesByUUID = new HashMap<>();
 	private final Map<String, SharedRule> ruleByUUID = new HashMap<>();
 	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
-
-	private Node lastSelectedNode = null;
 
 	private final AtomicBoolean nextSelectedRuleIsTarget = new AtomicBoolean(false);
 	private final AtomicReference<String> nextSelectedRuleIsTargetId = new AtomicReference<>("");
@@ -85,10 +80,10 @@ public class RuleGraphManager {
 			public void buttonReleased(String id) {
 				if (nextSelectedRuleIsTarget.getAndSet(false)) {
 					SharedRule clickedRule = App.getRemoteRuleCache().getRuleByName(id);
-					RuleDiffParts diff = App.getRuleDiffCache().getRuleDiffParts(lastSelectedNode.getId());
-					if(diff == null) {
-						JOptionPane.showMessageDialog(null, "You can only set a target when you are in a transformation state.",
-								"Rule cannot be matched to another rule.", JOptionPane.ERROR_MESSAGE);
+					RuleDiffParts diff = App.getRuleDiffCache().getRuleDiffParts(graph.getLastSelectedNode().getId());
+					if (diff == null) {
+						JOptionPane.showMessageDialog(null, "You can only set a target when you are in a transformation state.", "Rule cannot be matched to another rule.",
+								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					SharedRule rebuiltRule = App.getRuleChangeEventStore().rebuildRule(diff);
@@ -98,14 +93,13 @@ public class RuleGraphManager {
 						EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, id, false));
 						edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), id));
 						graph.refreshEdges(edges);
-						selectNode(id, false);
+						graph.selectNode(id, false, nodesByUUID, ruleByUUID);
 					} else {
 						JOptionPane.showMessageDialog(null, "Please select a rule that is compatible with your current transformation state:\n" + String.join("\n", warnings),
 								"Rule cannot be matched", JOptionPane.ERROR_MESSAGE);
 					}
-				}
-				else {
-					selectNode(id, false);
+				} else {
+					graph.selectNode(id, false, nodesByUUID, ruleByUUID);
 				}
 			}
 
@@ -119,7 +113,6 @@ public class RuleGraphManager {
 	private void visualizeRule(SharedRule rule) {
 		Node n = graph.createAndAddNode(rule.getName(), false);
 		nodesByUUID.put(rule.getName(), n);
-		nodeWithType.put(n, false);
 		ruleByUUID.put(rule.getName(), rule);
 		graph.refreshEdges(edges);
 	}
@@ -159,20 +152,26 @@ public class RuleGraphManager {
 			anchor = nodesByUUID.get(prevDiffUid);
 			if (anchor == null) {
 				createDiffNode(diffElement, silentAutoselect);
-				LOG.warn("Could not find diff anchor node {}.", prevDiffUid);
+				if (ClickableGraph.enableFineLogging) {
+					LOG.warn("Could not find diff anchor node {}.", prevDiffUid);
+				}
 				return;
 			}
 		} else {
 
 			if (sourceRuleName != null) {
 				createDiffNode(diffElement, silentAutoselect);
-				LOG.warn("Could not find source rule for diff {}.", sourceRuleName);
+				if (ClickableGraph.enableFineLogging) {
+					LOG.warn("Could not find source rule for diff {}.", sourceRuleName);
+				}
 				return;
 			}
 			anchor = nodesByUUID.get(sourceRuleName);
 			if (anchor == null) {
 				createDiffNode(diffElement, silentAutoselect);
-				LOG.warn("Could not find source rule node {}.", sourceRuleName);
+				if (ClickableGraph.enableFineLogging) {
+					LOG.warn("Could not find source rule node {}.", sourceRuleName);
+				}
 				return;
 			}
 		}
@@ -187,10 +186,9 @@ public class RuleGraphManager {
 	private Node createDiffNode(SharedRuleElementDiff diffElement, boolean silentAutoselect) {
 		Node n = graph.createAndAddNode(diffElement.getUid().toString(), true);
 		nodesByUUID.put(diffElement.getUid().toString(), n);
-		nodeWithType.put(n, true);
 		graph.refreshEdges(edges);
 		if (silentAutoselect) {
-			selectNode(n.getId(), true);
+			graph.selectNode(n.getId(), true, nodesByUUID, ruleByUUID);
 		}
 		return n;
 	}
@@ -200,58 +198,10 @@ public class RuleGraphManager {
 		edges.clear();
 		nodesByUUID.clear();
 		ruleByUUID.clear();
-		nodeWithType.clear();
 	}
 
 	public JPanel getGraphPanel() {
 		return graph.getViewPanel();
 	}
 
-	private void selectNode(String id, boolean suppressEvents) {
-		// de-select old node if present
-		if (lastSelectedNode != null) {
-			final Boolean nodeType = nodeWithType.get(lastSelectedNode);
-			lastSelectedNode.addAttribute("ui.style", "stroke-mode: none;");
-			lastSelectedNode.removeAttribute("ui.style");
-			if (nodeType == null) {
-
-			} else if (nodeType == true) {
-				lastSelectedNode.addAttribute("ui.style", "fill-color: #8bb0c4;");
-				lastSelectedNode.addAttribute("ui.style", "size: 8px;");
-			} else if (nodeType == false) {
-				lastSelectedNode.addAttribute("ui.style", "fill-color: #23729e;");
-				lastSelectedNode.addAttribute("ui.style", "size: 15px;");
-			}
-		}
-
-		// select new node
-		if (nodesByUUID.containsKey(id)) {
-			final Node node = nodesByUUID.get(id);
-			final Boolean nodeType = nodeWithType.get(node);
-
-			node.removeAttribute("ui.style");
-			if (nodeType == null) {
-
-			} else if (nodeType == true) {
-				node.addAttribute("ui.style", "stroke-mode: plain;");
-				node.addAttribute("ui.style", "stroke-color: #627782;");
-				node.addAttribute("ui.style", "stroke-width: 3px;");
-				node.addAttribute("ui.style", "size: 13px;");
-				if (!suppressEvents) {
-					EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
-				}
-				lastSelectedNode = node;
-
-			} else if (nodeType == false) {
-				node.addAttribute("ui.style", "size: 20px;");
-				node.addAttribute("ui.style", "stroke-mode: plain;");
-				node.addAttribute("ui.style", "stroke-color: #0b283d;");
-				node.addAttribute("ui.style", "stroke-width: 3px;");
-				if (!suppressEvents) {
-					EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
-				}
-				lastSelectedNode = node;
-			}
-		}
-	}
 }
