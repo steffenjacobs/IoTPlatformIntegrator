@@ -251,6 +251,9 @@ public enum ItemType {
 		}
 
 		public static Operation[] getKnownSubstitutes(Operation operation) {
+			if(operation == null) {
+				return Operation.values();
+			}
 			switch (operation) {
 			case EQUAL:
 			case NOT_EQUAL:
