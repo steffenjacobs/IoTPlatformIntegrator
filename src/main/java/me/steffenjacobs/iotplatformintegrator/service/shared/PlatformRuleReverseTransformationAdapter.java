@@ -6,5 +6,5 @@ import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.out
 /** @author Steffen Jacobs */
 public interface PlatformRuleReverseTransformationAdapter<Rule> {
 
-	Rule transformRule(SharedRule rule, ItemDirectory itemDirectory, OpenHabCommandReverseTransformer reverseCommandParser);
+	Rule transformRule(SharedRule rule, OpenHabCommandReverseTransformer reverseCommandParser);
 }

@@ -19,7 +19,6 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
-import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformRuleReverseTransformationAdapter;
 
 /** @author Steffen Jacobs */
@@ -37,7 +36,7 @@ public class OpenHabRuleReverseTransformationAdapter implements PlatformRuleReve
 	}
 
 	@Override
-	public ExperimentalRule transformRule(SharedRule rule, ItemDirectory itemDirectory, OpenHabCommandReverseTransformer reverseCommandParser) {
+	public ExperimentalRule transformRule(SharedRule rule, OpenHabCommandReverseTransformer reverseCommandParser) {
 		// create defensive copy
 		rule = new SharedRule(rule);
 
