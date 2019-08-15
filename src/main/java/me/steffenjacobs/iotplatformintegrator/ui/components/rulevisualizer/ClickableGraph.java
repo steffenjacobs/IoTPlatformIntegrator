@@ -59,13 +59,11 @@ public class ClickableGraph implements ViewerListener {
 
 		new Thread(() -> {
 			while (loop.get()) {
-				lock.lock();
 				try {
 					fromViewer.pump();
 				} catch (Exception e) {
 					LOG.error(e.getMessage(), e);
 				}
-				lock.unlock();
 			}
 		}).start();
 	}
@@ -105,7 +103,9 @@ public class ClickableGraph implements ViewerListener {
 	}
 
 	public void buttonReleased(String id) {
+		lock.lock();
 		listener.buttonReleased(id);
+		lock.unlock();
 	}
 
 	public void clear() {
