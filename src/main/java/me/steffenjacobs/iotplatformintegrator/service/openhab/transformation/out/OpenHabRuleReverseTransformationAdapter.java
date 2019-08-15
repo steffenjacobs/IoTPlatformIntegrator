@@ -41,6 +41,7 @@ public class OpenHabRuleReverseTransformationAdapter implements PlatformRuleReve
 		// create defensive copy
 		rule = new SharedRule(rule);
 
+		// convert master data
 		final ExperimentalRule result = new ExperimentalRule();
 		result.setName(rule.getName());
 		result.setUid(rule.getId());

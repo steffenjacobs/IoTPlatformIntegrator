@@ -5,5 +5,5 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 /** @author Steffen Jacobs */
 public interface PlatformItemTransformationAdapter<Item> {
 
-	SharedItem transformItem(Item rule);
+	SharedItem transformItem(Item item);
 }
