@@ -24,7 +24,7 @@ public class UserScore {
 		return username;
 	}
 
-	public UUID getUserid() {
+	public UUID getUserId() {
 		return userid;
 	}
 

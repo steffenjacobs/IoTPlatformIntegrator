@@ -229,8 +229,7 @@ public class MongoDbStorageService {
 				if (count > 0) {
 
 					getDiffCollection().aggregate(Arrays.asList(
-							// Aggregates.match(Filters.eq("categories", "Bakery")),
-							Aggregates.group("$_id",
+							Aggregates.group("$creator",
 									Arrays.asList(Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_ADDED, 1),
 											Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_REMOVED, 1),
 											Accumulators.sum(SharedRuleElementDiffJsonTransformer.KEY_PROPERTIES_UPDATED, 1)))))

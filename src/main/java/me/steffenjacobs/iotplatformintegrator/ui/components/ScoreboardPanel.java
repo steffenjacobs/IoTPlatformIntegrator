@@ -1,12 +1,11 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,22 +22,16 @@ public class ScoreboardPanel extends JPanel {
 
 	public ScoreboardPanel(ScoreboardController controller) {
 
-		JPanel contentPanel = new JPanel();
-
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-
-		JPanel rightBoundPanel = new JPanel();
-		rightBoundPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
-		JButton buttonUpdate = new JButton("Refresh");
-
-		buttonUpdate.addActionListener(e -> refresh(controller));
-
 		scoreboard = createItemsTable();
-		contentPanel.add(rightBoundPanel);
-		contentPanel.add(scoreboard);
 
-		this.add(contentPanel);
+		// add refresh popup
+		final JPopupMenu popup = new JPopupMenu();
+		final JMenuItem refreshItem = new JMenuItem("Refresh");
+		refreshItem.addActionListener(a -> refresh(controller));
+		popup.add(refreshItem);
+		this.setComponentPopupMenu(popup);
+
+		this.add(scoreboard);
 
 		refresh(controller);
 	}
@@ -62,7 +55,7 @@ public class ScoreboardPanel extends JPanel {
 		tableModel.setColumnCount(3);
 
 		// setup columns
-		String[] columnNames = { "Username", "Additions", "Deletions", "Modifications" };
+		String[] columnNames = { "UserId", "Additions", "Deletions", "Modifications" };
 		tableModel.setColumnIdentifiers(columnNames);
 
 		// create JTable
@@ -78,7 +71,7 @@ public class ScoreboardPanel extends JPanel {
 
 		for (UserScore score : scores) {
 			final String[] arr = new String[4];
-			arr[0] = score.getUsername();
+			arr[0] = score.getUserId().toString();
 			arr[1] = Long.toString(score.getAdditions());
 			arr[2] = Long.toString(score.getDeletions());
 			arr[3] = Long.toString(score.getModifications());
