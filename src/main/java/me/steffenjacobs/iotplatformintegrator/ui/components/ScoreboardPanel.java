@@ -29,7 +29,7 @@ public class ScoreboardPanel extends JPanel {
 		final JMenuItem refreshItem = new JMenuItem("Refresh");
 		refreshItem.addActionListener(a -> refresh(controller));
 		popup.add(refreshItem);
-		this.setComponentPopupMenu(popup);
+		scoreboard.setComponentPopupMenu(popup);
 
 		this.add(scoreboard);
 
