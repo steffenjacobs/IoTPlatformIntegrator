@@ -166,4 +166,12 @@ public class ServerConnectionManager {
 	private void clearSelection() {
 		selectedConnection = null;
 	}
+	
+	public static OpenHabExperimentalRulesService getRuleservice() {
+		return ruleService;
+	}
+	
+	public static OpenHabItemService getItemservice() {
+		return itemService;
+	}
 }

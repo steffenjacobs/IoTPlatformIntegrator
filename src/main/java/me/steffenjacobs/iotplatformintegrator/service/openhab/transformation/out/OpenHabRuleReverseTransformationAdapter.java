@@ -77,6 +77,7 @@ public class OpenHabRuleReverseTransformationAdapter implements PlatformRuleReve
 		result.setDescription(sc.getDescription());
 		result.setType(getReverseConditionType(sc.getConditionTypeContainer().getConditionType()));
 		result.setLabel(sc.getLabel());
+		result.setId(Integer.toString(sc.getRelativeElementId()));
 
 		// configuration
 		conditionReverseTransformer.convertConditionTypeContainer(sc.getConditionTypeContainer());
@@ -94,6 +95,7 @@ public class OpenHabRuleReverseTransformationAdapter implements PlatformRuleReve
 		result.setDescription(trigger.getDescription());
 		result.setLabel(trigger.getLabel());
 		result.setType(getReverseTriggerType(trigger.getTriggerTypeContainer().getTriggerType()));
+		result.setId(Integer.toString(trigger.getRelativeElementId()));
 
 		// configuration
 		triggerReverseTransformer.convertTriggerTypeContainer(trigger.getTriggerTypeContainer(), commandTransformer);
@@ -111,6 +113,7 @@ public class OpenHabRuleReverseTransformationAdapter implements PlatformRuleReve
 		action.setDescription(sa.getDescription());
 		action.setLabel(sa.getLabel());
 		action.setType(getReverseActionType(sa.getActionTypeContainer().getActionType()));
+		action.setId(Integer.toString(sa.getRelativeElementId()));
 
 		// configuration
 		actionReverseTransformer.convertActionTypeContainer(sa.getActionTypeContainer(), commandTransformer);
