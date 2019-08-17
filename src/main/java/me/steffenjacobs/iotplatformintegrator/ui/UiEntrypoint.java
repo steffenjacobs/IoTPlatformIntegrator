@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
+import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshOpenHABDataEvent;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ServerConnectionManager;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
@@ -53,6 +56,15 @@ public class UiEntrypoint {
 		adoptionPerspective = new AdoptionPerspective();
 		scoreboardPerspective = new ScoreboardPerspective();
 		serverConnectionManager = new ServerConnectionManager(settingService);
+
+		EventBus.getInstance().addEventHandler(EventType.REFRESH_OPENHAB_DATA, e -> {
+			try {
+				serverConnectionManager.loadOpenHABData();
+			} catch (Exception e2) {
+				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
+						serverConnectionManager.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
+			}
+		});
 	}
 
 	private void createAndShowGUI() {
@@ -123,14 +135,7 @@ public class UiEntrypoint {
 
 		JMenuItem mImportFromOpenhab = new JMenuItem("OpenHAB");
 		mConnect.add(mImportFromOpenhab);
-		mImportFromOpenhab.addActionListener(e -> {
-			try {
-				serverConnectionManager.loadOpenHABData();
-			} catch (Exception e2) {
-				JOptionPane.showMessageDialog(frame, String.format("Error while trying to connect to '%s' (%s).\nYou can change the URL and the port under File -> Settings.",
-						serverConnectionManager.getOHUrlWithPort(), e2.getMessage()), "Could not connect to openHAB server.", JOptionPane.ERROR_MESSAGE);
-			}
-		});
+		mImportFromOpenhab.addActionListener(e -> EventBus.getInstance().fireEvent(new RefreshOpenHABDataEvent()));
 
 		JMenuItem mImportFromHomeAssistant = new JMenuItem("HomeAssistant");
 		mConnect.add(mImportFromHomeAssistant);

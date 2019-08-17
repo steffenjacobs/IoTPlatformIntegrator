@@ -6,6 +6,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.openhab.experimental.rule.E
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ExportRuleToPlatformEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshOpenHABDataEvent;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.out.OpenHabCommandReverseTransformer;
 import me.steffenjacobs.iotplatformintegrator.service.openhab.transformation.out.OpenHabReverseTransformationAdapter;
 import me.steffenjacobs.iotplatformintegrator.service.ui.ServerConnectionManager;
@@ -28,7 +29,10 @@ public class RuleToPlatformExporter {
 		if (serverConnection.getPlatformType() == PlatformType.OPENHAB) {
 			final ExperimentalRule openHabRule = openHabReverseTransformationAdapter.getRuleTransformer().transformRule(rule, openHabCommandReverseTransformer);
 			ServerConnectionManager.getRuleservice().createRule(serverConnection.getUrl() + ":" + serverConnection.getPort(), openHabRule);
+			
 			// TODO: handle items
+			
+			EventBus.getInstance().fireEvent(new RefreshOpenHABDataEvent());
 		}
 		// TODO: handle export of home assistant rules + items
 
