@@ -22,6 +22,8 @@ public class HomeAssistantConditionTransformationAdapter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantConditionTransformationAdapter.class);
 
+	private static StringToNumberTransformer numberTransformer = new StringToNumberTransformer();
+
 	public List<SharedCondition> parseCondition(Object o, ItemDirectory itemDirectory, int relativeElementId) {
 		if (!(o instanceof Map)) {
 			System.out.println(o);
@@ -36,11 +38,11 @@ public class HomeAssistantConditionTransformationAdapter {
 		switch (conditionType) {
 		case ItemState:
 			if (map.get("condition").equals("numeric_state")) {
-				String below = "" + map.get("below");
-				String above = "" + map.get("above");
+				final Object below = numberTransformer.returnNumberIfPossibleElseString("" + map.get("below"));
+				final Object above = numberTransformer.returnNumberIfPossibleElseString("" + map.get("above"));
 				String itemName = "" + map.get("entity_id");
 
-				if (StringUtil.isNonNull(below)) {
+				if (below != null) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
 					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
@@ -51,7 +53,7 @@ public class HomeAssistantConditionTransformationAdapter {
 					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 					conditions.add(sc);
 				}
-				if (StringUtil.isNonNull(above)) {
+				if (above != null) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
 					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);

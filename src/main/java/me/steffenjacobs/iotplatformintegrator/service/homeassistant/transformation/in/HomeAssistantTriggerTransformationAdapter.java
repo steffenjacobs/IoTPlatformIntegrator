@@ -9,21 +9,22 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType;
-import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.ConditionType.ConditionTypeSpecificKey;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
-import me.steffenjacobs.iotplatformintegrator.service.manage.util.StringUtil;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 
 /** @author Steffen Jacobs */
 public class HomeAssistantTriggerTransformationAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(HomeAssistantTriggerTransformationAdapter.class);
+
+	private static StringToNumberTransformer numberTransformer = new StringToNumberTransformer();
 
 	public Pair<SharedTrigger, Set<SharedCondition>> parseTrigger(Object o, ItemDirectory itemDirectory, int relativeElementId) {
 		if (!(o instanceof Map)) {
@@ -46,11 +47,11 @@ public class HomeAssistantTriggerTransformationAdapter {
 
 			if (map.get("platform").equals("numeric_state")) {
 
-				String below = "" + map.get("below");
-				String above = "" + map.get("above");
+				Object below = numberTransformer.returnNumberIfPossibleElseString("" + map.get("below"));
+				Object above = numberTransformer.returnNumberIfPossibleElseString("" + map.get("above"));
 				String itemName = "" + map.get("entity_id");
 
-				if (StringUtil.isNonNull(below)) {
+				if (below != null) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
 					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.SMALLER);
@@ -61,7 +62,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 					SharedCondition sc = new SharedCondition(ConditionType.ItemState, conditionProperties, description, label, relativeElementId);
 					conditions.add(sc);
 				}
-				if (StringUtil.isNonNull(above)) {
+				if (above != null) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
 					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
