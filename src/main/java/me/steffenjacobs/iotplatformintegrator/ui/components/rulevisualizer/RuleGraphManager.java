@@ -70,26 +70,7 @@ public class RuleGraphManager {
 
 		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> checkIfCurrentTransformationStateExistsAsRule(((WithSharedRuleEvent) e).getSelectedRule()));
 
-		final JPopupMenu popup = new JPopupMenu();
-		final JMenuItem refreshMenu = new JMenuItem("Refresh");
-		final ActionListener refreshAction = e -> {
-			App.getRemoteRuleController().refreshRules();
-			EventBus.getInstance().fireEvent(new RefreshRuleDiffsEvent());
-		};
-		refreshMenu.addActionListener(refreshAction);
-
-		popup.add(refreshMenu);
-
-		graph.getViewPanel().setComponentPopupMenu(popup);
-
-		graphPanel = new JPanel(new BorderLayout());
-
 		final JPanel buttonPanel = new JPanel(new FlowLayout());
-
-		// refresh button
-		final JButton refreshButton = new JButton("Refresh");
-		refreshButton.addActionListener(refreshAction);
-		buttonPanel.add(refreshButton);
 
 		// search field
 		final PlaceholderTextField searchItemName = new PlaceholderTextField("Search for Item Name...");
@@ -113,12 +94,34 @@ public class RuleGraphManager {
 			}
 		});
 
+		// refresh button
+		final ActionListener refreshAction = e -> {
+			App.getRemoteRuleController().refreshRules();
+			EventBus.getInstance().fireEvent(new RefreshRuleDiffsEvent());
+		};
+
+		final JButton refreshButton = new JButton("Refresh");
+		refreshButton.addActionListener(refreshAction);
+
+		// add buttons to panel
+		buttonPanel.add(refreshButton);
 		buttonPanel.add(searchItemName);
 
 		// add button panel
+		graphPanel = new JPanel(new BorderLayout());
 		graphPanel.add(buttonPanel, BorderLayout.NORTH);
 
 		graphPanel.add(graph.getViewPanel(), BorderLayout.CENTER);
+
+		// setup popup menu
+		final JPopupMenu popup = new JPopupMenu();
+		final JMenuItem refreshMenu = new JMenuItem("Refresh");
+		refreshMenu.addActionListener(refreshAction);
+
+		popup.add(refreshMenu);
+
+		graph.getViewPanel().setComponentPopupMenu(popup);
+
 	}
 
 	private void visualizeItemFilter(String searchText) {
