@@ -22,4 +22,8 @@ public class RemoteRuleCache {
 		return cache.get(name);
 	}
 
+	public Iterable<SharedRule> getRules() {
+		return cache.values();
+	}
+
 }

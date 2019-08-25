@@ -55,6 +55,8 @@ public class RuleGraphManager {
 		EventBus.getInstance().addEventHandler(EventType.SELECT_TARGET_RULE, e -> {
 			nextSelectedRuleIsTarget.set(true);
 		});
+		
+		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> checkIfCurrentTransformationStateExistsAsRule(((WithSharedRuleEvent)e).getSelectedRule()));
 
 		JPopupMenu popup = new JPopupMenu();
 		JMenuItem refreshButton = new JMenuItem("Refresh");
@@ -66,6 +68,19 @@ public class RuleGraphManager {
 		popup.add(refreshButton);
 
 		graph.getViewPanel().setComponentPopupMenu(popup);
+	}
+	
+	private void checkIfCurrentTransformationStateExistsAsRule(SharedRule updatedRule) {
+		for(SharedRule rule : App.getRemoteRuleCache().getRules()) {
+			if(rule != updatedRule &&  App.getRuleChangeEventStore().checkRulesCompatible(rule, updatedRule).isEmpty()) {
+				EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, rule.getName(), false));
+				edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), rule.getName()));
+				graph.refreshEdges(edges);
+				graph.selectNode(rule.getName(), false, nodesByUUID, ruleByUUID);
+				nextSelectedRuleIsTargetId.set(rule.getName());
+				return;
+			}
+		}
 	}
 
 	private ClickableGraph createVisualization() {
@@ -94,6 +109,7 @@ public class RuleGraphManager {
 						edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), id));
 						graph.refreshEdges(edges);
 						graph.selectNode(id, false, nodesByUUID, ruleByUUID);
+						nextSelectedRuleIsTargetId.set(id);
 					} else {
 						JOptionPane.showMessageDialog(null, "Please select a rule that is compatible with your current transformation state:\n" + String.join("\n", warnings),
 								"Rule cannot be matched", JOptionPane.ERROR_MESSAGE);

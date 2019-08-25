@@ -416,8 +416,14 @@ public class RuleChangeEventStore {
 					if (!propertiesRebuilt.containsKey(key)) {
 						allMapped = false;
 					}
-
-					allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+					if (propertiesRebuilt.get(key) == null) {
+						if (propertiesClicked.get(key) != null) {
+							allMapped = false;
+						}
+						//both null -> OK
+					} else {
+						allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+					}
 				}
 
 				if (!allMapped) {
