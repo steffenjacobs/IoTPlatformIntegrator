@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.swing.SwingUtilities;
+
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
@@ -42,12 +44,14 @@ public class ClickableGraph implements ViewerListener {
 
 	final static boolean enableFineLogging = false;
 
+	private Viewer viewer;
+
 	public ClickableGraph(ViewerListener listener) {
 		System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 		this.listener = listener;
 		graph = new SingleGraph("RuleNetGraph");
 
-		Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+		viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
 		viewer.enableAutoLayout();
 		view = viewer.addDefaultView(false);
 
@@ -116,30 +120,30 @@ public class ClickableGraph implements ViewerListener {
 	}
 
 	public void refreshEdges(Set<Pair<String>> edges) {
-		lock.lock();
-		edges = new HashSet<Pair<String>>(edges);
-		if (enableFineLogging) {
-			LOG.info("Cleared edges.");
-			LOG.info("Available nodes: {}", graph.getNodeSet());
-		}
-		clearEdges();
-		for (Pair<String> edge : edges) {
-			try {
-				Edge e = graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
-				e.addAttribute("ui.style", "fill-color: #c5ccd1;");
-			} catch (ElementNotFoundException | IdAlreadyInUseException e) {
-				if (enableFineLogging) {
-					LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
+		SwingUtilities.invokeLater(() -> {
+			lock.lock();
+			if (enableFineLogging) {
+				LOG.info("Cleared edges.");
+				LOG.info("Available nodes: {}", graph.getNodeSet());
+			}
+			clearEdges();
+			for (Pair<String> edge : edges) {
+				try {
+					Edge e = graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
+					e.addAttribute("ui.style", "fill-color: #c5ccd1;");
+				} catch (ElementNotFoundException | IdAlreadyInUseException e) {
+					if (enableFineLogging) {
+						LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
+					}
 				}
 			}
-		}
-		lock.unlock();
+			viewer.enableAutoLayout();
+			lock.unlock();
+		});
 	}
 
 	private void clearEdges() {
-		for (int i = 0; i < graph.getEdgeCount(); i++) {
-			graph.removeEdge(i);
-		}
+		graph.getEdgeSet().forEach(graph::removeEdge);
 	}
 
 	public void selectNode(String id, boolean suppressEvents, Map<String, Node> nodesByUUID, Map<String, SharedRule> ruleByUUID) {
