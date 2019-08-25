@@ -2,7 +2,11 @@ package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -14,11 +18,17 @@ import javax.swing.JPanel;
 
 import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.ExportRuleToPlatformEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectTargetRuleEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
+import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleBuilderRenderController;
 
 /** @author Steffen Jacobs */
@@ -68,8 +78,20 @@ public class RuleBuilder extends JPanel {
 		selectTargetRuleButton.addActionListener(e -> {
 			EventBus.getInstance().fireEvent(new SelectTargetRuleEvent());
 		});
-
 		buttonBar.add(selectTargetRuleButton);
+
+		final JButton newRuleButton = new JButton("New Rule");
+		newRuleButton.addActionListener(e -> {
+			final Set<SharedTrigger> triggers = new HashSet<>();
+			
+			final Map<String, Object> properties = new HashMap<>();
+			properties.put(TriggerTypeSpecificKey.Command.getKeyString(), Command.On);
+			properties.put(TriggerTypeSpecificKey.ItemName.getKeyString(), new ItemDirectory().getItemByName(null));
+			triggers.add(new SharedTrigger(TriggerType.CommandReceived, properties, "<new trigger>", "<new trigger>", 0));
+			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(new SharedRule("<new>", UUID.randomUUID().toString(), "Newly created rule", "VISIBLE", "IDLE", triggers, new HashSet<>(), new HashSet<>())));
+		});
+		buttonBar.add(newRuleButton);
+
 		buttonBar.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		this.add(buttonBar, BorderLayout.SOUTH);
 		buttonBar.setEnabled(false);
