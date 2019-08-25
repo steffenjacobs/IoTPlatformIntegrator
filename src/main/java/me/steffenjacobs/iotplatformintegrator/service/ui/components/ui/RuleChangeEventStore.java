@@ -285,6 +285,13 @@ public class RuleChangeEventStore {
 	}
 
 	public List<String> checkRulesCompatible(SharedRule clickedRule, SharedRule rebuiltRule) {
+		return checkRulesCompatible(clickedRule, rebuiltRule, true);
+	}
+
+	/**
+	 * Strict mode allows checking only the rule structure, not the actual values
+	 */
+	public List<String> checkRulesCompatible(SharedRule clickedRule, SharedRule rebuiltRule, boolean strict) {
 		List<String> warnings = new ArrayList<>();
 		if (clickedRule.getActions().size() != rebuiltRule.getActions().size()) {
 			warnings.add(String.format("Target rule has to contain the same amount of actions (%s vs. %s).", clickedRule.getActions().size(), rebuiltRule.getActions().size()));
@@ -302,20 +309,20 @@ public class RuleChangeEventStore {
 			return warnings;
 		}
 
-		warnings = actionsMatch(clickedRule.getActions(), rebuiltRule.getActions());
+		warnings = actionsMatch(clickedRule.getActions(), rebuiltRule.getActions(), strict);
 		if (!warnings.isEmpty()) {
 			return warnings;
 		}
 
-		warnings = conditionsMatch(clickedRule.getConditions(), rebuiltRule.getConditions());
+		warnings = conditionsMatch(clickedRule.getConditions(), rebuiltRule.getConditions(), strict);
 		if (!warnings.isEmpty()) {
 			return warnings;
 		}
-		warnings = triggersMatch(clickedRule.getTriggers(), rebuiltRule.getTriggers());
+		warnings = triggersMatch(clickedRule.getTriggers(), rebuiltRule.getTriggers(), strict);
 		return warnings;
 	}
 
-	private List<String> actionsMatch(Set<SharedAction> actionsClicked, Set<SharedAction> actionsRebuilt) {
+	private List<String> actionsMatch(Set<SharedAction> actionsClicked, Set<SharedAction> actionsRebuilt, boolean strict) {
 		List<String> warnings = new ArrayList<>();
 		int mappedActionCount = 0;
 		for (SharedAction actionClicked : actionsClicked) {
@@ -337,7 +344,9 @@ public class RuleChangeEventStore {
 						allMapped = false;
 					}
 
-					allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+					if (strict) {
+						allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+					}
 				}
 
 				if (!allMapped) {
@@ -355,7 +364,7 @@ public class RuleChangeEventStore {
 		return warnings;
 	}
 
-	private List<String> conditionsMatch(Set<SharedCondition> conditionsClicked, Set<SharedCondition> conditionsRebuilt) {
+	private List<String> conditionsMatch(Set<SharedCondition> conditionsClicked, Set<SharedCondition> conditionsRebuilt, boolean strict) {
 		List<String> warnings = new ArrayList<>();
 		int mappedConditionCount = 0;
 		for (SharedCondition conditionClicked : conditionsClicked) {
@@ -376,8 +385,9 @@ public class RuleChangeEventStore {
 					if (!propertiesRebuilt.containsKey(key)) {
 						allMapped = false;
 					}
-
-					allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+					if (strict) {
+						allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+					}
 				}
 
 				if (!allMapped) {
@@ -395,7 +405,7 @@ public class RuleChangeEventStore {
 		return warnings;
 	}
 
-	private List<String> triggersMatch(Set<SharedTrigger> triggersClicked, Set<SharedTrigger> triggersRebuilt) {
+	private List<String> triggersMatch(Set<SharedTrigger> triggersClicked, Set<SharedTrigger> triggersRebuilt, boolean strict) {
 		List<String> warnings = new ArrayList<>();
 		int mappedTriggerCount = 0;
 		for (SharedTrigger triggerClicked : triggersClicked) {
@@ -420,9 +430,11 @@ public class RuleChangeEventStore {
 						if (propertiesClicked.get(key) != null) {
 							allMapped = false;
 						}
-						//both null -> OK
+						// both null -> OK
 					} else {
-						allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+						if (strict) {
+							allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
+						}
 					}
 				}
 

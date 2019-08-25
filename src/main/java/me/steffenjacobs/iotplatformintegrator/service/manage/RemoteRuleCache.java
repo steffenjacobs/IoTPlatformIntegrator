@@ -31,7 +31,10 @@ public class RemoteRuleCache implements RuleAnalyzer {
 	}
 
 	public Iterable<SharedRule> getRulesWithItemNameContaining(String searchText) {
-		Collection<SharedRule> rulesWithItemNames = new ArrayList<>();
+		if(searchText == null || searchText.isEmpty()) {
+			return new ArrayList<SharedRule>();
+		}
+		final Collection<SharedRule> rulesWithItemNames = new ArrayList<>();
 		for (SharedRule rule : cache.values()) {
 			if (aggregateItemsFromRuleWithoutDuplicates(rule).stream().flatMap(s -> Arrays.asList(s.getName(), s.getLabel()).stream())
 					.filter(s -> s.toLowerCase().contains(searchText.toLowerCase())).count() > 0) {
@@ -40,5 +43,4 @@ public class RemoteRuleCache implements RuleAnalyzer {
 		}
 		return rulesWithItemNames;
 	}
-
 }

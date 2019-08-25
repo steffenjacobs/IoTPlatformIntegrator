@@ -37,6 +37,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementChangeEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleRenderEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRenderer;
@@ -254,6 +255,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		for (SharedAction action : rule.getActions()) {
 			ruleBuilder.appendDynamicElement(renderAction(action, actionRenderer));
 		}
+		EventBus.getInstance().fireEvent(new RuleRenderEvent(rule));
 	}
 
 	private DynamicElement renderTrigger(SharedTrigger trigger, TriggerRenderer<Component> triggerRenderer) {

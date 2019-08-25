@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,6 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDif
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.ItemFilterChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
@@ -55,6 +56,8 @@ public class RuleGraphManager {
 
 	private JPanel graphPanel;
 
+	private SharedRule lastSelectedRule;
+
 	public RuleGraphManager() {
 		graph = createVisualization();
 
@@ -66,11 +69,27 @@ public class RuleGraphManager {
 		EventBus.getInstance().addEventHandler(EventType.SELECT_TARGET_RULE, e -> {
 			nextSelectedRuleIsTarget.set(true);
 		});
-		EventBus.getInstance().addEventHandler(EventType.ITEM_FILTER_CHANGE, e -> visualizeItemFilter(((ItemFilterChangeEvent) e).getSearchText()));
-
 		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> checkIfCurrentTransformationStateExistsAsRule(((WithSharedRuleEvent) e).getSelectedRule()));
+		
+		EventBus.getInstance().addEventHandler(EventType.RULE_RENDER, e -> this.lastSelectedRule = ((WithSharedRuleEvent)e).getSelectedRule());
 
 		final JPanel buttonPanel = new JPanel(new FlowLayout());
+
+		// find current rule button
+		final JButton findCurrentRuleButton = new JButton("Find current rule");
+		findCurrentRuleButton.addActionListener(e -> {
+			if (lastSelectedRule != null) {
+
+				final Collection<SharedRule> rules = new ArrayList<>();
+				for (SharedRule rule : App.getRemoteRuleCache().getRules()) {
+					List<String> warnings = App.getRuleChangeEventStore().checkRulesCompatible(lastSelectedRule, rule, false);
+					if (warnings.isEmpty()) {
+						rules.add(rule);
+					}
+				}
+				selectRuleNodes(rules);
+			}
+		});
 
 		// search field
 		final PlaceholderTextField searchItemName = new PlaceholderTextField("Search for Item Name...");
@@ -80,17 +99,17 @@ public class RuleGraphManager {
 		searchItemName.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				EventBus.getInstance().fireEvent(new ItemFilterChangeEvent(searchItemName.getText()));
+				visualizeItemFilter(searchItemName.getText());
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				EventBus.getInstance().fireEvent(new ItemFilterChangeEvent(searchItemName.getText()));
+				visualizeItemFilter(searchItemName.getText());
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				EventBus.getInstance().fireEvent(new ItemFilterChangeEvent(searchItemName.getText()));
+				visualizeItemFilter(searchItemName.getText());
 			}
 		});
 
@@ -106,6 +125,7 @@ public class RuleGraphManager {
 		// add buttons to panel
 		buttonPanel.add(refreshButton);
 		buttonPanel.add(searchItemName);
+		buttonPanel.add(findCurrentRuleButton);
 
 		// add button panel
 		graphPanel = new JPanel(new BorderLayout());
@@ -124,15 +144,16 @@ public class RuleGraphManager {
 
 	}
 
-	private void visualizeItemFilter(String searchText) {
+	private void selectRuleNodes(Iterable<SharedRule> rules) {
 		// clear selection
 		ruleByUUID.values().forEach(r -> graph.selectFilterNode(r.getName(), false, nodesByUUID::get));
 
 		// apply new selection
-		if (searchText != null && !searchText.isEmpty()) {
-			App.getRemoteRuleCache().getRulesWithItemNameContaining(searchText).forEach(r -> graph.selectFilterNode(r.getName(), true, nodesByUUID::get));
-		}
+		rules.forEach(r -> graph.selectFilterNode(r.getName(), true, nodesByUUID::get));
+	}
 
+	private void visualizeItemFilter(String searchText) {
+		selectRuleNodes(App.getRemoteRuleCache().getRulesWithItemNameContaining(searchText));
 	}
 
 	private void checkIfCurrentTransformationStateExistsAsRule(SharedRule updatedRule) {
