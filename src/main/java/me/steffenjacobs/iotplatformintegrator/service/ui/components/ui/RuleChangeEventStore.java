@@ -344,7 +344,7 @@ public class RuleChangeEventStore {
 						allMapped = false;
 					}
 
-					if (strict) {
+					if (key == ActionTypeSpecificKey.ItemName || key == ActionTypeSpecificKey.Command || strict) {
 						allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
 					}
 				}
@@ -385,7 +385,7 @@ public class RuleChangeEventStore {
 					if (!propertiesRebuilt.containsKey(key)) {
 						allMapped = false;
 					}
-					if (strict) {
+					if (key == ConditionTypeSpecificKey.ItemName || key == ConditionTypeSpecificKey.Operator || strict) {
 						allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
 					}
 				}
@@ -432,7 +432,7 @@ public class RuleChangeEventStore {
 						}
 						// both null -> OK
 					} else {
-						if (strict) {
+						if ((key != TriggerTypeSpecificKey.State && key != TriggerTypeSpecificKey.PreviousState) || strict) {
 							allMapped &= propertiesRebuilt.get(key).equals(propertiesClicked.get(key));
 						}
 					}
