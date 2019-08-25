@@ -9,15 +9,15 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 
 /** @author Steffen Jacobs */
 public interface RuleAnalyzer {
-	default Iterable<SharedItem> aggregateItemsFromRuleWithoutDuplicates(SharedRule rule) {
+	default Collection<SharedItem> aggregateItemsFromRuleWithoutDuplicates(SharedRule rule) {
 		return aggregateItemsFromRule(rule, new HashSet<>());
 	}
 
-	default Iterable<SharedItem> aggregateItemsFromRuleWithDuplicates(SharedRule rule) {
+	default Collection<SharedItem> aggregateItemsFromRuleWithDuplicates(SharedRule rule) {
 		return aggregateItemsFromRule(rule, new ArrayList<>());
 	}
 
-	default Iterable<SharedItem> aggregateItemsFromRule(SharedRule rule, Collection<SharedItem> items) {
+	default Collection<SharedItem> aggregateItemsFromRule(SharedRule rule, Collection<SharedItem> items) {
 		rule.getActions().forEach(a -> a.getActionTypeContainer().getActionTypeSpecificValues().values().forEach(e -> {
 			if (e instanceof SharedItem) {
 				items.add((SharedItem) e);

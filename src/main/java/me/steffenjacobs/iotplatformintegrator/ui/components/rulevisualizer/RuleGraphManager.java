@@ -1,5 +1,9 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,10 +11,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.graphstream.graph.Node;
 import org.graphstream.ui.view.ViewerListener;
@@ -22,6 +29,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDif
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.ItemFilterChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChangeEvent;
@@ -29,6 +37,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToD
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
 import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
+import me.steffenjacobs.iotplatformintegrator.ui.util.PlaceholderTextField;
 
 /** @author Steffen Jacobs */
 public class RuleGraphManager {
@@ -44,6 +53,8 @@ public class RuleGraphManager {
 
 	private final ClickableGraph graph;
 
+	private JPanel graphPanel;
+
 	public RuleGraphManager() {
 		graph = createVisualization();
 
@@ -55,24 +66,75 @@ public class RuleGraphManager {
 		EventBus.getInstance().addEventHandler(EventType.SELECT_TARGET_RULE, e -> {
 			nextSelectedRuleIsTarget.set(true);
 		});
-		
-		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> checkIfCurrentTransformationStateExistsAsRule(((WithSharedRuleEvent)e).getSelectedRule()));
+		EventBus.getInstance().addEventHandler(EventType.ITEM_FILTER_CHANGE, e -> visualizeItemFilter(((ItemFilterChangeEvent) e).getSearchText()));
 
-		JPopupMenu popup = new JPopupMenu();
-		JMenuItem refreshButton = new JMenuItem("Refresh");
-		refreshButton.addActionListener(e -> {
+		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> checkIfCurrentTransformationStateExistsAsRule(((WithSharedRuleEvent) e).getSelectedRule()));
+
+		final JPopupMenu popup = new JPopupMenu();
+		final JMenuItem refreshMenu = new JMenuItem("Refresh");
+		final ActionListener refreshAction = e -> {
 			App.getRemoteRuleController().refreshRules();
 			EventBus.getInstance().fireEvent(new RefreshRuleDiffsEvent());
-		});
+		};
+		refreshMenu.addActionListener(refreshAction);
 
-		popup.add(refreshButton);
+		popup.add(refreshMenu);
 
 		graph.getViewPanel().setComponentPopupMenu(popup);
+
+		graphPanel = new JPanel(new BorderLayout());
+
+		final JPanel buttonPanel = new JPanel(new FlowLayout());
+
+		// refresh button
+		final JButton refreshButton = new JButton("Refresh");
+		refreshButton.addActionListener(refreshAction);
+		buttonPanel.add(refreshButton);
+
+		// search field
+		final PlaceholderTextField searchItemName = new PlaceholderTextField("Search for Item Name...");
+		searchItemName.setColumns(15);
+		final Font f = searchItemName.getFont();
+		searchItemName.setFont(new Font(f.getName(), f.getStyle(), 18));
+		searchItemName.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				EventBus.getInstance().fireEvent(new ItemFilterChangeEvent(searchItemName.getText()));
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				EventBus.getInstance().fireEvent(new ItemFilterChangeEvent(searchItemName.getText()));
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				EventBus.getInstance().fireEvent(new ItemFilterChangeEvent(searchItemName.getText()));
+			}
+		});
+
+		buttonPanel.add(searchItemName);
+
+		// add button panel
+		graphPanel.add(buttonPanel, BorderLayout.NORTH);
+
+		graphPanel.add(graph.getViewPanel(), BorderLayout.CENTER);
 	}
-	
+
+	private void visualizeItemFilter(String searchText) {
+		// clear selection
+		ruleByUUID.values().forEach(r -> graph.selectFilterNode(r.getName(), false, nodesByUUID::get));
+
+		// apply new selection
+		if (searchText != null && !searchText.isEmpty()) {
+			App.getRemoteRuleCache().getRulesWithItemNameContaining(searchText).forEach(r -> graph.selectFilterNode(r.getName(), true, nodesByUUID::get));
+		}
+
+	}
+
 	private void checkIfCurrentTransformationStateExistsAsRule(SharedRule updatedRule) {
-		for(SharedRule rule : App.getRemoteRuleCache().getRules()) {
-			if(rule != updatedRule &&  App.getRuleChangeEventStore().checkRulesCompatible(rule, updatedRule).isEmpty()) {
+		for (SharedRule rule : App.getRemoteRuleCache().getRules()) {
+			if (rule != updatedRule && App.getRuleChangeEventStore().checkRulesCompatible(rule, updatedRule).isEmpty()) {
 				EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, rule.getName(), false));
 				edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), rule.getName()));
 				graph.refreshEdges(edges);
@@ -220,7 +282,7 @@ public class RuleGraphManager {
 	}
 
 	public JPanel getGraphPanel() {
-		return graph.getViewPanel();
+		return graphPanel;
 	}
 
 }

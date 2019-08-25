@@ -1,11 +1,11 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import javax.swing.SwingUtilities;
 
@@ -144,6 +144,35 @@ public class ClickableGraph implements ViewerListener {
 
 	private void clearEdges() {
 		graph.getEdgeSet().forEach(graph::removeEdge);
+	}
+
+	public void selectFilterNode(String id, boolean filtered, Function<String, Node> nodesByUUID) {
+		lock.lock();
+		Node node = nodesByUUID.apply(id);
+		// only continue with existing and non-diff nodes
+		if (node != null && !nodeWithType.get(node)) {
+			if (filtered) {
+				node.addAttribute("ui.style", "stroke-mode: none;");
+				node.removeAttribute("ui.style");
+
+				node.addAttribute("ui.style", "fill-color: #8bc4a6;");
+				node.addAttribute("ui.style", "size: 15px;");
+
+				lock.unlock();
+			} else {
+				// reset filter
+				node.addAttribute("ui.style", "stroke-mode: none;");
+				node.removeAttribute("ui.style");
+
+				node.addAttribute("ui.style", "fill-color: #23729e;");
+				node.addAttribute("ui.style", "size: 15px;");
+				lock.unlock();
+			}
+			// node.addAttribute(attribute, values);
+		} else {
+			LOG.error("Could not filter node {}", id);
+			lock.unlock();
+		}
 	}
 
 	public void selectNode(String id, boolean suppressEvents, Map<String, Node> nodesByUUID, Map<String, SharedRule> ruleByUUID) {
