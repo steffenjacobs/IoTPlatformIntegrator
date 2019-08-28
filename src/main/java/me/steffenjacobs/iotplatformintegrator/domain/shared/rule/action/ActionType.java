@@ -4,7 +4,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementTy
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 
 /** @author Steffen Jacobs */
-public enum ActionType implements SharedElementType{
+public enum ActionType implements SharedElementType {
 
 	EnableDisableRule(new ActionTypeSpecificKey[] { ActionTypeSpecificKey.Enable, ActionTypeSpecificKey.RuleUUIDs }), //
 	ExecuteScript(new ActionTypeSpecificKey[] { ActionTypeSpecificKey.Type, ActionTypeSpecificKey.Script }), //
@@ -24,7 +24,7 @@ public enum ActionType implements SharedElementType{
 		return typeSpecificKeys;
 	}
 
-	public static enum ActionTypeSpecificKey implements SharedTypeSpecificKey{
+	public static enum ActionTypeSpecificKey implements SharedTypeSpecificKey {
 		Enable("enable", "Enable"), RuleUUIDs("ruleUIDs", "Rule UUIDs"), Type("type", "Type"), Script("script", "Script"), Sink("sink", "Sink"), Sound("sound",
 				"Sound"), ConsiderConditions("considerConditions", "Consider conditions"), Text("text", "Text"), ItemName("itemName", "Item Name"), Command("command", "Command");
 
@@ -48,5 +48,9 @@ public enum ActionType implements SharedElementType{
 	@Override
 	public String getType() {
 		return ACTION_TYPE;
+	}
+
+	public static ActionType[] acceptableValues() {
+		return new ActionType[] { ItemCommand, EnableDisableRule, ExecuteScript, PlaySound, RunRules, SaySomething };
 	}
 }

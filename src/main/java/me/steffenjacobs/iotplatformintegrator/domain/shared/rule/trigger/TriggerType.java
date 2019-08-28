@@ -49,4 +49,8 @@ public enum TriggerType implements SharedElementType {
 	public String getType() {
 		return TRIGGER_TYPE;
 	}
+
+	public static TriggerType[] acceptableValues() {
+		return new TriggerType[] { ItemStateChanged, CommandReceived, ItemStateUpdated, Timed, TriggerChannelFired, GeoLocationChanged };
+	}
 }

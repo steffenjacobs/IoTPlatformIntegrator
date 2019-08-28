@@ -130,7 +130,7 @@ public abstract class DynamicElement extends JPanel {
 		selectionPopup.addSeparator();
 
 		selectionPopup.add(new JLabel("Triggers"));
-		for (TriggerType triggerType : TriggerType.values()) {
+		for (TriggerType triggerType : TriggerType.acceptableValues()) {
 			final JMenuItem menu = new JMenuItem(triggerType.name());
 			menu.addActionListener(l -> fireCreationEvent(ElementType.TRIGGER, triggerType, selectionPopup));
 			selectionPopup.add(menu);
@@ -138,7 +138,7 @@ public abstract class DynamicElement extends JPanel {
 
 		selectionPopup.addSeparator();
 		selectionPopup.add(new JLabel("Conditions"));
-		for (ConditionType conditionType : ConditionType.values()) {
+		for (ConditionType conditionType : ConditionType.acceptableValues()) {
 			final JMenuItem menu = new JMenuItem(conditionType.name());
 			menu.addActionListener(l -> fireCreationEvent(ElementType.CONDITION, conditionType, selectionPopup));
 			selectionPopup.add(menu);
@@ -146,7 +146,7 @@ public abstract class DynamicElement extends JPanel {
 
 		selectionPopup.addSeparator();
 		selectionPopup.add(new JLabel("Actions"));
-		for (ActionType actionType : ActionType.values()) {
+		for (ActionType actionType : ActionType.acceptableValues()) {
 			final JMenuItem menu = new JMenuItem(actionType.name());
 			menu.addActionListener(l -> fireCreationEvent(ElementType.ACTION, actionType, selectionPopup));
 			selectionPopup.add(menu);

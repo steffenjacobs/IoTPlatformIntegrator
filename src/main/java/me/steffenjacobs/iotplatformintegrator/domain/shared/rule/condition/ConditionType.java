@@ -46,4 +46,8 @@ public enum ConditionType implements SharedElementType {
 	public String getType() {
 		return CONDITION_TYPE;
 	}
+
+	public static ConditionType[] acceptableValues() {
+		return new ConditionType[] { ItemState, TimeOfDay, DayOfWeek, ScriptEvaluatesTrue };
+	}
 }
