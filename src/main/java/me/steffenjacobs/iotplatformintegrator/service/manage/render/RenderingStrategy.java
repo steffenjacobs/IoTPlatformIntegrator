@@ -7,7 +7,7 @@ import java.util.List;
 
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.Token.TokenType;
 
 /** @author Steffen Jacobs */
 public interface RenderingStrategy<ComponentType> {

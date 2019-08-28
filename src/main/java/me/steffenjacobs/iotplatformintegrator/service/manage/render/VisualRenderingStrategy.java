@@ -14,7 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Comman
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.Token.TokenType;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleComponentRegistry;
 
 /** @author Steffen Jacobs */

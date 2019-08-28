@@ -13,20 +13,20 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRule
 import me.steffenjacobs.iotplatformintegrator.service.shared.PseudocodeGenerator;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
-import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.Token.TokenType;
+import me.steffenjacobs.iotplatformintegrator.ui.components.PseudocodeEditor;
 
 /** @author Steffen Jacobs */
-public class CodeEditorController {
+public class PseudocodeEditorController {
 
 	private static final PseudocodeGenerator pseudocodeGenerator = new PseudocodeGenerator();
-	private final CodeEditor codeEditor;
+	private final PseudocodeEditor codeEditor;
 	private final SettingService settingService;
 
 	private final ArrayList<Token> tokens = new ArrayList<>();
 	private SharedRule rule = null;
 
-	public CodeEditorController(CodeEditor codeEditor, SettingService settingService) {
+	public PseudocodeEditorController(PseudocodeEditor codeEditor, SettingService settingService) {
 		this.codeEditor = codeEditor;
 		this.settingService = settingService;
 

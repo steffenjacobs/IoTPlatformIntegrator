@@ -10,22 +10,22 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
-import me.steffenjacobs.iotplatformintegrator.ui.components.CodeEditor;
+import me.steffenjacobs.iotplatformintegrator.ui.components.PseudocodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
 public class ImportPerspective extends Perspective {
 
-	private final CodeEditor codeText;
+	private final PseudocodeEditor codeText;
 	private final JPanel connectionExplorerPanel = new JPanel();
 	private final JPanel ruleTablePanel = new JPanel();
 
 	public ImportPerspective(SettingService settingService) {
-		codeText = new CodeEditor(settingService);
-		CodeEditorController controller = new CodeEditorController(codeText, settingService);
+		codeText = new PseudocodeEditor(settingService);
+		PseudocodeEditorController controller = new PseudocodeEditorController(codeText, settingService);
 		codeText.setController(controller);
 
 		connectionExplorerPanel.setLayout(new BorderLayout());

@@ -17,19 +17,19 @@ import org.apache.commons.lang3.StringUtils;
 import me.steffenjacobs.extern.TextLineNumber;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController;
 
 /** @author Steffen Jacobs */
-public class CodeEditor extends JPanel {
+public class PseudocodeEditor extends JPanel {
 
 	private static final long serialVersionUID = 9063897186457029715L;
 
 	private final JTextPane tp;
 	private final SettingService settingService;
 
-	private CodeEditorController controller;
+	private PseudocodeEditorController controller;
 
-	public CodeEditor(SettingService settingService) {
+	public PseudocodeEditor(SettingService settingService) {
 		super();
 		this.settingService = settingService;
 		this.setLayout(new BorderLayout());
@@ -124,7 +124,7 @@ public class CodeEditor extends JPanel {
 		appendToPane("Select a rule to see the generated pseudocode.", Color.BLACK, false);
 	}
 
-	public void setController(CodeEditorController controller) {
+	public void setController(PseudocodeEditorController controller) {
 		this.controller = controller;
 	}
 }

@@ -17,9 +17,9 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.render.ActionRender
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.ConditionRenderer;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.PseudoCodeRenderingStrategy;
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRenderer;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.ReferenceToken;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token;
-import me.steffenjacobs.iotplatformintegrator.service.ui.components.CodeEditorController.Token.TokenType;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.ReferenceToken;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.Token;
+import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.Token.TokenType;
 
 /** @author Steffen Jacobs */
 public class PseudocodeGenerator {
