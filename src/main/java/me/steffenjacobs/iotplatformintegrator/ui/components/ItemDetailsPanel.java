@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -25,7 +27,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.jfree.ui.tabbedui.VerticalLayout;
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,11 +118,11 @@ public class ItemDetailsPanel extends JPanel {
 
 			imagePanel.revalidate();
 			imagePanel.repaint();
-			new Thread(() -> {
+			ForkJoinPool.commonPool().execute(() -> {
 				final Set<String> urls = new HashSet<>();
 				App.getBabelnetrequester().requestSynsets(item.getLabel(), (BabelLanguage) selectSourceLang.getSelectedItem(), BabelLanguage.ENGLISH).values().stream()
 						.flatMap(s -> s.getImages().stream().map(me.steffenjacobs.extern.babelnetconnector.domain.Image::getUrl).limit(5)).filter(i -> !urls.contains(i)).limit(5)
-						.filter(i -> i != null).map(i -> {
+						.filter(Objects::nonNull).map(i -> {
 							// resize graphic and render it onto label
 							try {
 								final BufferedImage img = ImageIO.read(new URL(i));
@@ -143,7 +144,7 @@ public class ItemDetailsPanel extends JPanel {
 								LOG.error(e.getMessage(), e);
 								return null;
 							}
-						}).filter(i -> i != null).forEach(imagePanel::add);
+						}).filter(Objects::nonNull).forEach(imagePanel::add);
 
 				// remove spinner
 				imagePanel.remove(0);
@@ -156,7 +157,7 @@ public class ItemDetailsPanel extends JPanel {
 					imagePanel.repaint();
 				});
 
-			}).start();
+			});
 
 		});
 
