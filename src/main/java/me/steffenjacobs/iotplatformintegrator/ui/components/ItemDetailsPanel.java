@@ -1,18 +1,33 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import org.jfree.ui.tabbedui.VerticalLayout;
+
+import me.steffenjacobs.extern.babelnetconnector.BabelLanguage;
+import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.StateType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
@@ -33,7 +48,6 @@ public class ItemDetailsPanel extends JPanel {
 
 	private final JPanel noItemSelected, itemSelected;
 
-	@SuppressWarnings("unused")
 	private SharedItem item = null;
 
 	public ItemDetailsPanel() {
@@ -72,6 +86,7 @@ public class ItemDetailsPanel extends JPanel {
 		// Add form panel to panel
 		itemSelected = new JPanel();
 		itemSelected.add(form);
+		itemSelected.add(createBabelLayout());
 
 		itemSelected.setBorder(BorderFactory.createTitledBorder("Item Details"));
 		itemSelected.setLayout(new BoxLayout(itemSelected, BoxLayout.Y_AXIS));
@@ -82,6 +97,68 @@ public class ItemDetailsPanel extends JPanel {
 		super.add(noItemSelected, BorderLayout.NORTH);
 
 		EventBus.getInstance().addEventHandler(EventType.SELECTED_ITEM_CHANGE, e -> setDisplayedItem(((SelectedItemChangedEvent) e).getItem()));
+	}
+
+	private JPanel createBabelLayout() {
+		final JPanel babelPanel = new JPanel(new VerticalLayout());
+		final JComboBox<BabelLanguage> selectSourceLang = new JComboBox<>(BabelLanguage.values());
+		selectSourceLang.setRenderer((list, value, index, isSelected, cellHasFocus) -> new JLabel(value.getDisplayName()));
+
+		final JButton searchButton = new JButton("Show Images");
+		final JPanel imagePanel = new JPanel(new VerticalLayout());
+
+		searchButton.addActionListener(l -> {
+			imagePanel.removeAll();
+			URL url = getClass().getClassLoader().getResource("spinner.gif");
+			ImageIcon imageIcon = new ImageIcon(url);
+			imagePanel.add(new JLabel(imageIcon));
+
+			imagePanel.revalidate();
+			imagePanel.repaint();
+			new Thread(() -> {
+				final Set<String> urls = new HashSet<>();
+				App.getBabelnetrequester().requestSynsets(item.getLabel(), (BabelLanguage) selectSourceLang.getSelectedItem(), BabelLanguage.ENGLISH).values().stream()
+						.flatMap(s -> s.getImages().stream().map(me.steffenjacobs.extern.babelnetconnector.domain.Image::getUrl).limit(5)).filter(i -> !urls.contains(i)).limit(5)
+						.filter(i -> i != null).map(i -> {
+							BufferedImage img;
+							try {
+								img = ImageIO.read(new URL(i));
+								if (img == null) {
+									return null;
+								}
+								int newHeight = (int) (img.getHeight() / (double) img.getWidth() * 250);
+								final BufferedImage resized = new BufferedImage(250, newHeight, img.getType());
+								Graphics2D g = resized.createGraphics();
+								g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+								g.drawImage(img, 0, 0, 250, newHeight, 0, 0, img.getWidth(), img.getHeight(), null);
+								g.dispose();
+
+								final ImageIcon icon = new ImageIcon(resized);
+								final JLabel lbl = new JLabel();
+								lbl.setIcon(icon);
+								return lbl;
+							} catch (IOException e) {
+								return new JLabel("Error: " + e.getMessage());
+							}
+						}).filter(i -> i != null).forEach(imagePanel::add);
+
+				imagePanel.remove(0);
+				SwingUtilities.invokeLater(() -> {
+					if (imagePanel.getComponentCount() == 0) {
+						imagePanel.add(new JLabel("No images found for " + item.getLabel()));
+					}
+					imagePanel.revalidate();
+					imagePanel.repaint();
+				});
+
+			}).start();
+
+		});
+
+		babelPanel.add(selectSourceLang);
+		babelPanel.add(searchButton);
+		babelPanel.add(imagePanel);
+		return babelPanel;
 	}
 
 	private void setDisplayedItem(SharedItem item) {
@@ -103,5 +180,4 @@ public class ItemDetailsPanel extends JPanel {
 		this.repaint();
 		this.revalidate();
 	}
-
 }

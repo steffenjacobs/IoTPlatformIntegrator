@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.extern.babelnetconnector.BabelnetRequester;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationService;
 import me.steffenjacobs.iotplatformintegrator.service.authentication.AuthenticationServiceImpl;
@@ -50,6 +51,8 @@ public class App {
 
 	private static ServerConnectionCache serverConnectionCache;
 
+	private static final BabelnetRequester babelnetRequester = new BabelnetRequester();
+
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		final SettingService settingService = new SettingService("./settings.config");
@@ -73,7 +76,6 @@ public class App {
 			remoteRuleController = new RemoteRuleController(mongoDbRuleDiffStorageService, mongoDbSharedRuleStorageService, mongoDbSharedItemStorageService);
 
 			ruleDiffManager = new RuleDiffManager(mongoDbRuleDiffStorageService);
-			
 
 			LOG.info("Setup complete.");
 		} catch (IOException e) {
@@ -130,6 +132,10 @@ public class App {
 
 	public static ServerConnectionCache getServerConnectionCache() {
 		return serverConnectionCache;
+	}
+
+	public static BabelnetRequester getBabelnetrequester() {
+		return babelnetRequester;
 	}
 
 }
