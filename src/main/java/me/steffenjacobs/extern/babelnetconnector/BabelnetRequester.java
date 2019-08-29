@@ -14,12 +14,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import me.steffenjacobs.extern.babelnetconnector.domain.Synset;
 import me.steffenjacobs.extern.babelnetconnector.domain.SynsetDescription;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 public class BabelnetRequester {
 	private static final Logger LOG = LoggerFactory.getLogger(BabelnetRequester.class);
 
 	// add some lifo cache
 	private Map<String, Map<String, Synset>> cache;
+
+	private final SettingService settingService;
+	
+	public BabelnetRequester(SettingService settingService) {
+		this.settingService = settingService;
+		
+	}
 
 	public Map<String, Synset> requestSynsets(String word, BabelLanguage searchLanguage, BabelLanguage targetLanguage) {
 
@@ -34,7 +43,7 @@ public class BabelnetRequester {
 
 		try {
 			List<SynsetDescription> readValue = mapper.readValue(new URL("https://babelnet.io/v5/getSynsetIds?lemma=" + word + "&searchLang=" + searchLanguage.getKey()
-					+ "&targetLang=" + targetLanguage.getKey() + "&key=e73aa086-6d60-4a61-ba57-08a6185358b5"), new TypeReference<List<SynsetDescription>>() {
+					+ "&targetLang=" + targetLanguage.getKey() + "&key=" + settingService.getSetting(SettingKey.BABELNET_API_KEY)), new TypeReference<List<SynsetDescription>>() {
 					});
 			readValue.forEach(synsetDescr -> {
 				synsetDescr.getId();

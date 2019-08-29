@@ -51,11 +51,12 @@ public class App {
 
 	private static ServerConnectionCache serverConnectionCache;
 
-	private static final BabelnetRequester babelnetRequester = new BabelnetRequester();
+	private static BabelnetRequester babelnetRequester;
 
 	public static void main(String[] args) {
 		LOG.info("Started.");
 		final SettingService settingService = new SettingService("./settings.config");
+		babelnetRequester = new BabelnetRequester(settingService);
 		ruleDiffCache = new RuleDiffCache();
 		remoteRuleCache = new RemoteRuleCache();
 		serverConnectionCache = new ServerConnectionCache();
