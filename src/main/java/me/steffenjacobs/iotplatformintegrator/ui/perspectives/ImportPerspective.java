@@ -14,6 +14,7 @@ import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEd
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.PseudocodeEditor;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
+import me.steffenjacobs.iotplatformintegrator.ui.components.ItemDetailsPanel;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DockableUtil;
 
 /** @author Steffen Jacobs */
@@ -60,6 +61,10 @@ public class ImportPerspective extends Perspective {
 		// create rule details window
 		SingleCDockable ruleDetailsWindow = DockableUtil.createDockable("RuleDetails-Window", "Rule Details", GlobalComponentHolder.getInstance().getRuleDetailsPanel());
 		control.addDockable(ruleDetailsWindow);
+		
+		// create item details window
+		SingleCDockable itemDetailsWindow = DockableUtil.createDockable("ItemDetails-Window", "Item Details", new ItemDetailsPanel());
+		control.addDockable(itemDetailsWindow);
 
 		// create connection explorer window
 		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorerPanel);
@@ -72,6 +77,7 @@ public class ImportPerspective extends Perspective {
 		grid.add(.4, 0, 1, 1, pseudocodeWindow);
 		grid.add(0, 1, .5, 1, ruleTableWindow);
 		grid.add(.5, 1, .5, 1, itemsTableWindow);
+		grid.add(1, 0, 1, 2, itemDetailsWindow);
 		grid.add(1, 0, 1, 2, ruleDetailsWindow);
 
 		control.getContentArea().deploy(grid);

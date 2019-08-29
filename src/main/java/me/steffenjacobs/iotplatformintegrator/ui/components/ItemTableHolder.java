@@ -1,12 +1,17 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedItemChangedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedServerConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.SourceConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.TargetConnectionChangeEvent;
@@ -19,9 +24,11 @@ public class ItemTableHolder {
 	}
 
 	private final JTable itemsTable;
+	private final List<SharedItem> indexedVisualizedItems = new ArrayList<>();
 
 	public ItemTableHolder(ItemTableHolderType type) {
 		itemsTable = createItemsTable();
+		setupItemsTable();
 
 		switch (type) {
 		case Default:
@@ -70,7 +77,17 @@ public class ItemTableHolder {
 		return table;
 	}
 
+	private void setupItemsTable() {
+		itemsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		itemsTable.getSelectionModel().addListSelectionListener(e -> {
+			final SharedItem item = indexedVisualizedItems.get(itemsTable.getSelectedRow());
+			EventBus.getInstance().fireEvent(new SelectedItemChangedEvent(item));
+		});
+	}
+
 	private void updateItemsTable(ServerConnection serverConnection) {
+		EventBus.getInstance().fireEvent(new SelectedItemChangedEvent(null));
+		indexedVisualizedItems.clear();
 		DefaultTableModel tableModel = (DefaultTableModel) itemsTable.getModel();
 		tableModel.setNumRows(0);
 		if (serverConnection == null) {
@@ -81,6 +98,7 @@ public class ItemTableHolder {
 				arr[1] = item.getLabel();
 				arr[2] = "" + item.getType();
 				tableModel.addRow(arr);
+				indexedVisualizedItems.add(item);
 			}
 			tableModel.fireTableDataChanged();
 
