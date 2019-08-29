@@ -25,6 +25,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.jfree.ui.tabbedui.VerticalLayout;
+import org.jfree.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.extern.babelnetconnector.BabelLanguage;
 import me.steffenjacobs.iotplatformintegrator.App;
@@ -38,6 +41,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedItem
 /** @author Steffen Jacobs */
 public class ItemDetailsPanel extends JPanel {
 	private static final long serialVersionUID = -3955999116242608088L;
+	private static final Logger LOG = LoggerFactory.getLogger(ItemDetailsPanel.class);
 
 	private final JTextField txtName;
 	private final JTextField txtLabel;
@@ -56,7 +60,7 @@ public class ItemDetailsPanel extends JPanel {
 		form.setLayout(new GridBagLayout());
 		FormUtility formUtility = new FormUtility();
 
-		// Add fields
+		// create form
 		formUtility.addLabel("Name: ", form);
 		txtName = new JTextField();
 		formUtility.addLastField(txtName, form);
@@ -109,9 +113,7 @@ public class ItemDetailsPanel extends JPanel {
 
 		searchButton.addActionListener(l -> {
 			imagePanel.removeAll();
-			URL url = getClass().getClassLoader().getResource("spinner.gif");
-			ImageIcon imageIcon = new ImageIcon(url);
-			imagePanel.add(new JLabel(imageIcon));
+			imagePanel.add(new JLabel(new ImageIcon(getClass().getClassLoader().getResource("spinner.gif"))));
 
 			imagePanel.revalidate();
 			imagePanel.repaint();
@@ -120,10 +122,12 @@ public class ItemDetailsPanel extends JPanel {
 				App.getBabelnetrequester().requestSynsets(item.getLabel(), (BabelLanguage) selectSourceLang.getSelectedItem(), BabelLanguage.ENGLISH).values().stream()
 						.flatMap(s -> s.getImages().stream().map(me.steffenjacobs.extern.babelnetconnector.domain.Image::getUrl).limit(5)).filter(i -> !urls.contains(i)).limit(5)
 						.filter(i -> i != null).map(i -> {
-							BufferedImage img;
+							// resize graphic and render it onto label
 							try {
-								img = ImageIO.read(new URL(i));
+								final BufferedImage img = ImageIO.read(new URL(i));
 								if (img == null) {
+									// invalid file format -> will be filtered out later
+									LOG.warn("Could not load image from '{}'.", i);
 									return null;
 								}
 								int newHeight = (int) (img.getHeight() / (double) img.getWidth() * 250);
@@ -133,17 +137,18 @@ public class ItemDetailsPanel extends JPanel {
 								g.drawImage(img, 0, 0, 250, newHeight, 0, 0, img.getWidth(), img.getHeight(), null);
 								g.dispose();
 
-								final ImageIcon icon = new ImageIcon(resized);
-								final JLabel lbl = new JLabel();
-								lbl.setIcon(icon);
-								return lbl;
+								return new JLabel(new ImageIcon(resized));
 							} catch (IOException e) {
-								return new JLabel("Error: " + e.getMessage());
+								// will be filtered out later
+								LOG.error(e.getMessage(), e);
+								return null;
 							}
 						}).filter(i -> i != null).forEach(imagePanel::add);
 
+				// remove spinner
 				imagePanel.remove(0);
 				SwingUtilities.invokeLater(() -> {
+					// show label if no items found
 					if (imagePanel.getComponentCount() == 0) {
 						imagePanel.add(new JLabel("No images found for " + item.getLabel()));
 					}
