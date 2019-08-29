@@ -24,10 +24,10 @@ public class BabelnetRequester {
 	private Map<String, Map<String, Synset>> cache;
 
 	private final SettingService settingService;
-	
+
 	public BabelnetRequester(SettingService settingService) {
 		this.settingService = settingService;
-		
+
 	}
 
 	public Map<String, Synset> requestSynsets(String word, BabelLanguage searchLanguage, BabelLanguage targetLanguage) {
@@ -49,8 +49,14 @@ public class BabelnetRequester {
 				synsetDescr.getId();
 				try {
 
-					synSets.put(synsetDescr.getId(), mapper.readValue(new URL("https://babelnet.io/v5/getSynset?id=" + synsetDescr.getId() + "&searchLang="
-							+ searchLanguage.getKey() + "&targetLang=" + targetLanguage.getKey() + "&key=e73aa086-6d60-4a61-ba57-08a6185358b5"), Synset.class));
+					final Synset synset = mapper.readValue(new URL("https://babelnet.io/v5/getSynset?id=" + synsetDescr.getId() + "&searchLang=" + searchLanguage.getKey()
+							+ "&targetLang=" + targetLanguage.getKey() + "&key=e73aa086-6d60-4a61-ba57-08a6185358b5"), Synset.class);
+
+					if (synset.getAdditionalProperties().get("message").toString().startsWith("Your key is not valid or the daily requests limit has been reached")) {
+						LOG.warn("Daily usage limit for Babelnet API reached.");
+					} else {
+						synSets.put(synsetDescr.getId(), synset);
+					}
 				} catch (IOException e) {
 					LOG.error("Cannot deserialize synset {}: {} ", synsetDescr.getId(), e.getMessage());
 				}
