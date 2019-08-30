@@ -52,7 +52,7 @@ public class BabelnetRequester {
 					final Synset synset = mapper.readValue(new URL("https://babelnet.io/v5/getSynset?id=" + synsetDescr.getId() + "&searchLang=" + searchLanguage.getKey()
 							+ "&targetLang=" + targetLanguage.getKey() + "&key=e73aa086-6d60-4a61-ba57-08a6185358b5"), Synset.class);
 
-					if (synset.getAdditionalProperties().get("message").toString().startsWith("Your key is not valid or the daily requests limit has been reached")) {
+					if (synset.getAdditionalProperties().containsKey("message") && synset.getAdditionalProperties().get("message").toString().startsWith("Your key is not valid or the daily requests limit has been reached")) {
 						LOG.warn("Daily usage limit for Babelnet API reached.");
 					} else {
 						synSets.put(synsetDescr.getId(), synset);
