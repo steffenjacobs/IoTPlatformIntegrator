@@ -30,7 +30,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.Trigger
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementCopiedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementCreatedEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementDeletedEvent;
 
 /** @author Steffen Jacobs */
 
@@ -114,7 +114,7 @@ public abstract class DynamicElement extends JPanel {
 				onAddButtonClicked(e, uuid, type);
 			}
 		});
-		removeButton.addActionListener(e -> EventBus.getInstance().fireEvent(new RuleElementRemovedEvent(type, uuid)));
+		removeButton.addActionListener(e -> EventBus.getInstance().fireEvent(new RuleElementDeletedEvent(type, uuid)));
 	}
 
 	private void onAddButtonClicked(MouseEvent e, UUID uuidForCopy, ElementType elementType) {

@@ -6,10 +6,10 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement.ElementType;
 
 /** @author Steffen Jacobs */
-public class RuleElementRemovedEvent extends WithRuleElementEvent {
+public class RuleElementDeletedEvent extends WithRuleElementEvent {
 
-	public RuleElementRemovedEvent(ElementType elementType, UUID sourceId) {
-		super(EventType.RULE_ELEMENT_REMOVED, elementType, sourceId);
+	public RuleElementDeletedEvent(ElementType elementType, UUID sourceId) {
+		super(EventType.RULE_ELEMENT_DELETED, elementType, sourceId);
 	}
 
 }

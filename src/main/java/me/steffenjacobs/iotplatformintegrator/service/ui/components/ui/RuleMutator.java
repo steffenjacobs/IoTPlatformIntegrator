@@ -25,7 +25,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementCopiedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementCreatedEvent;
-import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementRemovedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementDeletedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement.ElementType;
 
@@ -39,7 +39,7 @@ public class RuleMutator {
 		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_CREATED,
 				e -> createRuleElement(((RuleElementCreatedEvent) e).getElementType(), ((RuleElementCreatedEvent) e).getSharedElementType()));
 		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_COPIED, e -> copyRuleElement(((RuleElementCopiedEvent) e).getSourceId()));
-		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_REMOVED, e -> removeRuleElement(((RuleElementRemovedEvent) e).getSourceId()));
+		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_DELETED, e -> deleteRuleElement(((RuleElementDeletedEvent) e).getSourceId()));
 	}
 
 	private void createRuleElement(ElementType elementType, SharedElementType sharedElementType) {
@@ -135,7 +135,7 @@ public class RuleMutator {
 		}
 	}
 
-	private void removeRuleElement(UUID sourceId) {
+	private void deleteRuleElement(UUID sourceId) {
 		Optional<SharedRule> oRule = ruleBuilderController.getDisplayedRule();
 		if (oRule.isPresent()) {
 			SharedRule rule = oRule.get();
