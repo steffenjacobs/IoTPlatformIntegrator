@@ -3,7 +3,6 @@ package me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
@@ -16,7 +15,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -62,22 +60,7 @@ public abstract class DynamicElement extends JPanel {
 
 	public DynamicElement(ElementType type, UUID uuid) {
 		elementType = new JLabel(type.getDisplayString());
-		elementType.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		JPopupMenu popupElement = new JPopupMenu();
-		for (ElementType t : ElementType.values()) {
-			JMenuItem elementTypeTrigger = new JMenuItem(t.getDisplayString());
-			popupElement.add(elementTypeTrigger);
-		}
-		this.add(popupElement);
-		setHeaderStyle(elementType, popupElement);
-
 		subType = new JLabel();
-		subType.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		JPopupMenu popupSubType = new JPopupMenu();
-		if (type == ElementType.TRIGGER) {
-		}
-		this.add(popupSubType);
-		setHeaderStyle(subType, popupSubType);
 
 		addButton = new JButton("+");
 		removeButton = new JButton("-");
@@ -160,30 +143,6 @@ public abstract class DynamicElement extends JPanel {
 	private void fireCreationEvent(ElementType elementType, SharedElementType sharedElementType, JPopupMenu popupToClose) {
 		EventBus.getInstance().fireEvent(new RuleElementCreatedEvent(null, elementType, sharedElementType));
 		popupToClose.setVisible(false);
-	}
-
-	private void setHeaderStyle(JComponent component, JPopupMenu popup) {
-		component.setFont(Style.FONT_UI_HEADER);
-		component.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-		component.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				super.mouseEntered(e);
-				component.setForeground(ColorPalette.FONT_COLOR_SELECTION);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				super.mouseExited(e);
-				component.setForeground(ColorPalette.FONT_COLOR);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				super.mouseReleased(e);
-				popup.show((JComponent) e.getSource(), e.getX(), e.getY());
-			}
-		});
 	}
 
 	protected void setColors(Color strategyPanelColor, Color headerColor, Color backgroundColor, Color borderColor) {

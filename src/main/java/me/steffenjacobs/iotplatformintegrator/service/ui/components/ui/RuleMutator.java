@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.JOptionPane;
+
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
@@ -27,6 +29,8 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementC
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementCreatedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleElementDeletedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.DynamicElement.ElementType;
 
 /** @author Steffen Jacobs */
@@ -34,12 +38,22 @@ public class RuleMutator {
 
 	private final RuleBuilderRenderController ruleBuilderController;
 
-	public RuleMutator(RuleBuilderRenderController ruleBuilderController) {
+	public RuleMutator(RuleBuilderRenderController ruleBuilderController, SettingService settingService) {
 		this.ruleBuilderController = ruleBuilderController;
+		final boolean enableEvaluationFeatures = !"1".equals(settingService.getSetting(SettingKey.DISABLE_EVALUATION_FEATURES));
 		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_CREATED,
 				e -> createRuleElement(((RuleElementCreatedEvent) e).getElementType(), ((RuleElementCreatedEvent) e).getSharedElementType()));
-		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_COPIED, e -> copyRuleElement(((RuleElementCopiedEvent) e).getSourceId()));
+		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_COPIED, e -> {
+			if (enableEvaluationFeatures)
+				copyRuleElement(((RuleElementCopiedEvent) e).getSourceId());
+			else
+				showError();
+		});
 		EventBus.getInstance().addEventHandler(EventType.RULE_ELEMENT_DELETED, e -> deleteRuleElement(((RuleElementDeletedEvent) e).getSourceId()));
+	}
+
+	private void showError() {
+		JOptionPane.showMessageDialog(null, "This feature is disabled during your evaluation.", "Feature Disabled", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void createRuleElement(ElementType elementType, SharedElementType sharedElementType) {

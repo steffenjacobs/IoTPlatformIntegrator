@@ -83,7 +83,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 
 	public RuleBuilderRenderController(RuleBuilder ruleBuilder, SettingService settingService) {
 		recommender  = new RuleElementRecommender(this, settingService);
-		new RuleMutator(this);
+		new RuleMutator(this, settingService);
 		this.ruleBuilder = ruleBuilder;
 		ruleBuilder.setRenderController(this);
 
