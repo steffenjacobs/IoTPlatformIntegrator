@@ -99,6 +99,12 @@ public enum ItemType {
 			return new Command[] { Up, Down, StopMove, Percent };
 		}
 
+		static Command[] getAllValidCommands() {
+			return new Command[] { On, Off, Open, Closed, String, Decimal, Increase, Decrease, Percent, HSB, Point, //
+					Play, Pause, Next, Previous, Rewind, Fastforward, //
+					Up, Down, StopMove };
+		}
+
 		public static Command[] getKnownSubstitutes(Command command) {
 			switch (command) {
 			case On:
@@ -119,6 +125,8 @@ public enum ItemType {
 			case StopMove:
 			case Percent:
 				return getRollershutterCommands();
+			case Unknown:
+				return getAllValidCommands();
 			default:
 				return new Command[] { command };
 			}

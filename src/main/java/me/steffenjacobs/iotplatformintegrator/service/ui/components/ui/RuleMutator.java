@@ -103,7 +103,7 @@ public class RuleMutator {
 		}
 
 		final ItemDirectory dummyCreator = new ItemDirectory();
-		map.computeIfPresent(TriggerTypeSpecificKey.Command.getKeyString(), (k, v) -> Command.Off);
+		map.computeIfPresent(TriggerTypeSpecificKey.Command.getKeyString(), (k, v) -> Command.Unknown);
 		map.computeIfPresent(TriggerTypeSpecificKey.PreviousState.getKeyString(), (k, v) -> 0);
 		map.computeIfPresent(TriggerTypeSpecificKey.State.getKeyString(), (k, v) -> 0);
 		map.computeIfPresent(TriggerTypeSpecificKey.Channel.getKeyString(), (k, v) -> "channel-0");
