@@ -16,6 +16,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedTypeSpeci
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.PseudocodeEditorController.Token.TokenType;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.ui.RuleComponentRegistry;
+import me.steffenjacobs.iotplatformintegrator.ui.util.SortedComboBoxModel;
 
 /** @author Steffen Jacobs */
 public class VisualRenderingStrategy implements RenderingStrategy<Component> {
@@ -76,7 +77,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 
 	@Override
 	public Component itemComponent(SharedItem item, SharedTypeSpecificKey key) {
-		DefaultComboBoxModel<SharedItem> itemModel = new DefaultComboBoxModel<>();
+		SortedComboBoxModel<SharedItem> itemModel = new SortedComboBoxModel<SharedItem>();
 		JComboBox<SharedItem> chooseItem = new JComboBox<>(itemModel);
 		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.getName() : ""));
 		itemModel.addElement(item);

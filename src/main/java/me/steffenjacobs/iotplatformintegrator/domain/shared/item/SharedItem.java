@@ -1,7 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.domain.shared.item;
 
 /** @author Steffen Jacobs */
-public class SharedItem {
+public class SharedItem implements Comparable<SharedItem> {
 
 	private final String name;
 	private final String label;
@@ -52,6 +52,11 @@ public class SharedItem {
 		if (type != other.type)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(SharedItem o) {
+		return this.getName().compareTo(o.getName());
 	}
 
 }
