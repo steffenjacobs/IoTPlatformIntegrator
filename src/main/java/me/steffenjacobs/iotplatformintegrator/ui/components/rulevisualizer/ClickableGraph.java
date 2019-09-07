@@ -30,6 +30,32 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRule
 import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
 
 public class ClickableGraph implements ViewerListener {
+
+	public static enum SelectionType {
+		RULE_FILTER("#8bc4a6"), DIFF_FILTER_COSMETIC("#c4b68b"), DIFF_FILTER_CREATE("#baa380"), DIFF_FILTER_UPDATE("#ba9280"), DIFF_FILTER_DELETE(
+				"ba8480"), DIFF_FILTER_DIFF_FULL_CREATED("#9fba80"), DIFF_FILTER_DIFF_FULL_DELETED("#ba8089"), UNKNOWN("#000000");
+
+		private final String color;
+
+		SelectionType(String color) {
+			this.color = color;
+		}
+
+		public String getColor() {
+			return color;
+		}
+	}
+
+	private static final String COLOR_DIFF_NODE = "#8bb0c4";
+	private static final String COLOR_RULE_NODE = "#23729e";
+	private static final String COLOR_EDGE = "#c5ccd1";
+	private static final String COLOR_DIFF_NODE_SELECTED = "#627782";
+	private static final String COLOR_RULE_NODE_SELECTED = "#0b283d";
+	private static final String SIZE_RULE_NODE = "15px";
+	private static final String SIZE_DIFF_NODE = "8px";
+	private static final String SIZE_RULE_NODE_SELECTED = "20px";
+	private static final String SIZE_DIFF_NODE_SELECTED = "13px";
+
 	private static final Logger LOG = LoggerFactory.getLogger(ClickableGraph.class);
 
 	private final AtomicBoolean loop = new AtomicBoolean(true);
@@ -78,12 +104,12 @@ public class ClickableGraph implements ViewerListener {
 		try {
 			n = graph.addNode(nodeId);
 			if (isDiff) {
-				n.addAttribute("ui.style", "fill-color: #8bb0c4;");
-				n.addAttribute("ui.style", "size: 8px;");
+				n.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
+				n.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
 			} else {
 				n.addAttribute("ui.label", n.getId());
-				n.addAttribute("ui.style", "fill-color: #23729e;");
-				n.addAttribute("ui.style", "size: 15px;");
+				n.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+				n.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
 			}
 			nodeWithType.put(n, isDiff);
 		} catch (IdAlreadyInUseException e) {
@@ -130,7 +156,7 @@ public class ClickableGraph implements ViewerListener {
 			for (Pair<String> edge : edges) {
 				try {
 					Edge e = graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
-					e.addAttribute("ui.style", "fill-color: #c5ccd1;");
+					e.addAttribute("ui.style", "fill-color: " + COLOR_EDGE + ";");
 				} catch (ElementNotFoundException | IdAlreadyInUseException e) {
 					if (enableFineLogging) {
 						LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
@@ -146,17 +172,20 @@ public class ClickableGraph implements ViewerListener {
 		graph.getEdgeSet().forEach(graph::removeEdge);
 	}
 
-	public void selectFilterNode(String id, boolean filtered, Function<String, Node> nodesByUUID) {
+	public void selectFilterNode(String id, boolean filtered, Function<String, Node> nodesByUUID, SelectionType type) {
+		if(type == SelectionType.UNKNOWN) {
+			return;
+		}
 		lock.lock();
 		Node node = nodesByUUID.apply(id);
-		// only continue with existing and non-diff nodes
-		if (node != null && !nodeWithType.get(node)) {
+		// only continue with existing nodes
+		if (node != null) {
 			if (filtered) {
 				node.addAttribute("ui.style", "stroke-mode: none;");
 				node.removeAttribute("ui.style");
 
-				node.addAttribute("ui.style", "fill-color: #8bc4a6;");
-				node.addAttribute("ui.style", "size: 15px;");
+				node.addAttribute("ui.style", "fill-color: " + type.getColor() + ";");
+				node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
 
 				lock.unlock();
 			} else {
@@ -164,11 +193,15 @@ public class ClickableGraph implements ViewerListener {
 				node.addAttribute("ui.style", "stroke-mode: none;");
 				node.removeAttribute("ui.style");
 
-				node.addAttribute("ui.style", "fill-color: #23729e;");
-				node.addAttribute("ui.style", "size: 15px;");
+				if (nodeWithType.get(node)) {
+					node.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
+					node.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
+				} else {
+					node.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+					node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
+				}
 				lock.unlock();
 			}
-			// node.addAttribute(attribute, values);
 		} else {
 			LOG.error("Could not filter node {}", id);
 			lock.unlock();
@@ -185,11 +218,11 @@ public class ClickableGraph implements ViewerListener {
 			if (nodeType == null) {
 
 			} else if (nodeType == true) {
-				lastSelectedNode.addAttribute("ui.style", "fill-color: #8bb0c4;");
-				lastSelectedNode.addAttribute("ui.style", "size: 8px;");
+				lastSelectedNode.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
+				lastSelectedNode.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
 			} else if (nodeType == false) {
-				lastSelectedNode.addAttribute("ui.style", "fill-color: #23729e;");
-				lastSelectedNode.addAttribute("ui.style", "size: 15px;");
+				lastSelectedNode.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+				lastSelectedNode.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
 			}
 		}
 
@@ -203,9 +236,9 @@ public class ClickableGraph implements ViewerListener {
 
 			} else if (nodeType == true) {
 				node.addAttribute("ui.style", "stroke-mode: plain;");
-				node.addAttribute("ui.style", "stroke-color: #627782;");
+				node.addAttribute("ui.style", "stroke-color: " + COLOR_DIFF_NODE_SELECTED + ";");
 				node.addAttribute("ui.style", "stroke-width: 3px;");
-				node.addAttribute("ui.style", "size: 13px;");
+				node.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE_SELECTED + ";");
 				lastSelectedNode = node;
 				lock.unlock();
 				if (!suppressEvents) {
@@ -213,9 +246,9 @@ public class ClickableGraph implements ViewerListener {
 				}
 
 			} else if (nodeType == false) {
-				node.addAttribute("ui.style", "size: 20px;");
+				node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE_SELECTED + ";");
 				node.addAttribute("ui.style", "stroke-mode: plain;");
-				node.addAttribute("ui.style", "stroke-color: #0b283d;");
+				node.addAttribute("ui.style", "stroke-color: " + COLOR_RULE_NODE_SELECTED + ";");
 				node.addAttribute("ui.style", "stroke-width: 3px;");
 				lastSelectedNode = node;
 				lock.unlock();
