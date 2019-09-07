@@ -114,7 +114,13 @@ public class ItemDetailsPanel extends JPanel {
 
 		searchButton.addActionListener(l -> {
 			imagePanel.removeAll();
-			imagePanel.add(new JLabel(new ImageIcon(getClass().getClassLoader().getResource("spinner.gif"))));
+			ImageIcon im;
+			try {
+				im = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resources/spinner.gif")));
+				imagePanel.add(new JLabel(im));
+			} catch (IOException e1) {
+				imagePanel.add(new JLabel("Loading images..."));
+			}
 
 			imagePanel.revalidate();
 			imagePanel.repaint();

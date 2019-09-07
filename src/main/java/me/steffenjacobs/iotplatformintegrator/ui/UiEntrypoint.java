@@ -103,7 +103,7 @@ public class UiEntrypoint {
 	private JFrame setupFrame() {
 		JFrame frame = new JFrame("IoT Platform Integrator");
 		try {
-			BufferedImage bufferedImage = ImageIO.read(getClass().getResource("/icon.png"));
+			BufferedImage bufferedImage = ImageIO.read(UiEntrypoint.class.getResourceAsStream("/resources/icon.png"));
 			Graphics2D g = bufferedImage.createGraphics();
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			frame.setIconImage(bufferedImage);
