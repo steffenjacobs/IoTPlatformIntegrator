@@ -1,9 +1,15 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +30,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -133,26 +141,15 @@ public class RuleGraphManager {
 		refreshButton.addActionListener(refreshAction);
 
 		// rule diff filters
-		final Set<SelectionType> selectedFilters = new HashSet<>();
-		final JPanel checkboxPanel = new JPanel(new VerticalLayout());
-		SelectionType.displayableValues().forEach(selectionType -> {
-			final JCheckBox checkBox = new JCheckBox(selectionType.getDisplayString());
-			checkBox.addActionListener(c -> {
-				if (checkBox.isSelected()) {
-					selectedFilters.add(selectionType);
-				} else {
-					selectedFilters.remove(selectionType);
-				}
-				visualizeDiffFilter(selectedFilters);
-			});
-			checkboxPanel.add(checkBox);
-		});
+
+		final JButton filterButton = new JButton("Filter...");
+		filterButton.addActionListener(new FilterPopupActionHandler(filterButton));
 
 		// add buttons to panel
 		buttonPanel.add(refreshButton);
 		buttonPanel.add(searchItemName);
 		buttonPanel.add(findCurrentRuleButton);
-		buttonPanel.add(checkboxPanel);
+		buttonPanel.add(filterButton);
 
 		// add button panel
 		graphPanel = new JPanel(new BorderLayout());
@@ -161,13 +158,13 @@ public class RuleGraphManager {
 		graphPanel.add(graph.getViewPanel(), BorderLayout.CENTER);
 
 		// setup popup menu
-		final JPopupMenu popup = new JPopupMenu();
+		final JPopupMenu popupMenu = new JPopupMenu();
 		final JMenuItem refreshMenu = new JMenuItem("Refresh");
 		refreshMenu.addActionListener(refreshAction);
 
-		popup.add(refreshMenu);
+		popupMenu.add(refreshMenu);
 
-		graph.getViewPanel().setComponentPopupMenu(popup);
+		graph.getViewPanel().setComponentPopupMenu(popupMenu);
 
 	}
 
@@ -377,6 +374,85 @@ public class RuleGraphManager {
 
 	public JPanel getGraphPanel() {
 		return graphPanel;
+	}
+
+	private class FilterPopupActionHandler implements ActionListener {
+
+		private final JPanel checkBoxPanel = new JPanel(new VerticalLayout());
+		private final JButton filterButton;
+		
+		private final Set<SelectionType> selectedFilters = new HashSet<>();
+		private final FocusListener fl;
+
+		
+		private Popup popup = null;
+		private boolean showing = false;
+
+		public FilterPopupActionHandler(JButton filterButton) {
+			this.filterButton = filterButton;
+			fl = new FocusAdapter() {
+
+				@Override
+				public void focusLost(FocusEvent e) {
+					e.getComponent().removeFocusListener(this);
+					if (e.getOppositeComponent() == checkBoxPanel) {
+						e.getOppositeComponent().addFocusListener(this);
+						return;
+					}
+					for (Component child : checkBoxPanel.getComponents()) {
+						if (e.getOppositeComponent() == child) {
+							e.getOppositeComponent().addFocusListener(this);
+							return;
+						}
+					}
+					hidePopup();
+				}
+			};
+
+			SelectionType.displayableValues().forEach(selectionType -> {
+				final JCheckBox checkBox = new JCheckBox(selectionType.getDisplayString());
+				checkBox.addActionListener(c -> {
+					if (checkBox.isSelected()) {
+						selectedFilters.add(selectionType);
+					} else {
+						selectedFilters.remove(selectionType);
+					}
+					visualizeDiffFilter(selectedFilters);
+				});
+				checkBox.addFocusListener(fl);
+				checkBoxPanel.add(checkBox);
+			});
+			checkBoxPanel.addFocusListener(fl);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			removeFocusListenerIfPresent(filterButton, fl);
+			filterButton.addFocusListener(fl);
+			if (!showing) {
+				final Point filterButtonLocation = filterButton.getLocationOnScreen();
+				popup = PopupFactory.getSharedInstance().getPopup(filterButton, checkBoxPanel, filterButtonLocation.x, filterButtonLocation.y + filterButton.getHeight());
+				showing = true;
+				popup.show();
+			} else {
+				hidePopup();
+			}
+		}
+
+		private void removeFocusListenerIfPresent(Component c, FocusListener f) {
+			for (FocusListener ff : c.getFocusListeners()) {
+				if (ff == f) {
+					c.removeFocusListener(f);
+				}
+			}
+		}
+
+		private void hidePopup() {
+			showing = false;
+			if (popup != null) {
+				popup.hide();
+			}
+		}
 	}
 
 }
