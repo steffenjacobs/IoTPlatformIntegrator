@@ -81,12 +81,19 @@ public class RuleChangeEventStore {
 		}
 		if (parts.getPrevDiffId() == null) {
 			final SharedRule ruleByName = App.getRemoteRuleCache().getRuleByName(parts.getSourceRuleName());
+			if (ruleByName == null) {
+				// newly created rule without a source
+				return null;
+			}
 			final SharedRule sharedRuleCopy = new SharedRule(ruleByName.getName(), ruleByName);
 
 			applyDiff(sharedRuleCopy, parts.getRuleDiff(), App.getDatabaseConnectionObject().getItemDirectory());
 			return sharedRuleCopy;
 		} else {
 			final SharedRule rule = rebuildRule(App.getRuleDiffCache().getRuleDiffParts(parts.getPrevDiffId()));
+			if(rule == null) {
+				return null;
+			}
 			this.applyDiff(rule, parts.getRuleDiff(), App.getDatabaseConnectionObject().getItemDirectory());
 			return rule;
 		}
