@@ -63,22 +63,22 @@ public class RuleMutator {
 			switch (elementType) {
 			case TRIGGER:
 				int relativeElementId = findHighestId(selectedRule) + 1;
-				final SharedTrigger trigger = new SharedTrigger((TriggerType) sharedElementType, createDefaults(sharedElementType), "TRIGGER-" + relativeElementId, "-",
-						relativeElementId);
+				final SharedTrigger trigger = new SharedTrigger((TriggerType) sharedElementType, createDefaults(sharedElementType), "TRIGGER-" + relativeElementId,
+						sharedElementType.name() + " (" + relativeElementId + ")", relativeElementId);
 				selectedRule.getTriggers().add(trigger);
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(selectedRule, trigger, null));
 				break;
 			case CONDITION:
 				int relativeElementId2 = findHighestId(selectedRule) + 1;
-				final SharedCondition condition = new SharedCondition((ConditionType) sharedElementType, createDefaults(sharedElementType), "CONDITION-" + relativeElementId2, "-",
-						relativeElementId2);
+				final SharedCondition condition = new SharedCondition((ConditionType) sharedElementType, createDefaults(sharedElementType), "CONDITION-" + relativeElementId2,
+						sharedElementType.name() + " (" + relativeElementId2 + ")", relativeElementId2);
 				selectedRule.getConditions().add(condition);
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(selectedRule, condition, null));
 				break;
 			case ACTION:
 				int relativeElementId3 = findHighestId(selectedRule) + 1;
-				final SharedAction action = new SharedAction((ActionType) sharedElementType, createDefaults(sharedElementType), "ACTION-" + relativeElementId3, "-",
-						relativeElementId3);
+				final SharedAction action = new SharedAction((ActionType) sharedElementType, createDefaults(sharedElementType), "ACTION-" + relativeElementId3,
+						sharedElementType.name() + " (" + relativeElementId3 + ")", relativeElementId3);
 				selectedRule.getActions().add(action);
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(selectedRule, action, null));
 				break;
