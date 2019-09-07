@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -82,7 +84,7 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 	}
 
 	public RuleBuilderRenderController(RuleBuilder ruleBuilder, SettingService settingService) {
-		recommender  = new RuleElementRecommender(this, settingService);
+		recommender = new RuleElementRecommender(this, settingService);
 		new RuleMutator(this, settingService);
 		this.ruleBuilder = ruleBuilder;
 		ruleBuilder.setRenderController(this);
@@ -248,13 +250,24 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 		}
 		ruleBuilder.setHeader(rule.getName(), rule.getStatus(), rule.getDescription());
 
-		for (SharedTrigger trigger : rule.getTriggers()) {
+		final List<SharedTrigger> triggers = new ArrayList<>();
+		triggers.addAll(rule.getTriggers());
+		triggers.sort((t1, t2) -> t1.getRelativeElementId() - t2.getRelativeElementId());
+		for (SharedTrigger trigger : triggers) {
 			ruleBuilder.appendDynamicElement(renderTrigger(trigger, triggerRenderer));
 		}
-		for (SharedCondition condition : rule.getConditions()) {
+
+		final List<SharedCondition> conditions = new ArrayList<>();
+		conditions.addAll(rule.getConditions());
+		conditions.sort((t1, t2) -> t1.getRelativeElementId() - t2.getRelativeElementId());
+		for (SharedCondition condition : conditions) {
 			ruleBuilder.appendDynamicElement(renderCondition(condition, conditionRenderer));
 		}
-		for (SharedAction action : rule.getActions()) {
+
+		final List<SharedAction> actions = new ArrayList<>();
+		actions.addAll(rule.getActions());
+		actions.sort((t1, t2) -> t1.getRelativeElementId() - t2.getRelativeElementId());
+		for (SharedAction action : actions) {
 			ruleBuilder.appendDynamicElement(renderAction(action, actionRenderer));
 		}
 		EventBus.getInstance().fireEvent(new RuleRenderEvent(rule));
