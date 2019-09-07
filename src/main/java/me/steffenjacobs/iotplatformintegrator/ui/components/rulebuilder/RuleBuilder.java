@@ -61,10 +61,15 @@ public class RuleBuilder extends JPanel {
 			jcb.setEditable(true);
 			JOptionPane.showMessageDialog(null, jcb, "select or type a value", JOptionPane.QUESTION_MESSAGE);
 
-			boolean result = controller.validateForPlatformExport(((ServerConnection) jcb.getSelectedItem()).getItemDirectory());
-			if (result) {
-				String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
-				EventBus.getInstance().fireEvent(new ExportRuleToPlatformEvent((ServerConnection) jcb.getSelectedItem(), controller.getDisplayedRule().get(), name));
+			try {
+
+				boolean result = controller.validateForPlatformExport(((ServerConnection) jcb.getSelectedItem()).getItemDirectory());
+				if (result) {
+					String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
+					EventBus.getInstance().fireEvent(new ExportRuleToPlatformEvent((ServerConnection) jcb.getSelectedItem(), controller.getDisplayedRule().get(), name));
+				}
+			} catch (NullPointerException exx) {
+				JOptionPane.showMessageDialog(null, "Could not export to platform: Please select a rule first.");
 			}
 		});
 		buttonBar.add(exportToPlatformButton);
