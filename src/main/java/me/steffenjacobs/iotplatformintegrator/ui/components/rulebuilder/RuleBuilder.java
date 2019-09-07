@@ -72,9 +72,11 @@ public class RuleBuilder extends JPanel {
 		final JButton exportToDatabaseButton = new JButton("Store rule to Database");
 		exportToDatabaseButton.addActionListener(e -> {
 			String name = JOptionPane.showInputDialog(this, "Enter a name for the new rule:", controller.getDisplayedRule().get().getName());
-			EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(controller.getDisplayedRule().get(), name, true));
+			if (name != null) {
+				EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(controller.getDisplayedRule().get(), name, true));
+			}
 		});
-		
+
 		boolean enableEvaluationFeatures = !"1".equals(settingService.getSetting(SettingKey.DISABLE_EVALUATION_FEATURES));
 		if (enableEvaluationFeatures) {
 			buttonBar.add(exportToDatabaseButton);
