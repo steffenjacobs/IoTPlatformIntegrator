@@ -196,6 +196,7 @@ public class RuleGraphManager {
 			return set(DiffType.ACTION_TYPE_CHANGED, DiffType.ACTION_TYPE_VALUE_UPDATED, DiffType.CONDITION_TYPE_CHANGED, DiffType.CONDITION_TYPE_VALUE_UPDATED,
 					DiffType.TRIGGER_TYPE_CHANGE, DiffType.TRIGGER_TYPE_VALUE_UPDATED);
 		case RULE_FILTER:
+		case DESELECT:
 		case UNKNOWN:
 			return Collections.emptySet();
 		}
