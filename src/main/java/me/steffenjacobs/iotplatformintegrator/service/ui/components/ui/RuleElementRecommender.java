@@ -9,9 +9,11 @@ import javax.swing.JComboBox;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import me.steffenjacobs.iotplatformintegrator.App;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.RuleRelatedAnnotation;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.ServerConnection;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Command;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType.Operation;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
@@ -78,6 +80,38 @@ public class RuleElementRecommender {
 					}
 				}
 			}
+
+			// add recommendations for item for created null item
+			if (item.isPresent() && item.get().getType() == ItemType.Unknown) {
+				ItemDirectory currentItemDirectory;
+				if (targetItemDirectory == null) {
+					currentItemDirectory = App.getDatabaseConnectionObject().getItemDirectory();
+				} else {
+					currentItemDirectory = targetItemDirectory;
+				}
+				
+				//add only those items with correct command or operator
+				for (SharedItem si : currentItemDirectory.getAllItems()) {
+					if (si.getType() == ItemType.Unknown) {
+						continue;
+					}
+					if (cCommand.isPresent()) {
+						if (!ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())) {
+							continue;
+						}
+					}
+					if (cOperator.isPresent()) {
+						if (!ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
+							continue;
+						}
+					}
+					JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
+					if (!containsItem(box, si)) {
+						box.addItem(si);
+					}
+				}
+			}
+
 			// add recommendations for item based on operator and/or command
 			if (targetItemDirectory != null && cItem.get() instanceof JComboBox<?>) {
 				Collection<SharedItem> items = new ArrayList<>();
