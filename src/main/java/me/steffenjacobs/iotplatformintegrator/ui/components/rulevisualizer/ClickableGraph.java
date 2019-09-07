@@ -122,18 +122,22 @@ public class ClickableGraph implements ViewerListener {
 		lock.lock();
 		Node n = null;
 		try {
-			n = graph.addNode(nodeId);
-			if (isDiff) {
-				n.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
-				n.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
-			} else {
-				n.addAttribute("ui.label", n.getId());
-				n.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
-				n.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
+			try {
+				n = graph.addNode(nodeId);
+				if (isDiff) {
+					n.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
+					n.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
+				} else {
+					n.addAttribute("ui.label", n.getId());
+					n.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+					n.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
+				}
+				nodeWithType.put(n, isDiff);
+			} catch (IdAlreadyInUseException e) {
+				LOG.warn("Could not create node {}: {}", nodeId, e.getMessage());
 			}
-			nodeWithType.put(n, isDiff);
-		} catch (IdAlreadyInUseException e) {
-			LOG.warn("Could not create node {}: {}", nodeId, e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		lock.unlock();
 		return n;
@@ -154,36 +158,48 @@ public class ClickableGraph implements ViewerListener {
 
 	public void buttonReleased(String id) {
 		lock.lock();
-		listener.buttonReleased(id);
+		try {
+			listener.buttonReleased(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		lock.unlock();
 	}
 
 	public void clear() {
 		lock.lock();
-		graph.clear();
-		nodeWithType.clear();
+		try {
+			graph.clear();
+			nodeWithType.clear();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		lock.unlock();
 	}
 
 	public void refreshEdges(Set<Pair<String>> edges) {
 		SwingUtilities.invokeLater(() -> {
 			lock.lock();
-			if (enableFineLogging) {
-				LOG.info("Cleared edges.");
-				LOG.info("Available nodes: {}", graph.getNodeSet());
-			}
-			clearEdges();
-			for (Pair<String> edge : edges) {
-				try {
-					Edge e = graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
-					e.addAttribute("ui.style", "fill-color: " + COLOR_EDGE + ";");
-				} catch (ElementNotFoundException | IdAlreadyInUseException e) {
-					if (enableFineLogging) {
-						LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
+			try {
+				if (enableFineLogging) {
+					LOG.info("Cleared edges.");
+					LOG.info("Available nodes: {}", graph.getNodeSet());
+				}
+				clearEdges();
+				for (Pair<String> edge : edges) {
+					try {
+						Edge e = graph.addEdge(edge.getLeft() + "_" + edge.getRight(), edge.getLeft(), edge.getRight(), true);
+						e.addAttribute("ui.style", "fill-color: " + COLOR_EDGE + ";");
+					} catch (ElementNotFoundException | IdAlreadyInUseException e) {
+						if (enableFineLogging) {
+							LOG.warn("Could not find a node for edge {}_{}", edge.getLeft(), edge.getRight());
+						}
 					}
 				}
+				viewer.enableAutoLayout();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			viewer.enableAutoLayout();
 			lock.unlock();
 		});
 	}
@@ -197,88 +213,98 @@ public class ClickableGraph implements ViewerListener {
 			return;
 		}
 		lock.lock();
-		Node node = nodesByUUID.apply(id);
-		// only continue with existing nodes
-		if (node != null) {
-			if (filtered && type != SelectionType.DESELECT) {
-				node.addAttribute("ui.style", "stroke-mode: none;");
-				node.removeAttribute("ui.style");
+		try {
+			Node node = nodesByUUID.apply(id);
+			// only continue with existing nodes
+			if (node != null) {
+				if (filtered && type != SelectionType.DESELECT) {
+					node.addAttribute("ui.style", "stroke-mode: none;");
+					node.removeAttribute("ui.style");
 
-				node.addAttribute("ui.style", "fill-color: " + type.getColor() + ";");
-				node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
-
-				lock.unlock();
-			} else {
-				// reset filter
-				node.addAttribute("ui.style", "stroke-mode: none;");
-				node.removeAttribute("ui.style");
-
-				if (nodeWithType.get(node)) {
-					node.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
-					node.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
-				} else {
-					node.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+					node.addAttribute("ui.style", "fill-color: " + type.getColor() + ";");
 					node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
+
+					lock.unlock();
+				} else {
+					// reset filter
+					node.addAttribute("ui.style", "stroke-mode: none;");
+					node.removeAttribute("ui.style");
+
+					if (nodeWithType.get(node)) {
+						node.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
+						node.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
+					} else {
+						node.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+						node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
+					}
+					lock.unlock();
 				}
+			} else {
+				LOG.error("Could not filter node {}", id);
 				lock.unlock();
 			}
-		} else {
-			LOG.error("Could not filter node {}", id);
+		} catch (Exception e) {
+			e.printStackTrace();
 			lock.unlock();
 		}
 	}
 
 	public void selectNode(String id, boolean suppressEvents, Map<String, Node> nodesByUUID, Map<String, SharedRule> ruleByUUID) {
 		lock.lock();
-		// de-select old node if present
-		if (lastSelectedNode != null) {
-			final Boolean nodeType = nodeWithType.get(lastSelectedNode);
-			lastSelectedNode.addAttribute("ui.style", "stroke-mode: none;");
-			lastSelectedNode.removeAttribute("ui.style");
-			if (nodeType == null) {
+		try {
+			// de-select old node if present
+			if (lastSelectedNode != null) {
+				final Boolean nodeType = nodeWithType.get(lastSelectedNode);
+				lastSelectedNode.addAttribute("ui.style", "stroke-mode: none;");
+				lastSelectedNode.removeAttribute("ui.style");
+				if (nodeType == null) {
 
-			} else if (nodeType == true) {
-				lastSelectedNode.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
-				lastSelectedNode.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
-			} else if (nodeType == false) {
-				lastSelectedNode.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
-				lastSelectedNode.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
-			}
-		}
-
-		// select new node
-		if (nodesByUUID.containsKey(id)) {
-			final Node node = nodesByUUID.get(id);
-			final Boolean nodeType = nodeWithType.get(node);
-
-			node.removeAttribute("ui.style");
-			if (nodeType == null) {
-
-			} else if (nodeType == true) {
-				node.addAttribute("ui.style", "stroke-mode: plain;");
-				node.addAttribute("ui.style", "stroke-color: " + COLOR_DIFF_NODE_SELECTED + ";");
-				node.addAttribute("ui.style", "stroke-width: 3px;");
-				node.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE_SELECTED + ";");
-				lastSelectedNode = node;
-				lock.unlock();
-				if (!suppressEvents) {
-					EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
+				} else if (nodeType == true) {
+					lastSelectedNode.addAttribute("ui.style", "fill-color: " + COLOR_DIFF_NODE + ";");
+					lastSelectedNode.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE + ";");
+				} else if (nodeType == false) {
+					lastSelectedNode.addAttribute("ui.style", "fill-color: " + COLOR_RULE_NODE + ";");
+					lastSelectedNode.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
 				}
+			}
 
-			} else if (nodeType == false) {
-				node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE_SELECTED + ";");
-				node.addAttribute("ui.style", "stroke-mode: plain;");
-				node.addAttribute("ui.style", "stroke-color: " + COLOR_RULE_NODE_SELECTED + ";");
-				node.addAttribute("ui.style", "stroke-width: 3px;");
-				lastSelectedNode = node;
-				lock.unlock();
-				if (!suppressEvents) {
-					EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
+			// select new node
+			if (nodesByUUID.containsKey(id)) {
+				final Node node = nodesByUUID.get(id);
+				final Boolean nodeType = nodeWithType.get(node);
+
+				node.removeAttribute("ui.style");
+				if (nodeType == null) {
+
+				} else if (nodeType == true) {
+					node.addAttribute("ui.style", "stroke-mode: plain;");
+					node.addAttribute("ui.style", "stroke-color: " + COLOR_DIFF_NODE_SELECTED + ";");
+					node.addAttribute("ui.style", "stroke-width: 3px;");
+					node.addAttribute("ui.style", "size: " + SIZE_DIFF_NODE_SELECTED + ";");
+					lastSelectedNode = node;
+					lock.unlock();
+					if (!suppressEvents) {
+						EventBus.getInstance().fireEvent(new SelectedRuleDiffChangeEvent(App.getRuleDiffCache().getRuleDiffParts(id)));
+					}
+
+				} else if (nodeType == false) {
+					node.addAttribute("ui.style", "size: " + SIZE_RULE_NODE_SELECTED + ";");
+					node.addAttribute("ui.style", "stroke-mode: plain;");
+					node.addAttribute("ui.style", "stroke-color: " + COLOR_RULE_NODE_SELECTED + ";");
+					node.addAttribute("ui.style", "stroke-width: 3px;");
+					lastSelectedNode = node;
+					lock.unlock();
+					if (!suppressEvents) {
+						EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(ruleByUUID.get(id)));
+					}
+				} else {
+					lock.unlock();
 				}
 			} else {
 				lock.unlock();
 			}
-		} else {
+		} catch (Exception e) {
+			e.printStackTrace();
 			lock.unlock();
 		}
 	}
