@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,17 +34,35 @@ import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
 public class ClickableGraph implements ViewerListener {
 
 	public static enum SelectionType {
-		RULE_FILTER("#8bc4a6"), DIFF_FILTER_COSMETIC("#c4b68b"), DIFF_FILTER_CREATE("#baa380"), DIFF_FILTER_UPDATE("#ba9280"), DIFF_FILTER_DELETE(
-				"ba8480"), DIFF_FILTER_DIFF_FULL_CREATED("#9fba80"), DIFF_FILTER_DIFF_FULL_DELETED("#ba8089"), UNKNOWN("#000000");
+		RULE_FILTER("#8bc4a6", "Rule"), DIFF_FILTER_COSMETIC("#c4b68b", "Cosmetic"), DIFF_FILTER_CREATE("#baa380", "Create Value"), DIFF_FILTER_UPDATE("#ba9280",
+				"Update Value"), DIFF_FILTER_DELETE("ba8480", "Delete Value"), DIFF_FILTER_DIFF_FULL_CREATED("#9fba80",
+						"Create Element"), DIFF_FILTER_DIFF_FULL_DELETED("#ba8089", "Delete Element"), UNKNOWN("#000000", "Unknown"), DESELECT("#000000", "Deselect");
 
 		private final String color;
+		private final String displayString;
 
-		SelectionType(String color) {
+		SelectionType(String color, String displayString) {
 			this.color = color;
+			this.displayString = displayString;
 		}
 
 		public String getColor() {
 			return color;
+		}
+
+		public String getDisplayString() {
+			return displayString;
+		}
+
+		public static Iterable<SelectionType> displayableValues() {
+			final Collection<SelectionType> displayableTypes = new ArrayList<>();
+			displayableTypes.add(DIFF_FILTER_COSMETIC);
+			displayableTypes.add(DIFF_FILTER_CREATE);
+			displayableTypes.add(DIFF_FILTER_UPDATE);
+			displayableTypes.add(DIFF_FILTER_DELETE);
+			displayableTypes.add(DIFF_FILTER_DIFF_FULL_CREATED);
+			displayableTypes.add(DIFF_FILTER_DIFF_FULL_DELETED);
+			return displayableTypes;
 		}
 	}
 
@@ -173,14 +193,14 @@ public class ClickableGraph implements ViewerListener {
 	}
 
 	public void selectFilterNode(String id, boolean filtered, Function<String, Node> nodesByUUID, SelectionType type) {
-		if(type == SelectionType.UNKNOWN) {
+		if (type == SelectionType.UNKNOWN) {
 			return;
 		}
 		lock.lock();
 		Node node = nodesByUUID.apply(id);
 		// only continue with existing nodes
 		if (node != null) {
-			if (filtered) {
+			if (filtered && type != SelectionType.DESELECT) {
 				node.addAttribute("ui.style", "stroke-mode: none;");
 				node.removeAttribute("ui.style");
 

@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -134,12 +133,20 @@ public class RuleGraphManager {
 		refreshButton.addActionListener(refreshAction);
 
 		// rule diff filters
+		final Set<SelectionType> selectedFilters = new HashSet<>();
 		final JPanel checkboxPanel = new JPanel(new VerticalLayout());
-		for (SelectionType selectionType : SelectionType.values()) {
-			final JCheckBox checkBox = new JCheckBox(selectionType.name());
-			checkBox.addActionListener(c -> visualizeDiffFilter(selectionType, checkBox.isSelected()));
+		SelectionType.displayableValues().forEach(selectionType -> {
+			final JCheckBox checkBox = new JCheckBox(selectionType.getDisplayString());
+			checkBox.addActionListener(c -> {
+				if (checkBox.isSelected()) {
+					selectedFilters.add(selectionType);
+				} else {
+					selectedFilters.remove(selectionType);
+				}
+				visualizeDiffFilter(selectedFilters);
+			});
 			checkboxPanel.add(checkBox);
-		}
+		});
 
 		// add buttons to panel
 		buttonPanel.add(refreshButton);
@@ -164,39 +171,13 @@ public class RuleGraphManager {
 
 	}
 
-	private void visualizeDiffFilter(SelectionType filter, boolean selected) {
-		selectDiffNodes(App.getRuleDiffCache().getRuleDiffsWithAnyFilter(getAssociatedDiffTypes(filter)).stream().map(RuleDiffParts::getRuleDiff).collect(Collectors.toList()),
-				Optional.of(filter), selected);
-	}
-
-	private void selectDiffNodes(Iterable<SharedRuleElementDiff> diffs, Optional<SelectionType> selectionType, boolean selected) {
+	private void visualizeDiffFilter(Collection<SelectionType> filters) {
 		// clear selection
-		diffByUUID.values().forEach(r -> graph.selectFilterNode(r.getUid().toString(), false, nodesByUUID::get, selectionType.orElse(getSelectionType(r.getDiffTypes()))));
+		diffByUUID.values().forEach(r -> graph.selectFilterNode(r.getUid().toString(), false, nodesByUUID::get, SelectionType.DESELECT));
 
 		// apply new selection
-		if (selected) {
-			diffs.forEach(r -> graph.selectFilterNode(r.getUid().toString(), true, nodesByUUID::get, selectionType.orElse(getSelectionType(r.getDiffTypes()))));
-		}
-	}
-
-	private SelectionType getSelectionType(Collection<DiffType> types) {
-
-		if (types.size() == 0) {
-			return SelectionType.UNKNOWN;
-		}
-
-		if (types.size() == 1) {
-			return getSelectionType(types.iterator().next());
-		}
-		if (types.size() == 2) {
-			if (types.contains(DiffType.ACTION_TYPE_VALUE_DELETED) && types.contains(DiffType.ACTION_TYPE_VALUE_ADDED)
-					|| types.contains(DiffType.CONDITION_TYPE_VALUE_DELETED) && types.contains(DiffType.CONDITION_TYPE_VALUE_ADDED)
-					|| types.contains(DiffType.TRIGGER_TYPE_VALUE_DELETED) && types.contains(DiffType.TRIGGER_TYPE_VALUE_ADDED)) {
-				return SelectionType.DIFF_FILTER_UPDATE;
-			}
-		}
-		LOG.info("Too many strange types: " + types);
-		return getSelectionType(types.iterator().next());
+		filters.forEach(filter -> App.getRuleDiffCache().getRuleDiffsWithAnyFilter(getAssociatedDiffTypes(filter)).stream().map(RuleDiffParts::getRuleDiff)
+				.collect(Collectors.toList()).forEach(r -> graph.selectFilterNode(r.getUid().toString(), true, nodesByUUID::get, filter)));
 	}
 
 	private Set<DiffType> getAssociatedDiffTypes(SelectionType selectionType) {
@@ -228,40 +209,6 @@ public class RuleGraphManager {
 			set.add(tt);
 		}
 		return set;
-	}
-
-	private SelectionType getSelectionType(DiffType type) {
-		switch (type) {
-		case ACTION_TYPE_CHANGED:
-		case ACTION_TYPE_VALUE_UPDATED:
-		case CONDITION_TYPE_CHANGED:
-		case CONDITION_TYPE_VALUE_UPDATED:
-		case TRIGGER_TYPE_CHANGE:
-		case TRIGGER_TYPE_VALUE_UPDATED:
-			return SelectionType.DIFF_FILTER_UPDATE;
-
-		case ACTION_TYPE_VALUE_ADDED:
-		case CONDITION_TYPE_VALUE_ADDED:
-		case TRIGGER_TYPE_VALUE_ADDED:
-			return SelectionType.DIFF_FILTER_CREATE;
-
-		case ACTION_TYPE_VALUE_DELETED:
-		case CONDITION_TYPE_VALUE_DELETED:
-		case TRIGGER_TYPE_VALUE_DELETED:
-			return SelectionType.DIFF_FILTER_DELETE;
-
-		case DESCRIPTION_CHANGED:
-		case LABEL_CHANGED:
-			return SelectionType.DIFF_FILTER_COSMETIC;
-
-		case FULL:
-			return SelectionType.DIFF_FILTER_DIFF_FULL_CREATED;
-		case FULL_DELETED:
-			return SelectionType.DIFF_FILTER_DIFF_FULL_DELETED;
-		default:
-			return SelectionType.DIFF_FILTER_COSMETIC;
-		}
-
 	}
 
 	private void selectRuleNodes(Iterable<SharedRule> rules) {
