@@ -16,10 +16,5 @@ public class SortedComboBoxModel<E extends Comparable<E>> extends DefaultComboBo
 			if (getElementAt(index).compareTo(element) > 0)
 				break;
 		}
-
-		super.insertElementAt(element, index);
-		if (index == 0 && element != null) {
-			setSelectedItem(element);
-		}
 	}
 }
