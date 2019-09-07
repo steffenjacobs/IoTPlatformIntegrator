@@ -1,13 +1,17 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.iotplatformintegrator.domain.manage.DiffType;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedElementType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.UnknownSharedElementType;
@@ -37,6 +41,7 @@ public class SharedRuleElementDiffJsonTransformer {
 	public static final String KEY_PROPERTIES_ADDED = "added";
 	public static final String KEY_PROPERTIES_REMOVED = "removed";
 	public static final String KEY_PROPERTIES_UPDATED = "updated";
+	public static final String KEY_DIFF_TYPES = "diff-types";
 
 	public JSONObject toJSON(SharedRuleElementDiff diff, String associatedRuleName, String creatorName) {
 		final JSONObject json = new JSONObject();
@@ -54,6 +59,7 @@ public class SharedRuleElementDiffJsonTransformer {
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_ADDED, diff.getPropertiesAdded());
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_REMOVED, diff.getPropertiesRemoved());
 		jsonHelper.putStringMapIfNotNull(json, KEY_PROPERTIES_UPDATED, diff.getPropertiesUpdated());
+		jsonHelper.putIterableIfNotNull(json, KEY_DIFF_TYPES, diff.getDiffTypes().stream().map(Object::toString).collect(Collectors.toList()));
 		diff.getTargetRule().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_TARGET_RULE_NAME, r));
 		diff.getPrevDiff().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_PREV_DIFF_ID, r.getUid()));
 		diff.getSourceRule().ifPresent(r -> jsonHelper.putIfNotNull(json, KEY_SOURCE_RULE_NAME, r.getName()));
@@ -90,9 +96,11 @@ public class SharedRuleElementDiffJsonTransformer {
 		Map<String, Object> propertiesUpdated = jsonHelper.readMapFromJson(json, KEY_PROPERTIES_UPDATED);
 
 		String creator = getStringOrNull(json, KEY_CREATOR);
+		Collection<DiffType> dt = new ArrayList<>();
+		jsonHelper.readIterableFromJson(json, KEY_DIFF_TYPES).forEach(d -> dt.add(DiffType.valueOf(d)));
 
 		SharedRuleElementDiff ruleDiff = new SharedRuleElementDiff(UUID.fromString(uid), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated,
-				isNegative, relativeElementId);
+				isNegative, relativeElementId, dt);
 
 		String targetRuleName = getStringOrNull(json, KEY_TARGET_RULE_NAME);
 		String sourceRuleName = getStringOrNull(json, KEY_SOURCE_RULE_NAME);

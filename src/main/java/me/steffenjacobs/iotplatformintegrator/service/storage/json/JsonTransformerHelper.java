@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.service.storage.json;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,6 +58,22 @@ public class JsonTransformerHelper {
 			}
 		}
 		return map;
+	}
+
+	public void putIterableIfNotNull(JSONObject json, String key, Iterable<String> iterable) {
+		if (iterable.iterator().hasNext()) {
+			final JSONArray jsonArr = new JSONArray();
+			iterable.forEach(i -> jsonArr.put(i));
+			json.put(key, jsonArr);
+		}
+	}
+	
+	public Iterable<String> readIterableFromJson(JSONObject json, String key){
+		final Collection<String> result = new ArrayList<>();
+		for(Object o : getArrayOrEmpty(json, key)) {
+			result.add(o.toString());
+		}
+		return result;
 	}
 
 	private JSONArray getArrayOrEmpty(JSONObject json, String key) {
