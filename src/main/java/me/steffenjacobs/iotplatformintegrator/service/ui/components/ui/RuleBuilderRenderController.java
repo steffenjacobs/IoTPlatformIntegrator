@@ -46,6 +46,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.render.TriggerRende
 import me.steffenjacobs.iotplatformintegrator.service.manage.render.VisualRenderingStrategy;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectoryHolder;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.service.ui.components.RuleAnalyzer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ActionElement;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.ConditionElement;
@@ -73,14 +74,15 @@ public class RuleBuilderRenderController implements RuleComponentRegistry, RuleA
 
 	private SharedRule rule = null;
 
-	private final RuleElementRecommender recommender = new RuleElementRecommender(this);
+	private final RuleElementRecommender recommender;
 	private final RuleElementValidator validator = new RuleElementValidator(this);
 
 	public Optional<SharedRule> getDisplayedRule() {
 		return rule == null ? Optional.empty() : Optional.of(rule);
 	}
 
-	public RuleBuilderRenderController(RuleBuilder ruleBuilder) {
+	public RuleBuilderRenderController(RuleBuilder ruleBuilder, SettingService settingService) {
+		recommender  = new RuleElementRecommender(this, settingService);
 		new RuleMutator(this);
 		this.ruleBuilder = ruleBuilder;
 		ruleBuilder.setRenderController(this);

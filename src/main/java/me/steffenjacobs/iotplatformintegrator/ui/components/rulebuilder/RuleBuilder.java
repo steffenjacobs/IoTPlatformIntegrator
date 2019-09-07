@@ -106,7 +106,7 @@ public class RuleBuilder extends JPanel {
 		this.add(buttonBar, BorderLayout.SOUTH);
 		buttonBar.setEnabled(false);
 
-		new RuleBuilderRenderController(this);
+		new RuleBuilderRenderController(this, settingService);
 	}
 
 	public void onSelectedRuleChanged(SharedRule rule) {

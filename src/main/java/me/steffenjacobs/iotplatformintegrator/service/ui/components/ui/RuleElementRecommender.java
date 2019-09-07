@@ -20,15 +20,20 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.TargetConnectionChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.shared.ItemDirectory;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 
 /** @author Steffen Jacobs */
 public class RuleElementRecommender {
 
 	private final RuleComponentRegistry registry;
+	private final boolean enableEvaluationFeatures;
+
 	private ItemDirectory targetItemDirectory = null;
 
-	public RuleElementRecommender(RuleComponentRegistry registry) {
+	public RuleElementRecommender(RuleComponentRegistry registry, SettingService settingService) {
 		this.registry = registry;
+		enableEvaluationFeatures = !"1".equals(settingService.getSetting(SettingKey.DISABLE_EVALUATION_FEATURES));
 
 		EventBus.getInstance().addEventHandler(EventType.TARGET_CONNECTION_CHANGE, e -> {
 			ServerConnection c = ((TargetConnectionChangeEvent) e).getServerConnection();
@@ -45,102 +50,128 @@ public class RuleElementRecommender {
 		Optional<Component> cState = getType(strategyElements, "state");
 		Optional<Component> cCommand = getType(strategyElements, "command");
 
-		if (cItem.isPresent()) {
-			final Optional<SharedItem> item;
-			if (cItem.get() instanceof JComboBox<?>) {
-				SharedItem si = (SharedItem) ((JComboBox<?>) cItem.get()).getSelectedItem();
-				if (si != null) {
-					item = Optional.of(si);
+		if (!enableEvaluationFeatures) {
+			if (cItem.isPresent()) {
+				if (targetItemDirectory != null) {
+					final JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
+					for (SharedItem item : targetItemDirectory.getAllItems()) {
+						box.addItem(item);
+					}
+				}
+			}
+
+			if (cCommand.isPresent()) {
+				final JComboBox<Command> box = (JComboBox<Command>) cCommand.get();
+				for (Command cmd : Command.values()) {
+					box.addItem(cmd);
+				}
+			}
+
+			if (cOperator.isPresent()) {
+				final JComboBox<Operation> box = (JComboBox<Operation>) cOperator.get();
+				for (Operation op : Operation.values()) {
+					box.addItem(op);
+				}
+			}
+			return;
+		} else {
+			if (cItem.isPresent()) {
+				final Optional<SharedItem> item;
+				if (cItem.get() instanceof JComboBox<?>) {
+					SharedItem si = (SharedItem) ((JComboBox<?>) cItem.get()).getSelectedItem();
+					if (si != null) {
+						item = Optional.of(si);
+					} else {
+						item = Optional.empty();
+					}
 				} else {
 					item = Optional.empty();
 				}
-			} else {
-				item = Optional.empty();
-			}
 
-			// add recommendations for commands based on current item
-			if (item.isPresent() && cCommand.isPresent()) {
-				for (Command command : item.get().getType().getAllowedCommands()) {
-					JComboBox<Command> box = (JComboBox<Command>) cCommand.get();
-					if (!containsItem(box, command)) {
-						box.addItem(command);
+				// add recommendations for commands based on current item
+				if (item.isPresent() && cCommand.isPresent()) {
+					for (Command command : item.get().getType().getAllowedCommands()) {
+						JComboBox<Command> box = (JComboBox<Command>) cCommand.get();
+						if (!containsItem(box, command)) {
+							box.addItem(command);
+						}
 					}
 				}
-			}
-			if (cState.isPresent()) {
-				// TODO: validation if state is a command or item
-			}
+				if (cState.isPresent()) {
+					// TODO: validation if state is a command or item
+				}
 
-			// add recommendations for operator based on current item
-			if (item.isPresent() && cOperator.isPresent()) {
-				for (Operation op : item.get().getType().getDatatype().getOperations()) {
-					JComboBox<Operation> box = (JComboBox<Operation>) cOperator.get();
-					if (!containsItem(box, op)) {
-						box.addItem(op);
+				// add recommendations for operator based on current item
+				if (item.isPresent() && cOperator.isPresent()) {
+					for (Operation op : item.get().getType().getDatatype().getOperations()) {
+						JComboBox<Operation> box = (JComboBox<Operation>) cOperator.get();
+						if (!containsItem(box, op)) {
+							box.addItem(op);
+						}
 					}
 				}
-			}
 
-			// add recommendations for item for created null item
-			if (item.isPresent() && item.get().getType() == ItemType.Unknown) {
-				ItemDirectory currentItemDirectory;
-				if (targetItemDirectory == null) {
-					currentItemDirectory = App.getDatabaseConnectionObject().getItemDirectory();
-				} else {
-					currentItemDirectory = targetItemDirectory;
-				}
-				
-				//add only those items with correct command or operator
-				for (SharedItem si : currentItemDirectory.getAllItems()) {
-					if (si.getType() == ItemType.Unknown) {
-						continue;
+				// add recommendations for item for created null item
+				if (item.isPresent() && item.get().getType() == ItemType.Unknown) {
+					ItemDirectory currentItemDirectory;
+					if (targetItemDirectory == null) {
+						currentItemDirectory = App.getDatabaseConnectionObject().getItemDirectory();
+					} else {
+						currentItemDirectory = targetItemDirectory;
 					}
-					if (cCommand.isPresent()) {
-						if (!ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())) {
+
+					// add only those items with correct command or operator
+					for (SharedItem si : currentItemDirectory.getAllItems()) {
+						if (si.getType() == ItemType.Unknown) {
 							continue;
 						}
-					}
-					if (cOperator.isPresent()) {
-						if (!ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
-							continue;
+						if (cCommand.isPresent()) {
+							if (!ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())) {
+								continue;
+							}
 						}
-					}
-					JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
-					if (!containsItem(box, si)) {
-						box.addItem(si);
-					}
-				}
-			}
-
-			// add recommendations for item based on operator and/or command
-			if (targetItemDirectory != null && cItem.get() instanceof JComboBox<?>) {
-				Collection<SharedItem> items = new ArrayList<>();
-				if (cOperator.isPresent() && cCommand.isPresent()) {
-					for (SharedItem si : targetItemDirectory.getAllItems()) {
-						if (ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())
-								&& ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
-							items.add(si);
+						if (cOperator.isPresent()) {
+							if (!ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
+								continue;
+							}
 						}
-					}
-				} else if (cOperator.isPresent()) {
-					for (SharedItem si : targetItemDirectory.getAllItems()) {
-						if (ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
-							items.add(si);
-						}
-					}
-				} else if (cCommand.isPresent()) {
-					for (SharedItem si : targetItemDirectory.getAllItems()) {
-						if (ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())) {
-							items.add(si);
+						JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
+						if (!containsItem(box, si)) {
+							box.addItem(si);
 						}
 					}
 				}
 
-				// add alternative items to combobox
-				for (SharedItem si : items) {
-					JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
-					if (!containsItem(box, si)) {
-						box.addItem(si);
+				// add recommendations for item based on operator and/or command
+				if (targetItemDirectory != null && cItem.get() instanceof JComboBox<?>) {
+					Collection<SharedItem> items = new ArrayList<>();
+					if (cOperator.isPresent() && cCommand.isPresent()) {
+						for (SharedItem si : targetItemDirectory.getAllItems()) {
+							if (ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())
+									&& ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
+								items.add(si);
+							}
+						}
+					} else if (cOperator.isPresent()) {
+						for (SharedItem si : targetItemDirectory.getAllItems()) {
+							if (ArrayUtils.contains(si.getType().getDatatype().getOperations(), ((JComboBox<?>) cOperator.get()).getSelectedItem())) {
+								items.add(si);
+							}
+						}
+					} else if (cCommand.isPresent()) {
+						for (SharedItem si : targetItemDirectory.getAllItems()) {
+							if (ArrayUtils.contains(si.getType().getAllowedCommands(), ((JComboBox<?>) cCommand.get()).getSelectedItem())) {
+								items.add(si);
+							}
+						}
+					}
+
+					// add alternative items to combobox
+					for (SharedItem si : items) {
+						JComboBox<SharedItem> box = (JComboBox<SharedItem>) cItem.get();
+						if (!containsItem(box, si)) {
+							box.addItem(si);
+						}
 					}
 				}
 			}
