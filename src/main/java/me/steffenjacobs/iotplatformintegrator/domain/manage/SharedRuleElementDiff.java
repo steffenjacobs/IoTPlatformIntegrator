@@ -1,5 +1,7 @@
 package me.steffenjacobs.iotplatformintegrator.domain.manage;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,18 +23,19 @@ public class SharedRuleElementDiff {
 	private final Map<String, Object> propertiesUpdated = new HashMap<>();
 	private final boolean negative;
 	private final int relativeElementId;
+	private final Collection<DiffType> diffTypes;
 
 	private Optional<SharedRule> sourceRule = Optional.empty();
 	private Optional<String> targetRuleName = Optional.empty();
 	private Optional<SharedRuleElementDiff> prevDiff = Optional.empty();
 
 	public SharedRuleElementDiff(String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded, Map<String, Object> propertiesRemoved,
-			Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId) {
-		this(UUID.randomUUID(), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative, relativeElementId);
+			Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId, Collection<DiffType> diffTypes) {
+		this(UUID.randomUUID(), description, label, elementType, propertiesAdded, propertiesRemoved, propertiesUpdated, isNegative, relativeElementId, diffTypes);
 	}
 
 	public SharedRuleElementDiff(UUID uid, String description, String label, SharedElementType elementType, Map<String, Object> propertiesAdded,
-			Map<String, Object> propertiesRemoved, Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId) {
+			Map<String, Object> propertiesRemoved, Map<String, Object> propertiesUpdated, boolean isNegative, int relativeElementId, Collection<DiffType> diffTypes) {
 		super();
 		this.uid = uid;
 		this.description = description;
@@ -49,6 +52,7 @@ public class SharedRuleElementDiff {
 			this.propertiesUpdated.putAll(propertiesUpdated);
 		}
 		this.negative = isNegative;
+		this.diffTypes = diffTypes;
 	}
 
 	public void setTargetRuleName(String targetRuleName) {
@@ -58,14 +62,14 @@ public class SharedRuleElementDiff {
 	public void setPrevDiff(SharedRuleElementDiff prevDiff) {
 		this.prevDiff = Optional.of(prevDiff);
 	}
-	
+
 	public void setSourceRule(SharedRule sourceRule) {
 		this.sourceRule = Optional.of(sourceRule);
 	}
 
 	/** Constructor to create an empty diff element. */
 	public SharedRuleElementDiff(boolean isNegative, int relativeElementId) {
-		this(null, null, UnknownSharedElementType.INSTANCE, null, null, null, isNegative, relativeElementId);
+		this(null, null, UnknownSharedElementType.INSTANCE, null, null, null, isNegative, relativeElementId, Collections.singleton(DiffType.FULL));
 	}
 
 	public String getDescription() {
@@ -119,8 +123,12 @@ public class SharedRuleElementDiff {
 	public Optional<SharedRuleElementDiff> getPrevDiff() {
 		return prevDiff;
 	}
-	
+
 	public Optional<SharedRule> getSourceRule() {
 		return sourceRule;
+	}
+
+	public Collection<DiffType> getDiffTypes() {
+		return diffTypes;
 	}
 }
