@@ -1,8 +1,11 @@
 package me.steffenjacobs.iotplatformintegrator.service.manage;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.steffenjacobs.iotplatformintegrator.domain.manage.DiffType;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus.EventType;
@@ -25,6 +28,21 @@ public class RuleDiffCache {
 
 	public RuleDiffParts getRuleDiffParts(String id) {
 		return cache.get(id);
+	}
+
+	public Collection<RuleDiffParts> getRuleDiffsWithAnyFilter(Collection<DiffType> diffTypes) {
+		final Collection<RuleDiffParts> filtered = new ArrayList<>();
+
+		cache.values().forEach(v -> {
+			for (DiffType dt : v.getRuleDiff().getDiffTypes()) {
+				if (diffTypes.contains(dt)) {
+					filtered.add(v);
+					return;
+				}
+			}
+		});
+
+		return filtered;
 	}
 
 	private RuleDiffParts toParts(SharedRuleElementDiff diff) {
