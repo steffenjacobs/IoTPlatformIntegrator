@@ -10,6 +10,7 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.App;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.RemoteRuleDiffPanel;
@@ -37,14 +38,14 @@ public class IntegrationPerspective extends Perspective {
 		ruleTableTargetPanel.add(new JScrollPane(ruleTableTarget), BorderLayout.CENTER);
 	}
 
-	public IntegrationPerspective() {
+	public IntegrationPerspective(SettingService settingService) {
 		connectionExplorerPanel.setLayout(new BorderLayout());
 		ruleTableSourcePanel.setLayout(new BorderLayout());
 		ruleTableTargetPanel.setLayout(new BorderLayout());
-		setupDockingEnvironment();
+		setupDockingEnvironment(settingService);
 	}
 
-	private void setupDockingEnvironment() {
+	private void setupDockingEnvironment(SettingService settingService) {
 		control = new CControl();
 
 		// create connection explorer window
@@ -76,7 +77,7 @@ public class IntegrationPerspective extends Perspective {
 		control.addDockable(targetItemWindow);
 
 		// create rule builder window
-		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new RuleBuilder());
+		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new RuleBuilder(settingService));
 		control.addDockable(ruleBuilderWindow);
 
 		// configure grid

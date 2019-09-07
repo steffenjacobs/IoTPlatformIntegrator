@@ -53,7 +53,7 @@ public class UiEntrypoint {
 		this.authenticationService = authenticationService;
 		settingsFrameFactory = new SettingsFrameFactory(settingService);
 		importPerspective = new ImportPerspective(settingService);
-		adoptionPerspective = new AdoptionPerspective();
+		adoptionPerspective = new AdoptionPerspective(settingService);
 		scoreboardPerspective = new ScoreboardPerspective();
 		serverConnectionManager = new ServerConnectionManager(settingService);
 

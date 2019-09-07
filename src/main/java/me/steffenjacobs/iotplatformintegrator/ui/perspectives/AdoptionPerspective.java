@@ -10,6 +10,8 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.SingleCDockable;
 import me.steffenjacobs.iotplatformintegrator.App;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
+import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.GlobalComponentHolder;
 import me.steffenjacobs.iotplatformintegrator.ui.components.ConnectionExplorer;
 import me.steffenjacobs.iotplatformintegrator.ui.components.rulebuilder.RuleBuilder;
@@ -36,15 +38,17 @@ public class AdoptionPerspective extends Perspective {
 		remoteRulesTablePanel.add(new JScrollPane(ruleTableRemote), BorderLayout.CENTER);
 	}
 
-	public AdoptionPerspective() {
+	public AdoptionPerspective(SettingService settingService) {
 		connectionExplorerPanel.setLayout(new BorderLayout());
 		platformRulesTablePanel.setLayout(new BorderLayout());
 		remoteRulesTablePanel.setLayout(new BorderLayout());
-		setupDockingEnvironment();
+		setupDockingEnvironment(settingService);
 	}
 
-	private void setupDockingEnvironment() {
+	private void setupDockingEnvironment(SettingService settingService) {
 		control = new CControl();
+
+		final boolean enableEvaluationFeatures = !"1".equals(settingService.getSetting(SettingKey.DISABLE_EVALUATION_FEATURES));
 
 		// create connection explorer window
 		SingleCDockable connectionExplorerWindow = DockableUtil.createDockable("ConnectionExplorer-Window", "ConnectionExplorer", connectionExplorerPanel);
@@ -54,26 +58,34 @@ public class AdoptionPerspective extends Perspective {
 		SingleCDockable ruleTableSourceWindow = DockableUtil.createDockable("RuleTablePlatform-Window", "Rules from Platform", platformRulesTablePanel);
 		control.addDockable(ruleTableSourceWindow);
 
-		// create rule net window
-		SingleCDockable ruleNetWindow = DockableUtil.createDockable("RuleNet-Window", "Remote Rules Network", App.getRuleGraphManager().getGraphPanel());
-		control.addDockable(ruleNetWindow);
+		SingleCDockable ruleNetWindow = null;
+		if (enableEvaluationFeatures) {
+			// create rule net window
+			ruleNetWindow = DockableUtil.createDockable("RuleNet-Window", "Remote Rules Network", App.getRuleGraphManager().getGraphPanel());
+			control.addDockable(ruleNetWindow);
+		}
 
 		// create remote rules window
-		SingleCDockable remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", remoteRulesTablePanel);
-		control.addDockable(remoteRulesWindow);
+		SingleCDockable remoteRulesWindow = null;
+		if (enableEvaluationFeatures) {
+			remoteRulesWindow = DockableUtil.createDockable("RemoteRules-Window", "Remote Rules", remoteRulesTablePanel);
+			control.addDockable(remoteRulesWindow);
+		}
 
 		// create rule builder window
-		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new RuleBuilder());
+		SingleCDockable ruleBuilderWindow = DockableUtil.createDockable("RuleBuilder-Window", "RuleBuilder", new RuleBuilder(settingService));
 		control.addDockable(ruleBuilderWindow);
 
 		// configure grid
 		CGrid grid = new CGrid(control);
 
-		grid.add(0, 0, .5, .7, ruleNetWindow);
+		if (enableEvaluationFeatures) {
+			grid.add(0, 0, .5, .7, ruleNetWindow);
+			grid.add(.575, .7, .425, .3, remoteRulesWindow);
+		}
 		grid.add(.5, 0, .5, .7, ruleBuilderWindow);
 		grid.add(0, .7, .15, .3, connectionExplorerWindow);
 		grid.add(.15, .7, .425, .3, ruleTableSourceWindow);
-		grid.add(.575, .7, .425, .3, remoteRulesWindow);
 
 		control.getContentArea().deploy(grid);
 	}

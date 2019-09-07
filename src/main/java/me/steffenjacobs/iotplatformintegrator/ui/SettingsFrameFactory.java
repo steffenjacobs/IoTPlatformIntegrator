@@ -27,7 +27,7 @@ public class SettingsFrameFactory {
 
 	public JFrame createSettingsFrame() {
 		JFrame frame = new JFrame("OpenHAB Settings");
-		frame.setSize(590, 480);
+		frame.setSize(590, 495);
 
 		JButton btnSave = new JButton("Save");
 		JPanel contentPanel = new JPanel();

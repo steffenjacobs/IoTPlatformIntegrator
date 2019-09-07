@@ -12,7 +12,8 @@ public enum SettingKey {
 	PASSWORD("changeme", "password", "Password"), //
 	USERID("1337", "userid", "UserId"), //
 	DATABASE_URI("mongodb://localhost", "database-uri", "Database URI"),//
-	BABELNET_API_KEY("5f7d9a98-c99f-454e-a9b5-4f17305e7845", "babelnet-api-key", "Babelnet API Key");
+	BABELNET_API_KEY("5f7d9a98-c99f-454e-a9b5-4f17305e7845", "babelnet-api-key", "Babelnet API Key"),//
+	DISABLE_EVALUATION_FEATURES("0", "disable-evaluation-features", "Disable all Evaluation Features");
 
 	private final String defaultValue;
 	private final String configKey;
