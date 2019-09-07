@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.swing.JOptionPane;
 
@@ -137,16 +139,43 @@ public class RuleMutator {
 			SharedRule rule = oRule.get();
 			SharedRuleElement elem = ruleBuilderController.getRuleElementById(sourceId);
 			if (elem instanceof SharedTrigger) {
-				rule.getTriggers().add(copy((SharedTrigger) elem));
+				rule.getTriggers().add(copy((SharedTrigger) elem, nextElementId(rule, elem)));
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null));
 			} else if (elem instanceof SharedCondition) {
-				rule.getConditions().add(copy((SharedCondition) elem));
+				rule.getConditions().add(copy((SharedCondition) elem, nextElementId(rule, elem)));
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null));
 			} else if (elem instanceof SharedAction) {
-				rule.getActions().add(copy((SharedAction) elem));
+				rule.getActions().add(copy((SharedAction) elem, nextElementId(rule, elem)));
 				EventBus.getInstance().fireEvent(new RuleChangeEvent(rule, elem, null));
 			}
 		}
+	}
+
+	private int nextElementId(SharedRule rule, SharedRuleElement elem) {
+		int id = elem.getRelativeElementId();
+
+		final Function<SharedRuleElement, Set<? extends SharedRuleElement>> retrieveSharedRuleElementSet = t -> {
+			if (t instanceof SharedTrigger) {
+				return rule.getTriggers();
+			} else if (t instanceof SharedCondition) {
+				return rule.getConditions();
+			}
+			return rule.getActions();
+		};
+
+		Predicate<Integer> elementIdTaken = e -> {
+			for (SharedRuleElement ruleElement : retrieveSharedRuleElementSet.apply(elem)) {
+				if (ruleElement.getRelativeElementId() == e) {
+					return true;
+				}
+			}
+			return false;
+		};
+
+		do {
+			id++;
+		} while (elementIdTaken.test(id));
+		return id;
 	}
 
 	private void deleteRuleElement(UUID sourceId) {
@@ -170,24 +199,22 @@ public class RuleMutator {
 		}
 	}
 
-	private SharedTrigger copy(SharedTrigger trigger) {
+	private SharedTrigger copy(SharedTrigger trigger, int newElementId) {
 		Map<String, Object> properties = new HashMap<>();
 		trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties, trigger.getDescription(), trigger.getLabel() + " - Copy",
-				trigger.getRelativeElementId() + 10000);
+		return new SharedTrigger(trigger.getTriggerTypeContainer().getTriggerType(), properties, trigger.getDescription(), trigger.getLabel() + " - Copy", newElementId);
 	}
 
-	private SharedCondition copy(SharedCondition condition) {
+	private SharedCondition copy(SharedCondition condition, int newElementId) {
 		Map<String, Object> properties = new HashMap<>();
 		condition.getConditionTypeContainer().getConditionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
 		return new SharedCondition(condition.getConditionTypeContainer().getConditionType(), properties, condition.getDescription(), condition.getLabel() + " - Copy",
-				condition.getRelativeElementId() + 10000);
+				newElementId);
 	}
 
-	private SharedAction copy(SharedAction action) {
+	private SharedAction copy(SharedAction action, int newElementId) {
 		Map<String, Object> properties = new HashMap<>();
 		action.getActionTypeContainer().getActionTypeSpecificValues().entrySet().stream().forEach(e -> properties.put(e.getKey().getKeyString(), e.getValue()));
-		return new SharedAction(action.getActionTypeContainer().getActionType(), properties, action.getDescription(), action.getLabel() + " - Copy",
-				action.getRelativeElementId() + 10000);
+		return new SharedAction(action.getActionTypeContainer().getActionType(), properties, action.getDescription(), action.getLabel() + " - Copy", newElementId);
 	}
 }
