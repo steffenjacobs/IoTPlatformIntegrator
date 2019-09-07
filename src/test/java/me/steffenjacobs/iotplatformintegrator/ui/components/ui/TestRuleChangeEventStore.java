@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.ui.components.ui;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import me.steffenjacobs.iotplatformintegrator.domain.manage.DiffType;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.ItemType;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.item.SharedItem;
@@ -33,7 +35,7 @@ public class TestRuleChangeEventStore {
 	public void testDiffApplicationForTriggerWithChangedDescription() {
 		SharedRule rule = createSharedRule();
 
-		SharedRuleElementDiff diff = new SharedRuleElementDiff("NewItemStateChangedDescription", null, TriggerType.CommandReceived, null, null, null, false, 1);
+		SharedRuleElementDiff diff = new SharedRuleElementDiff("NewItemStateChangedDescription", null, TriggerType.CommandReceived, null, null, null, false, 1, Collections.singleton(DiffType.DESCRIPTION_CHANGED));
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff, new ItemDirectory());
@@ -63,7 +65,7 @@ public class TestRuleChangeEventStore {
 
 		Map<String, Object> propertiesUpdated = new HashMap<>();
 		propertiesUpdated.put(TriggerTypeSpecificKey.Command.getKeyString(), Command.Off);
-		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.CommandReceived, null, null, propertiesUpdated, false, 1);
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.CommandReceived, null, null, propertiesUpdated, false, 1, Collections.singleton(DiffType.TRIGGER_TYPE_CHANGE));
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff, new ItemDirectory());
@@ -104,7 +106,7 @@ public class TestRuleChangeEventStore {
 		Map<String, Object> propertiesUpdated = new HashMap<>();
 		propertiesUpdated.put(TriggerTypeSpecificKey.ItemName.getKeyString(), createTestItem("TestSwitch2"));
 
-		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.ItemStateUpdated, propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1);
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, TriggerType.ItemStateUpdated, propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1, Collections.singleton(DiffType.TRIGGER_TYPE_VALUE_UPDATED));
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff, new ItemDirectory());
@@ -142,7 +144,7 @@ public class TestRuleChangeEventStore {
 
 		Map<String, Object> propertiesUpdated = new HashMap<>();
 
-		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ConditionType.TimeOfDay, propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1337);
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ConditionType.TimeOfDay, propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1337, Collections.singleton(DiffType.CONDITION_TYPE_VALUE_UPDATED));
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff, new ItemDirectory());
@@ -180,7 +182,7 @@ public class TestRuleChangeEventStore {
 
 		Map<String, Object> propertiesUpdated = new HashMap<>();
 
-		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ActionType.SaySomething, propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1);
+		SharedRuleElementDiff diff = new SharedRuleElementDiff(null, null, ActionType.SaySomething, propertiesCreated, propertiesRemoved, propertiesUpdated, false, 1, Collections.singleton(DiffType.ACTION_TYPE_VALUE_UPDATED));
 		RuleChangeEventStore store = new RuleChangeEventStore(new AuthenticationServiceMock());
 
 		store.applyDiff(rule, diff, new ItemDirectory());

@@ -105,7 +105,7 @@ public class RuleDiffService {
 				Object newValue = newTrigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().get(key);
 				if (newValue == null) {
 					propertiesRemoved.put(key.getKeyString(), oldValue);
-					diffTypes.add(DiffType.TRIGGER_TYPE_VALUE_REMOVED);
+					diffTypes.add(DiffType.TRIGGER_TYPE_VALUE_DELETED);
 				}
 			}
 
