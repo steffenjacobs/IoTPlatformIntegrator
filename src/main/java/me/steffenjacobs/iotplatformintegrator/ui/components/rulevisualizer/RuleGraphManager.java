@@ -227,7 +227,7 @@ public class RuleGraphManager {
 				EventBus.getInstance().fireEvent(new StoreRuleToDatabaseEvent(null, rule.getName(), false));
 				edges.add(Pair.of(nextSelectedRuleIsTargetId.get(), rule.getName()));
 				graph.refreshEdges(edges);
-				graph.selectNode(rule.getName(), false, nodesByUUID, ruleByUUID);
+				graph.selectNode(rule.getName(), true, nodesByUUID, ruleByUUID);
 				nextSelectedRuleIsTargetId.set(rule.getName());
 				return;
 			}

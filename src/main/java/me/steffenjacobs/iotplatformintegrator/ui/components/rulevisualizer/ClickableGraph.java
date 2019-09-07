@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -133,7 +134,7 @@ public class ClickableGraph implements ViewerListener {
 					n.addAttribute("ui.style", "size: " + SIZE_RULE_NODE + ";");
 				}
 				nodeWithType.put(n, isDiff);
-			} catch (IdAlreadyInUseException e) {
+			} catch (IdAlreadyInUseException | NoSuchElementException e) {
 				LOG.warn("Could not create node {}: {}", nodeId, e.getMessage());
 			}
 		} catch (Exception e) {

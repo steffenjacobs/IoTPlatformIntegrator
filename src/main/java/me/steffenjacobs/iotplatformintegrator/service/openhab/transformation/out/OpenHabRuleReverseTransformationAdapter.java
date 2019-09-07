@@ -19,6 +19,7 @@ import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.Condi
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.condition.SharedCondition;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.SharedTrigger;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType;
+import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.trigger.TriggerType.TriggerTypeSpecificKey;
 import me.steffenjacobs.iotplatformintegrator.service.shared.PlatformRuleReverseTransformationAdapter;
 
 /** @author Steffen Jacobs */
@@ -98,10 +99,15 @@ public class OpenHabRuleReverseTransformationAdapter implements PlatformRuleReve
 		result.setId(Integer.toString(trigger.getRelativeElementId()));
 
 		// configuration
+		final boolean isItemStateChange = trigger.getTriggerTypeContainer().getTriggerType() == TriggerType.ItemStateChanged
+				|| trigger.getTriggerTypeContainer().getTriggerType() == TriggerType.ItemStateUpdated;
 		triggerReverseTransformer.convertTriggerTypeContainer(trigger.getTriggerTypeContainer(), commandTransformer);
 		final Configuration configuration = new Configuration();
 		trigger.getTriggerTypeContainer().getTriggerTypeSpecificValues().forEach((k, v) -> {
-			configuration.setAdditionalProperty(k.getKeyString(), v);
+			if (!isItemStateChange || (k != TriggerTypeSpecificKey.PreviousState && k != TriggerTypeSpecificKey.State)) {
+				configuration.setAdditionalProperty(k.getKeyString(), v);
+			}
+
 		});
 		result.setConfiguration(configuration);
 
