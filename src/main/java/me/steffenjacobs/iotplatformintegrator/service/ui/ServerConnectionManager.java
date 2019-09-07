@@ -136,6 +136,14 @@ public class ServerConnectionManager {
 		Pair<String, Integer> parsedUrlAndPort = UrlUtil.parseUrlWithPort(urlWithPort);
 		ServerConnection connection = new ServerConnection(PlatformType.OPENHAB, statusMessage.getVersion(), "Open Hab Instance on port: " + parsedUrlAndPort.getRight(),
 				parsedUrlAndPort.getLeft(), parsedUrlAndPort.getRight());
+		if(currentConnections.contains(connection)) {
+			for(ServerConnection c : currentConnections) {
+				if(connection.equals(c)) {
+					connection = c;
+					break;
+				}
+			}
+		}
 		ItemDirectoryHolder.getInstance().add(connection);
 		currentConnections.add(connection);
 
