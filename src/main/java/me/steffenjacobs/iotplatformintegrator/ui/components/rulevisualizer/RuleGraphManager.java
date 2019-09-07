@@ -6,14 +6,21 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,10 +30,12 @@ import javax.swing.event.DocumentListener;
 
 import org.graphstream.graph.Node;
 import org.graphstream.ui.view.ViewerListener;
+import org.jfree.ui.tabbedui.VerticalLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import me.steffenjacobs.iotplatformintegrator.App;
+import me.steffenjacobs.iotplatformintegrator.domain.manage.DiffType;
 import me.steffenjacobs.iotplatformintegrator.domain.manage.SharedRuleElementDiff;
 import me.steffenjacobs.iotplatformintegrator.domain.shared.rule.SharedRule;
 import me.steffenjacobs.iotplatformintegrator.service.manage.EventBus;
@@ -37,6 +46,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.RuleDiffChan
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.WithSharedRuleEvent;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
+import me.steffenjacobs.iotplatformintegrator.ui.components.rulevisualizer.ClickableGraph.SelectionType;
 import me.steffenjacobs.iotplatformintegrator.ui.util.Pair;
 import me.steffenjacobs.iotplatformintegrator.ui.util.PlaceholderTextField;
 
@@ -47,6 +57,7 @@ public class RuleGraphManager {
 
 	private final Map<String, Node> nodesByUUID = new HashMap<>();
 	private final Map<String, SharedRule> ruleByUUID = new HashMap<>();
+	private final Map<UUID, SharedRuleElementDiff> diffByUUID = new HashMap<>();
 	private final CopyOnWriteArraySet<Pair<String>> edges = new CopyOnWriteArraySet<>();
 
 	private final AtomicBoolean nextSelectedRuleIsTarget = new AtomicBoolean(false);
@@ -70,8 +81,8 @@ public class RuleGraphManager {
 			nextSelectedRuleIsTarget.set(true);
 		});
 		EventBus.getInstance().addEventHandler(EventType.RULE_CHANGE, e -> checkIfCurrentTransformationStateExistsAsRule(((WithSharedRuleEvent) e).getSelectedRule()));
-		
-		EventBus.getInstance().addEventHandler(EventType.RULE_RENDER, e -> this.lastSelectedRule = ((WithSharedRuleEvent)e).getSelectedRule());
+
+		EventBus.getInstance().addEventHandler(EventType.RULE_RENDER, e -> this.lastSelectedRule = ((WithSharedRuleEvent) e).getSelectedRule());
 
 		final JPanel buttonPanel = new JPanel(new FlowLayout());
 
@@ -122,10 +133,19 @@ public class RuleGraphManager {
 		final JButton refreshButton = new JButton("Refresh");
 		refreshButton.addActionListener(refreshAction);
 
+		// rule diff filters
+		final JPanel checkboxPanel = new JPanel(new VerticalLayout());
+		for (SelectionType selectionType : SelectionType.values()) {
+			final JCheckBox checkBox = new JCheckBox(selectionType.name());
+			checkBox.addActionListener(c -> visualizeDiffFilter(selectionType, checkBox.isSelected()));
+			checkboxPanel.add(checkBox);
+		}
+
 		// add buttons to panel
 		buttonPanel.add(refreshButton);
 		buttonPanel.add(searchItemName);
 		buttonPanel.add(findCurrentRuleButton);
+		buttonPanel.add(checkboxPanel);
 
 		// add button panel
 		graphPanel = new JPanel(new BorderLayout());
@@ -144,12 +164,112 @@ public class RuleGraphManager {
 
 	}
 
-	private void selectRuleNodes(Iterable<SharedRule> rules) {
+	private void visualizeDiffFilter(SelectionType filter, boolean selected) {
+		selectDiffNodes(App.getRuleDiffCache().getRuleDiffsWithAnyFilter(getAssociatedDiffTypes(filter)).stream().map(RuleDiffParts::getRuleDiff).collect(Collectors.toList()),
+				Optional.of(filter), selected);
+	}
+
+	private void selectDiffNodes(Iterable<SharedRuleElementDiff> diffs, Optional<SelectionType> selectionType, boolean selected) {
 		// clear selection
-		ruleByUUID.values().forEach(r -> graph.selectFilterNode(r.getName(), false, nodesByUUID::get));
+		diffByUUID.values().forEach(r -> graph.selectFilterNode(r.getUid().toString(), false, nodesByUUID::get, selectionType.orElse(getSelectionType(r.getDiffTypes()))));
 
 		// apply new selection
-		rules.forEach(r -> graph.selectFilterNode(r.getName(), true, nodesByUUID::get));
+		if (selected) {
+			diffs.forEach(r -> graph.selectFilterNode(r.getUid().toString(), true, nodesByUUID::get, selectionType.orElse(getSelectionType(r.getDiffTypes()))));
+		}
+	}
+
+	private SelectionType getSelectionType(Collection<DiffType> types) {
+
+		if (types.size() == 0) {
+			return SelectionType.UNKNOWN;
+		}
+
+		if (types.size() == 1) {
+			return getSelectionType(types.iterator().next());
+		}
+		if (types.size() == 2) {
+			if (types.contains(DiffType.ACTION_TYPE_VALUE_DELETED) && types.contains(DiffType.ACTION_TYPE_VALUE_ADDED)
+					|| types.contains(DiffType.CONDITION_TYPE_VALUE_DELETED) && types.contains(DiffType.CONDITION_TYPE_VALUE_ADDED)
+					|| types.contains(DiffType.TRIGGER_TYPE_VALUE_DELETED) && types.contains(DiffType.TRIGGER_TYPE_VALUE_ADDED)) {
+				return SelectionType.DIFF_FILTER_UPDATE;
+			}
+		}
+		LOG.info("Too many strange types: " + types);
+		return getSelectionType(types.iterator().next());
+	}
+
+	private Set<DiffType> getAssociatedDiffTypes(SelectionType selectionType) {
+		switch (selectionType) {
+		case DIFF_FILTER_COSMETIC:
+			return set(DiffType.DESCRIPTION_CHANGED, DiffType.LABEL_CHANGED);
+		case DIFF_FILTER_DIFF_FULL_CREATED:
+			return set(DiffType.FULL);
+		case DIFF_FILTER_DIFF_FULL_DELETED:
+			return set(DiffType.FULL_DELETED);
+		case DIFF_FILTER_CREATE:
+			return set(DiffType.ACTION_TYPE_VALUE_ADDED, DiffType.CONDITION_TYPE_VALUE_ADDED, DiffType.TRIGGER_TYPE_VALUE_ADDED);
+		case DIFF_FILTER_DELETE:
+			return set(DiffType.ACTION_TYPE_VALUE_DELETED, DiffType.CONDITION_TYPE_VALUE_DELETED, DiffType.TRIGGER_TYPE_VALUE_DELETED);
+		case DIFF_FILTER_UPDATE:
+			return set(DiffType.ACTION_TYPE_CHANGED, DiffType.ACTION_TYPE_VALUE_UPDATED, DiffType.CONDITION_TYPE_CHANGED, DiffType.CONDITION_TYPE_VALUE_UPDATED,
+					DiffType.TRIGGER_TYPE_CHANGE, DiffType.TRIGGER_TYPE_VALUE_UPDATED);
+		case RULE_FILTER:
+		case UNKNOWN:
+			return Collections.emptySet();
+		}
+		return Collections.emptySet();
+	}
+
+	@SafeVarargs
+	private final <T> Set<T> set(T... t) {
+		Set<T> set = new HashSet<>();
+		for (T tt : t) {
+			set.add(tt);
+		}
+		return set;
+	}
+
+	private SelectionType getSelectionType(DiffType type) {
+		switch (type) {
+		case ACTION_TYPE_CHANGED:
+		case ACTION_TYPE_VALUE_UPDATED:
+		case CONDITION_TYPE_CHANGED:
+		case CONDITION_TYPE_VALUE_UPDATED:
+		case TRIGGER_TYPE_CHANGE:
+		case TRIGGER_TYPE_VALUE_UPDATED:
+			return SelectionType.DIFF_FILTER_UPDATE;
+
+		case ACTION_TYPE_VALUE_ADDED:
+		case CONDITION_TYPE_VALUE_ADDED:
+		case TRIGGER_TYPE_VALUE_ADDED:
+			return SelectionType.DIFF_FILTER_CREATE;
+
+		case ACTION_TYPE_VALUE_DELETED:
+		case CONDITION_TYPE_VALUE_DELETED:
+		case TRIGGER_TYPE_VALUE_DELETED:
+			return SelectionType.DIFF_FILTER_DELETE;
+
+		case DESCRIPTION_CHANGED:
+		case LABEL_CHANGED:
+			return SelectionType.DIFF_FILTER_COSMETIC;
+
+		case FULL:
+			return SelectionType.DIFF_FILTER_DIFF_FULL_CREATED;
+		case FULL_DELETED:
+			return SelectionType.DIFF_FILTER_DIFF_FULL_DELETED;
+		default:
+			return SelectionType.DIFF_FILTER_COSMETIC;
+		}
+
+	}
+
+	private void selectRuleNodes(Iterable<SharedRule> rules) {
+		// clear selection
+		ruleByUUID.values().forEach(r -> graph.selectFilterNode(r.getName(), false, nodesByUUID::get, SelectionType.RULE_FILTER));
+
+		// apply new selection
+		rules.forEach(r -> graph.selectFilterNode(r.getName(), true, nodesByUUID::get, SelectionType.RULE_FILTER));
 	}
 
 	private void visualizeItemFilter(String searchText) {
@@ -241,6 +361,7 @@ public class RuleGraphManager {
 
 	private void visualizeRuleDiff(SharedRuleElementDiff diffElement, String prevDiffUid, String targetRuleName, String sourceRuleName, boolean silentAutoselect) {
 		final Node anchor;
+		diffByUUID.put(diffElement.getUid(), diffElement);
 
 		if (prevDiffUid != null) {
 			edges.add(Pair.of(prevDiffUid, diffElement.getUid().toString()));
@@ -303,6 +424,7 @@ public class RuleGraphManager {
 		edges.clear();
 		nodesByUUID.clear();
 		ruleByUUID.clear();
+		diffByUUID.clear();
 	}
 
 	public JPanel getGraphPanel() {
