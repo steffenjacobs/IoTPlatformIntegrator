@@ -1,5 +1,6 @@
 package me.steffenjacobs.iotplatformintegrator.ui;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.BoxLayout;
@@ -10,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
+
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingKey;
 import me.steffenjacobs.iotplatformintegrator.service.ui.SettingService;
 import me.steffenjacobs.iotplatformintegrator.ui.util.DocumentAdapter;
@@ -25,7 +27,7 @@ public class SettingsFrameFactory {
 
 	public JFrame createSettingsFrame() {
 		JFrame frame = new JFrame("OpenHAB Settings");
-		frame.setSize(400, 400);
+		frame.setSize(590, 480);
 
 		JButton btnSave = new JButton("Save");
 		JPanel contentPanel = new JPanel();
@@ -47,7 +49,7 @@ public class SettingsFrameFactory {
 	}
 
 	private JPanel createSettingField(final SettingKey key, final JButton saveButton) {
-		JTextField settingsField = new JTextField(settingService.getSetting(key));
+		JTextField settingsField = new JTextField(settingService.getSetting(key), 15);
 		JButton settingsButton = new JButton("Restore Default");
 
 		settingsField.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -73,8 +75,13 @@ public class SettingsFrameFactory {
 	}
 
 	private JPanel wrapToPanel(String label, JComponent... components) {
-		JPanel panel = new JPanel();
-		panel.add(new JLabel(label));
+		final JPanel panel = new JPanel();
+		final JLabel lab = new JLabel(label);
+		panel.add(lab);
+		final int height = (int)lab.getMinimumSize().getHeight();
+		lab.setMinimumSize(new Dimension(230, height));
+		lab.setPreferredSize(new Dimension(230, height));
+		lab.setMaximumSize(new Dimension(230, height));
 		for (JComponent component : components) {
 			panel.add(component);
 		}
