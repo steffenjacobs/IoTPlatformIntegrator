@@ -41,7 +41,9 @@ public class OpenHabExperimentalRulesService {
 	public boolean createRule(String openHabUrlWithPort, ExperimentalRule rule) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return 201 == sharedService.sendPost(openHabUrlWithPort + "/rest/rules", objectMapper.writeValueAsString(rule));
+			String createdRule = objectMapper.writeValueAsString(rule);
+			System.out.println(createdRule);
+			return 201 == sharedService.sendPost(openHabUrlWithPort + "/rest/rules", createdRule);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -17,6 +17,7 @@ import me.steffenjacobs.iotplatformintegrator.service.manage.events.ClearAllRemo
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RefreshRuleDiffsEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteItemAddedEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.RemoteRuleAddedEvent;
+import me.steffenjacobs.iotplatformintegrator.service.manage.events.SelectedRuleChangeEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.events.StoreRuleToDatabaseEvent;
 import me.steffenjacobs.iotplatformintegrator.service.manage.util.SimplifiedSubscriber;
 import me.steffenjacobs.iotplatformintegrator.service.storage.json.SharedRuleElementDiffJsonTransformer.RuleDiffParts;
@@ -41,6 +42,7 @@ public class RemoteRuleController implements RuleAnalyzer {
 			if (event.isUploadRule()) {
 				SharedRule rule = new SharedRule(event.getNewRuleName(), event.getSelectedRule());
 				uploadRule(rule);
+				EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(App.getRemoteRuleCache().getRuleByName(rule.getName())));
 			}
 		});
 
