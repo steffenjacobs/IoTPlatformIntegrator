@@ -118,7 +118,7 @@ public class ItemDetailsPanel extends JPanel {
 			try {
 				im = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resources/spinner.gif")));
 				imagePanel.add(new JLabel(im));
-			} catch (IOException e1) {
+			} catch (IOException | IllegalArgumentException e1) {
 				imagePanel.add(new JLabel("Loading images..."));
 			}
 

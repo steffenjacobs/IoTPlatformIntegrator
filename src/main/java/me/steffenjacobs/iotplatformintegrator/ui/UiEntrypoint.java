@@ -102,14 +102,21 @@ public class UiEntrypoint {
 
 	private JFrame setupFrame() {
 		JFrame frame = new JFrame("IoT Platform Integrator");
+
+		BufferedImage bufferedImage = null;
 		try {
-			BufferedImage bufferedImage = ImageIO.read(UiEntrypoint.class.getResourceAsStream("/resources/icon.png"));
-			Graphics2D g = bufferedImage.createGraphics();
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			frame.setIconImage(bufferedImage);
-		} catch (IOException e1) {
-			LOG.error("Could not load icon: " + e1.getMessage());
+			bufferedImage = ImageIO.read(UiEntrypoint.class.getResourceAsStream("/resources/icon.png"));
+		} catch (IOException | IllegalArgumentException e1) {
+			try {
+				bufferedImage = ImageIO.read(UiEntrypoint.class.getResourceAsStream("/icon.png"));
+			} catch (IOException e2) {
+				LOG.error("Could not load icon: " + e1.getMessage());
+				System.exit(1);
+			}
 		}
+		Graphics2D g = bufferedImage.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		frame.setIconImage(bufferedImage);
 
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
