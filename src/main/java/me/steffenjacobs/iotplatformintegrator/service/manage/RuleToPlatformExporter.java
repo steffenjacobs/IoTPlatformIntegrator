@@ -39,6 +39,7 @@ public class RuleToPlatformExporter {
 	private void export(ServerConnection serverConnection, SharedRule rule, String name) {
 		if (serverConnection.getPlatformType() == PlatformType.OPENHAB) {
 			final ExperimentalRule openHabRule = openHabReverseTransformationAdapter.getRuleTransformer().transformRule(rule, openHabCommandReverseTransformer);
+			openHabRule.setName(name);
 			ServerConnectionManager.getRuleservice().createRule(serverConnection.getUrl() + ":" + serverConnection.getPort(), openHabRule);
 			EventBus.getInstance().fireEvent(new RefreshOpenHABDataEvent());
 			EventBus.getInstance().fireEvent(new SelectedRuleChangeEvent(App.getRemoteRuleCache().getRuleByName(rule.getName())));
