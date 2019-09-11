@@ -55,7 +55,7 @@ public enum ItemType {
 	 * type implies its own allowed operations.
 	 */
 	public enum DataType {
-		Discrete(Operation.EQUAL, Operation.NOT_EQUAL), Numerical(Operation.EQUAL, Operation.SMALLER_EQUAL, Operation.SMALLER, Operation.BIGGER_EQUAL, Operation.BIGGER,
+		Discrete(Operation.EQUAL, Operation.NOT_EQUAL), Numerical(Operation.EQUAL, Operation.SMALLER_EQUAL, Operation.SMALLER, Operation.GREATER_EQUAL, Operation.GREATER,
 				Operation.NOT_EQUAL), Unknown;
 
 		private final Operation[] operations;
@@ -190,7 +190,7 @@ public enum ItemType {
 
 	/** Operations to execute with the items. */
 	public enum Operation {
-		EQUAL("=="), SMALLER_EQUAL("\u2264"), SMALLER("<"), BIGGER_EQUAL("\u2265"), BIGGER(">"), NOT_EQUAL("\u2260"), OR("\u2228"), AND("\u2227"), UNKNOWN("<?>");
+		EQUAL("=="), SMALLER_EQUAL("\u2264"), SMALLER("<"), GREATER_EQUAL("\u2265"), GREATER(">"), NOT_EQUAL("\u2260"), OR("\u2228"), AND("\u2227"), UNKNOWN("<?>");
 
 		final String text;
 
@@ -221,9 +221,9 @@ public enum ItemType {
 			case "<":
 				return SMALLER;
 			case ">":
-				return BIGGER;
+				return GREATER;
 			case "\u2265":
-				return BIGGER_EQUAL;
+				return GREATER_EQUAL;
 			case "\u2260":
 				return NOT_EQUAL;
 			case "\u2228":
@@ -244,9 +244,9 @@ public enum ItemType {
 			case "<":
 				return SMALLER;
 			case ">":
-				return BIGGER;
+				return GREATER;
 			case ">=":
-				return BIGGER_EQUAL;
+				return GREATER_EQUAL;
 			case "\u2260":
 				return NOT_EQUAL;
 			case "\u2228":
@@ -266,9 +266,9 @@ public enum ItemType {
 				return "<=";
 			case SMALLER:
 				return "<";
-			case BIGGER:
+			case GREATER:
 				return ">";
-			case BIGGER_EQUAL:
+			case GREATER_EQUAL:
 				return ">=";
 			case NOT_EQUAL:
 				return "!=";
@@ -290,12 +290,12 @@ public enum ItemType {
 			case EQUAL:
 			case NOT_EQUAL:
 				return new Operation[] { Operation.EQUAL, Operation.NOT_EQUAL };
-			case BIGGER:
+			case GREATER:
 			case SMALLER:
-				return new Operation[] { Operation.BIGGER, Operation.SMALLER, Operation.EQUAL, Operation.NOT_EQUAL };
-			case BIGGER_EQUAL:
+				return new Operation[] { Operation.GREATER, Operation.SMALLER, Operation.EQUAL, Operation.NOT_EQUAL };
+			case GREATER_EQUAL:
 			case SMALLER_EQUAL:
-				return new Operation[] { Operation.BIGGER_EQUAL, Operation.SMALLER_EQUAL, Operation.BIGGER, Operation.SMALLER, Operation.EQUAL, Operation.NOT_EQUAL };
+				return new Operation[] { Operation.GREATER_EQUAL, Operation.SMALLER_EQUAL, Operation.GREATER, Operation.SMALLER, Operation.EQUAL, Operation.NOT_EQUAL };
 			case AND:
 			case OR:
 				return new Operation[] { Operation.AND, Operation.OR };

@@ -56,7 +56,7 @@ public class HomeAssistantConditionTransformationAdapter {
 				if (above != null) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
-					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.GREATER);
 					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
 					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), above);
 					String description = itemName + " above " + above;
@@ -147,7 +147,7 @@ public class HomeAssistantConditionTransformationAdapter {
 		if (StringUtil.isNonNull(after)) {
 			// TODO: fix label + description
 			Map<String, Object> conditionProperties = new HashMap<>();
-			conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+			conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.GREATER);
 			conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), item);
 
 			if (map.containsKey("after_offset")) {

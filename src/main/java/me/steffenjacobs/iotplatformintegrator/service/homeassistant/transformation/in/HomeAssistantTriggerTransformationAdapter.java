@@ -65,7 +65,7 @@ public class HomeAssistantTriggerTransformationAdapter {
 				if (above != null) {
 					// TODO: fix label + description
 					Map<String, Object> conditionProperties = new HashMap<>();
-					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.BIGGER);
+					conditionProperties.put(ConditionTypeSpecificKey.Operator.getKeyString(), Operation.GREATER);
 					conditionProperties.put(ConditionTypeSpecificKey.ItemName.getKeyString(), itemDirectory.getItemByName(itemName));
 					conditionProperties.put(ConditionTypeSpecificKey.State.getKeyString(), above);
 					String description = itemName + " above " + above;

@@ -34,7 +34,7 @@ public class HomeAssistantReverseConditionTransformationAdapter {
 				final Operation operator = (Operation) sc.getConditionTypeContainer().getConditionTypeSpecificValues().get(ConditionTypeSpecificKey.Operator);
 				if (operator == Operation.SMALLER) {
 					map.put("below", state);
-				} else if (operator == Operation.BIGGER) {
+				} else if (operator == Operation.GREATER) {
 					map.put("above", state);
 				} else if (operator == Operation.EQUAL) {
 					map.put("state", state);

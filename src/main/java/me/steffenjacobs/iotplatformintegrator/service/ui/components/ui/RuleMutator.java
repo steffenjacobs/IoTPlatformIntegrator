@@ -113,7 +113,7 @@ public class RuleMutator {
 		map.computeIfPresent(TriggerTypeSpecificKey.Time.getKeyString(), (k, v) -> "");
 		map.computeIfPresent(ConditionTypeSpecificKey.Script.getKeyString(), (k, v) -> "");
 		map.computeIfPresent(ConditionTypeSpecificKey.Type.getKeyString(), (k, v) -> "");
-		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k, v) -> Operation.BIGGER_EQUAL);
+		map.computeIfPresent(ConditionTypeSpecificKey.Operator.getKeyString(), (k, v) -> Operation.GREATER_EQUAL);
 		map.computeIfPresent(ConditionTypeSpecificKey.StartTime.getKeyString(), (k, v) -> "");
 		map.computeIfPresent(ConditionTypeSpecificKey.EndTime.getKeyString(), (k, v) -> "");
 		map.computeIfPresent(ActionTypeSpecificKey.Enable.getKeyString(), (k, v) -> false);
