@@ -32,7 +32,7 @@ public class VisualRenderingStrategy implements RenderingStrategy<Component> {
 	public Component operationComponent(Operation operation, SharedTypeSpecificKey key) {
 		DefaultComboBoxModel<Operation> itemModel = new DefaultComboBoxModel<>();
 		JComboBox<Operation> chooseItem = new JComboBox<>(itemModel);
-		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.name() : ""));
+		chooseItem.setRenderer((l, v, i, iS, cHF) -> new JLabel(v != null ? v.getText() : ""));
 		for (Operation op : Operation.getKnownSubstitutes(operation)) {
 			itemModel.addElement(op);
 			// TODO: add alternative operations allowed in this item context
