@@ -29,7 +29,7 @@ public class LoginFrameFactory {
 	public JDialog createLoginFrame(Window parent) {
 		JDialog frame = new JDialog(parent);
 		frame.setTitle("Registration required!");
-		frame.setSize(400, 300);
+		frame.setSize(300, 120);
 
 		JButton btnRegister = new JButton("Register");
 		JPanel gridPanel = new JPanel();
