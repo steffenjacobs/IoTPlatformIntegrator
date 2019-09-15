@@ -2,7 +2,9 @@
 IoT Platform Integrator for OpenHAB and Home Assistant
 
 This prototype was created in the course of my Master Thesis at the Institute of Enterprise Systems at the University of Mannheim.
+
 <img src="./Main UI.jpg" />
+<img src="./Integration UI.jpg" />
 
 ## Features:
 - simple creation of Automation rules for OpenHAB and Home Assistant 
